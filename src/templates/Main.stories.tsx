@@ -33,10 +33,10 @@ export const MainWithString = {
 export const MainWithHomeLink: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const loginButton = await canvas.getByRole('link', {
+    const loginButton = canvas.getByRole('link', {
       name: /Home/i,
     });
 
-    await userEvent.click(loginButton);
+    userEvent.click(loginButton);
   },
 } satisfies Story;

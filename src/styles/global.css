@@ -8,7 +8,28 @@ a:hover {
   @apply border-b-2 border-blue-700;
 }
 
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+html, body {
+  overscroll-behavior: none;
+	background-color: #F0F8FF;
+}
+
 @tailwind components;
+
+.flex-container-row {
+	@apply flex w-screen max-w-screen-md flex-row place-content-between px-3
+}
+
+.flexbox-row {
+	@apply flex flex-row w-full place-content-between
+}
+.flexbox-col {
+@apply flex flex-col w-full place-content-between
+}
 
 @tailwind utilities;
 
@@ -18,4 +39,8 @@ a:hover {
 
 .content ul {
   @apply my-6;
+}
+
+.mobile-disable-highlight {
+	-webkit-tap-highlight-color: transparent
 }

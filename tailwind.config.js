@@ -41,5 +41,13 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    ({ addUtilities }) => {
+      addUtilities({
+        '.mobile-disable-highlight': {
+          '-webkit-tap-highlight-color': 'transparent',
+        },
+      });
+    },
+  ],
 };
