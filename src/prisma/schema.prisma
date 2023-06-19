@@ -1,0 +1,38 @@
+model Group {
+	groupId String @id @default(uuid())
+	groupName String
+	currency String
+	memberNames String[]
+	transactions Transaction[]
+	history History[]
+}
+
+model Transaction {
+	group Group @relation(fields: [groupId], references: [groupId])
+	groupId String
+
+	transactionId String @id @default(uuid())
+	payer String
+	description String
+	amount Int
+	split Json
+	date DateTime
+	type String
+}
+
+model History {
+	group Group @relation(fields: [groupId], references: [groupId])
+	groupId String
+	historyId String @id @default(uuid())
+	details Json
+	createdDate DateTime
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}

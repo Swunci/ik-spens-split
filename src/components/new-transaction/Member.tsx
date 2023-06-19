@@ -1,8 +1,4 @@
-interface IMember {
-  name: string;
-  amount: number;
-  isSelected: boolean;
-}
+import type { IMember } from './helpers';
 
 export default function Member({
   member,
@@ -32,7 +28,7 @@ export default function Member({
   return (
     <li
       key={member.name}
-      className={`flex flex-row place-content-between items-center rounded border align-middle text-sm ${
+      className={`flex flex-row place-content-between items-center rounded border align-middle text-lg ${
         member.isSelected ? 'border-black bg-green-400' : 'border-gray-200'
       }`}
     >

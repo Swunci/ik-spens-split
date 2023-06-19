@@ -1,6 +1,6 @@
-import BodyContainer from '@/componenets/shared/BodyContainer';
-import Footer from '@/componenets/shared/Footer';
-import Navbar from '@/componenets/shared/Navbar';
+import BodyContainer from '@/components/shared/BodyContainer';
+import Footer from '@/components/shared/Footer';
+import Navbar from '@/components/shared/Navbar';
 
 export default function RootLayout({ children }: { children: any }) {
   return (

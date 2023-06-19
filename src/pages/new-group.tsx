@@ -1,44 +1,31 @@
-import type { ChangeEvent } from 'react';
-import { useState } from 'react';
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
+import { useRouter } from 'next/navigation';
+import { useReducer, useRef, useState } from 'react';
 
-import MembersList from '@/componenets/new-group/MembersList';
+import {
+  ACTION_TYPES,
+  initialState,
+  snackbarReducer,
+} from '@/components/hooks/snackbarReducer';
+import MembersList from '@/components/new-group/MembersList';
 import { RootLayout } from '@/layouts/RootLayout';
 
+import { handleSubmit, onAddMember } from './new-group-helpers';
+
 export default function NewGroup() {
-  const [newMembersInput, setNewMembersInput] = useState('');
+  const router = useRouter();
+
+  const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);
+
+  const groupNameRef = useRef<HTMLInputElement>(null);
+  const currencyRef = useRef<HTMLSelectElement>(null);
+  const memberInputRef = useRef<HTMLInputElement>(null);
   const [currentMembers, setCurrentMembers] = useState(new Set<string>());
-
-  const handleNewMembersInput = (e: ChangeEvent<HTMLInputElement>) => {
-    setNewMembersInput(e.target.value);
-  };
-
-  const onAddMember = () => {
-    let hasNewMember: boolean = false;
-    const newMembers = newMembersInput.split(',').reduce((result, value) => {
-      const name = value.trim();
-      if (!currentMembers.has(name)) {
-        hasNewMember = true;
-      }
-      if (name !== '') {
-        result.push(name);
-      }
-      return result;
-    }, new Array<string>());
-    setCurrentMembers(new Set([...currentMembers, ...newMembers]));
-    if (hasNewMember) {
-      setNewMembersInput('');
-      return;
-    }
-    console.log('Members already exist');
-  };
 
   const onDeleteMember = (member: string) => {
     currentMembers.delete(member);
     setCurrentMembers(new Set([...currentMembers]));
-  };
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
   };
 
   return (
@@ -48,9 +35,16 @@ export default function NewGroup() {
       </div>
       <form
         className="flex w-full flex-col items-start"
-        action=""
-        method="post"
-        onSubmit={handleSubmit}
+        onSubmit={(e) =>
+          handleSubmit(
+            e,
+            groupNameRef,
+            currencyRef,
+            currentMembers,
+            router,
+            dispatch
+          )
+        }
       >
         <label className="flex w-full flex-col p-2" htmlFor="groupName">
           Group name
@@ -60,6 +54,7 @@ export default function NewGroup() {
             type="text"
             placeholder="Trip to ?"
             required
+            ref={groupNameRef}
           />
         </label>
         <label className="flex flex-col p-2" htmlFor="mainCurrency">
@@ -68,6 +63,7 @@ export default function NewGroup() {
             className="mt-2 rounded bg-white p-1"
             id="mainCurrency"
             required
+            ref={currencyRef}
           >
             <option>USD</option>
             <option>EUR</option>
@@ -85,13 +81,19 @@ export default function NewGroup() {
               id="addMembers"
               type="text"
               placeholder="Alice, Bob, Charlie"
-              onChange={handleNewMembersInput}
-              value={newMembersInput}
+              ref={memberInputRef}
             />
             <button
               className="mt-2 rounded bg-orange-400 p-2 px-4"
               type="button"
-              onClick={onAddMember}
+              onClick={(e) =>
+                onAddMember(
+                  e,
+                  currentMembers,
+                  memberInputRef,
+                  setCurrentMembers
+                )
+              }
             >
               Add
             </button>
@@ -108,6 +110,25 @@ export default function NewGroup() {
           Create group
         </button>
       </form>
+      <Snackbar
+        open={snackbarState.isOpen}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        onClick={() =>
+          dispatch({
+            type: ACTION_TYPES.CLOSE,
+            message: '',
+            alertType: 'info',
+          })
+        }
+      >
+        {snackbarState.isOpen ? (
+          <Alert severity={snackbarState.alertType}>
+            {snackbarState.message}
+          </Alert>
+        ) : (
+          <div />
+        )}
+      </Snackbar>
     </RootLayout>
   );
 }

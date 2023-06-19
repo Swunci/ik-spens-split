@@ -1,9 +1,19 @@
+import { usePathname, useRouter } from 'next/navigation';
+
 import { RootLayout } from '@/layouts/RootLayout';
 
 export default function Group() {
   const groupName: string = 'Ski trip';
   const currency: string = '$';
   const amount: number = 100.1;
+
+  const router = useRouter();
+  const currentPath = usePathname();
+
+  const handleAddExpense = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push(`${currentPath}/new-transaction`);
+  };
 
   return (
     <RootLayout>
@@ -69,7 +79,11 @@ export default function Group() {
         <button className="rounded bg-orange-500 p-2" type="button">
           View expenses
         </button>
-        <button className="rounded bg-orange-500 p-2" type="button">
+        <button
+          className="rounded bg-orange-500 p-2"
+          type="button"
+          onClick={handleAddExpense}
+        >
           Add expense
         </button>
       </div>
