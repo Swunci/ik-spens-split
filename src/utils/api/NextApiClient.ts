@@ -1,11 +1,11 @@
-import type { GroupCreation } from '@/interfaces/request';
+import type { GroupCreation, TransactionCreation } from '@/interfaces/request';
 
 import HttpClient from './HttpClient';
 
 class NextApiClient extends HttpClient {
   static debtsURL = '/api/users/current/debts';
 
-  static friendsURL = '/api/users/current/friends';
+  static groupsURL = '/api/groups';
 
   constructor() {
     super({});
@@ -13,17 +13,15 @@ class NextApiClient extends HttpClient {
 
   get groups() {
     return {
-      create: (groupDetails: GroupCreation) =>
-        this.post('http://localhost:3000/api/groups', groupDetails),
-      get: () => this.get('/api/groups'),
+      create: (body: GroupCreation) => this.post('/api/groups', body),
+      get: (groupId: string) => this.get(`/api/groups/${groupId}`),
     };
   }
 
-  get friends() {
+  get transactions() {
     return {
-      create: (friend: Object) =>
-        this.post('/api/users/current/friends', friend),
-      retrieve: () => this.get(NextApiClient.friendsURL),
+      create: (body: TransactionCreation) =>
+        this.post(`/api/groups/${body.groupId}/transactions`, body),
     };
   }
 

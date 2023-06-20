@@ -1,3 +1,5 @@
+import Typography from '@mui/material/Typography';
+
 import type { IMember } from './helpers';
 
 export default function Member({
@@ -37,7 +39,9 @@ export default function Member({
         type="button"
         onClick={handleSelect}
       >
-        {member.name}
+        <Typography className="max-w-11/12 text-ellipsis">
+          {member.name}
+        </Typography>
         <span>${member.amount.toFixed(2)}</span>
       </button>
     </li>

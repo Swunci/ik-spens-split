@@ -1,30 +1,50 @@
+import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 
 import type { IMember } from './helpers';
 import { setSelectAllMembers, updateMembersSplitCost } from './helpers';
 import Member from './Member';
 
-export default function MembersList({ totalCost }: { totalCost: number }) {
-  const currentMembers: IMember[] = ['Person A', 'Person B', 'Person C']
-    .sort((a, b) => a.localeCompare(b))
-    .map((member: string) => {
-      return {
-        name: member,
-        amount: 0,
-        isSelected: true,
-      };
-    });
-  const [membersList, setMembersList] = useState(currentMembers);
+interface MemberDetails {
+  totalCost: number;
+  memberNames: string[];
+  setParentMembersList: Dispatch<SetStateAction<IMember[]>>;
+}
 
-  const [numSelected, setNumSelected] = useState(membersList.length);
+export default function MembersList({
+  totalCost,
+  memberNames,
+  setParentMembersList,
+}: MemberDetails) {
+  const [numSelected, setNumSelected] = useState(memberNames.length);
+  const [membersList, setMembersList] = useState(
+    memberNames.map((name: string) => {
+      const member = {} as IMember;
+      member.name = name;
+      member.isSelected = true;
+      member.amount = totalCost / numSelected;
+      return member;
+    })
+  );
 
   const handleSelectAll = (isAllSelected: boolean) => {
-    setSelectAllMembers(membersList, setMembersList, isAllSelected);
+    setSelectAllMembers(
+      membersList,
+      setMembersList,
+      setParentMembersList,
+      isAllSelected
+    );
     setNumSelected(isAllSelected ? membersList.length : 0);
   };
 
   useEffect(() => {
-    updateMembersSplitCost(membersList, totalCost, numSelected, setMembersList);
+    updateMembersSplitCost(
+      membersList,
+      totalCost,
+      numSelected,
+      setMembersList,
+      setParentMembersList
+    );
   }, [totalCost, numSelected]);
 
   return (

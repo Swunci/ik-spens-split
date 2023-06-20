@@ -13,7 +13,7 @@ import { RootLayout } from '@/layouts/RootLayout';
 
 import { handleSubmit, onAddMember } from './new-group-helpers';
 
-export default function NewGroup() {
+export default function NewGroupPage() {
   const router = useRouter();
 
   const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);

@@ -1,15 +1,31 @@
-import { useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import React, { useRef, useState } from 'react';
+import useSwr from 'swr';
 
+import type { IMember } from '@/components/new-transaction/helpers';
 import {
   handleHowMuch,
   handleTypeChange,
 } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
+import type CustomError from '@/errors/customError';
+import type { TransactionCreation } from '@/interfaces/request';
+import type { Group } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
+import NextApiClient from '@/utils/api/NextApiClient';
+import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
+import { fetcher } from '@/utils/fetcherWrapper';
 import { getTodaysDate } from '@/utils/timeUtils';
 
-export default function Transaction() {
+export default function NewTransactionPage() {
   const todaysDate = getTodaysDate();
+
+  const currentPath = usePathname();
+
+  const { data, error, isLoading } = useSwr<Group, CustomError>(
+    `/api${currentPath}`,
+    fetcher
+  );
 
   const [amountError, setAmountError] = useState(false);
   const [totalCost, setTotalCost] = useState(0);
@@ -18,78 +34,126 @@ export default function Transaction() {
   const payerRef = useRef<HTMLSelectElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
+  const typeRef = useRef<HTMLSelectElement>(null);
+  const [membersList, setMembersList] = useState(new Array<IMember>());
+
+  if (isLoading) {
+    return displayBackdrop();
+  }
+  if (error) {
+    return displaySnackbar('BACKEND BUSTED');
+  }
+
+  function calculateSplit(members: IMember[]) {
+    const split: Map<string, number> = members.reduce(
+      (splitMap: Map<string, number>, member: IMember) => {
+        if (member.isSelected) {
+          splitMap.set(member.name, member.amount);
+        }
+        return splitMap;
+      },
+      new Map<string, number>()
+    );
+    return split;
+  }
+
+  const handleCreation = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const requestBody: TransactionCreation = {} as TransactionCreation;
+    requestBody.groupId = data!.groupId;
+    requestBody.payer = payerRef.current!.value;
+    requestBody.type = typeRef.current!.value;
+    requestBody.totalCost = totalCost;
+    requestBody.date = dateRef.current!.value;
+    requestBody.description = descriptionRef.current!.value;
+    requestBody.split = calculateSplit(membersList!);
+
+    const nextApiClient = new NextApiClient().jsonBody();
+    const response = await nextApiClient.transactions.create(requestBody);
+
+    if (!response.ok) {
+      // show error
+    }
+  };
 
   return (
     <RootLayout>
-      <div className="flexbox-row w-11/12 place-content-start gap-2 p-2">
-        <select className="w-full bg-white p-2" ref={payerRef}>
-          <option>
-            Person
-            AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-          </option>
-          <option>Person B</option>
-          <option>Person C</option>
-        </select>
-        <div className="bg-blue-400 p-2">{action}</div>
-        <select
-          className="bg-white p-2"
-          onChange={(e) => handleTypeChange(e, setAction)}
-        >
-          <option>Expense</option>
-          <option>Loan</option>
-          <option>Income</option>
-        </select>
-      </div>
-      <div className="w-11/12 p-2">
-        <label className="flex w-full flex-col" htmlFor="howMuch">
-          How much?
-          <input
-            className={`mt-2 rounded p-1 ${amountError ? 'bg-red-300' : ''}`}
-            id="howMuch"
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="Amount"
-            required
-            onChange={(e) => handleHowMuch(e, setTotalCost, setAmountError)}
+      <form
+        className="flex w-full flex-col items-center"
+        onSubmit={handleCreation}
+      >
+        <div className="flexbox-row w-11/12 place-content-start gap-2 p-2">
+          <select className="w-full bg-white p-2" ref={payerRef}>
+            {data!.memberNames.map((member: string) => {
+              return <option key={member}>{member}</option>;
+            })}
+          </select>
+          <div className="bg-blue-400 p-2">{action}</div>
+          <select
+            className="bg-white p-2"
+            onChange={(e) => handleTypeChange(e, setAction)}
+            ref={typeRef}
+          >
+            <option>Expense</option>
+            <option>Loan</option>
+            <option>Income</option>
+          </select>
+        </div>
+        <div className="w-11/12 p-2">
+          <label className="flex w-full flex-col" htmlFor="howMuch">
+            How much?
+            <input
+              className={`mt-2 rounded p-1 ${amountError ? 'bg-red-300' : ''}`}
+              id="howMuch"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Amount"
+              required
+              onChange={(e) => handleHowMuch(e, setTotalCost, setAmountError)}
+            />
+          </label>
+        </div>
+        <div className="w-11/12 p-2">
+          <label className="flex w-full flex-col" htmlFor="whatFor">
+            What for?
+            <input
+              className="mt-2 rounded p-1"
+              id="whatFor"
+              type="text"
+              placeholder="Food"
+              required
+              ref={descriptionRef}
+            />
+          </label>
+        </div>
+        <div className="w-11/12 p-2">
+          <label className="flex w-full flex-col" htmlFor="when">
+            When?
+            <input
+              className="mt-2 rounded bg-white p-1"
+              id="when"
+              type="date"
+              defaultValue={todaysDate}
+              required
+              ref={dateRef}
+            />
+          </label>
+        </div>
+        <div className="w-11/12 p-2">
+          <div className="py-2">How to split?</div>
+          <MembersList
+            totalCost={totalCost}
+            memberNames={data!.memberNames}
+            setParentMembersList={setMembersList}
           />
-        </label>
-      </div>
-      <div className="w-11/12 p-2">
-        <label className="flex w-full flex-col" htmlFor="whatFor">
-          What for?
-          <input
-            className="mt-2 rounded p-1"
-            id="whatFor"
-            type="text"
-            placeholder="Food"
-            required
-            ref={descriptionRef}
-          />
-        </label>
-      </div>
-      <div className="w-11/12 p-2">
-        <label className="flex w-full flex-col" htmlFor="when">
-          When?
-          <input
-            className="mt-2 rounded bg-white p-1"
-            id="when"
-            type="date"
-            defaultValue={todaysDate}
-            required
-            ref={dateRef}
-          />
-        </label>
-      </div>
-      <div className="w-11/12 p-2">
-        <div className="py-2">How to split?</div>
-        <MembersList totalCost={totalCost} />
-      </div>
-      <div className="w-11/12 p-2">
-        <button className="rounded bg-red-700 p-2" type="button">
-          Create
-        </button>
-      </div>
+        </div>
+        <div className="w-11/12 p-2">
+          <button className="rounded bg-red-700 p-2" type="button">
+            Create
+          </button>
+        </div>
+      </form>
     </RootLayout>
   );
 }

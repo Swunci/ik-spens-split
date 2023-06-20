@@ -1,4 +1,4 @@
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, Dispatch, SetStateAction } from 'react';
 
 import { getTodaysDate } from '@/utils/timeUtils';
 
@@ -10,32 +10,34 @@ export interface IMember {
 
 export function setSelectAllMembers(
   membersList: IMember[],
-  setMembersList: Function,
+  setMembersList: Dispatch<SetStateAction<IMember[]>>,
+  setParentMembersList: Dispatch<SetStateAction<IMember[]>>,
   isAllSelected: boolean
 ): void {
-  setMembersList(
-    membersList.map((mem: IMember) => {
-      const newMem = mem;
-      newMem.isSelected = isAllSelected;
-      return newMem;
-    })
-  );
+  const newList = membersList.map((mem: IMember) => {
+    const newMem = mem;
+    newMem.isSelected = isAllSelected;
+    return newMem;
+  });
+  setMembersList(newList);
+  setParentMembersList(newList);
 }
 
 export function updateMembersSplitCost(
   membersList: IMember[],
   totalCost: number,
   numSelected: number,
-  setMembersList: Function
+  setMembersList: Dispatch<SetStateAction<IMember[]>>,
+  setParentMembersList: Dispatch<SetStateAction<IMember[]>>
 ): void {
-  setMembersList(
-    membersList.map((mem: IMember) => {
-      const newMem = mem;
-      newMem.amount =
-        numSelected !== 0 && newMem.isSelected ? totalCost / numSelected : 0;
-      return newMem;
-    })
-  );
+  const updatedList = membersList.map((mem: IMember) => {
+    const newMem = mem;
+    newMem.amount =
+      numSelected !== 0 && newMem.isSelected ? totalCost / numSelected : 0;
+    return newMem;
+  });
+  setMembersList(updatedList);
+  setParentMembersList(updatedList);
 }
 
 // New transaction page handlers and dummy data
@@ -49,7 +51,7 @@ const transactionMap = new Map(Object.entries(transactionType));
 
 export function handleTypeChange(
   e: ChangeEvent<HTMLSelectElement>,
-  setAction: Function
+  setAction: Dispatch<SetStateAction<string>>
 ) {
   const newType = e.target.value.toLowerCase();
   const newAction = transactionMap.get(newType);
@@ -58,8 +60,8 @@ export function handleTypeChange(
 
 export function handleHowMuch(
   e: ChangeEvent<HTMLInputElement>,
-  setTotalCost: Function,
-  setAmountError: Function
+  setTotalCost: Dispatch<SetStateAction<number>>,
+  setAmountError: Dispatch<SetStateAction<boolean>>
 ) {
   const newTotalCost = e.target.valueAsNumber ? e.target.valueAsNumber : 0;
   if (newTotalCost < 0) {
@@ -73,7 +75,7 @@ export function handleHowMuch(
 
 export function handleDateChange(
   e: ChangeEvent<HTMLInputElement>,
-  setDate: Function
+  setDate: Dispatch<SetStateAction<string>>
 ) {
   const inputDate = e.target.value;
   const todaysDate = getTodaysDate();

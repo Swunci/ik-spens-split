@@ -1,9 +1,14 @@
+import { FormControl, MenuItem, Select, Typography } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
+import useSwr from 'swr';
 
+import type CustomError from '@/errors/customError';
+import type { Group } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
+import { displayBackdrop } from '@/utils/component/helpers';
+import { fetcher } from '@/utils/fetcherWrapper';
 
-export default function Group() {
-  const groupName: string = 'Ski trip';
+export default function GroupPage() {
   const currency: string = '$';
   const amount: number = 100.1;
 
@@ -15,15 +20,43 @@ export default function Group() {
     router.push(`${currentPath}/new-transaction`);
   };
 
+  const { data, error, isLoading } = useSwr<Group, CustomError>(
+    `/api${currentPath}`,
+    fetcher
+  );
+
+  if (isLoading) {
+    return displayBackdrop();
+  }
+
+  if (error) {
+    return error.status === 404 ? router.push('/404') : router.push('/500');
+  }
+
   return (
     <RootLayout>
-      <div>{groupName}</div>
-      <div className="w-11/12 p-2">
-        View as
-        <select className="ml-2 bg-white">
-          <option>Person A</option>
-          <option>Person B</option>
-        </select>
+      <Typography className="min-w-fit whitespace-normal break-words p-1 text-center text-3xl">
+        {data?.groupName}
+      </Typography>
+      <div className="flexbox-row max-w-11/12 items-center justify-start p-2">
+        <Typography className="min-w-fit p-1">View as</Typography>
+        <FormControl fullWidth>
+          <Select
+            className="static bg-white"
+            autoWidth
+            defaultValue={data?.memberNames.at(0)}
+          >
+            {data?.memberNames.map((name: string) => {
+              return (
+                <MenuItem key={name} value={name}>
+                  <Typography className="whitespace-normal break-words" noWrap>
+                    {name}
+                  </Typography>
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
       </div>
       <div className="flexbox-row w-11/12 p-2">
         <div className="text-2xl">Overview</div>
