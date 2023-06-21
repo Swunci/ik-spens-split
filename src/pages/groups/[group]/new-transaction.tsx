@@ -1,4 +1,4 @@
-import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
 import useSwr from 'swr';
 
@@ -20,10 +20,12 @@ import { getTodaysDate } from '@/utils/timeUtils';
 export default function NewTransactionPage() {
   const todaysDate = getTodaysDate();
 
-  const currentPath = usePathname();
+  const router = useRouter();
+
+  const { group: groupId } = router.query;
 
   const { data, error, isLoading } = useSwr<Group, CustomError>(
-    `/api${currentPath}`,
+    () => (groupId ? `${NextApiClient.groupsURL}/${groupId}` : null),
     fetcher
   );
 
@@ -37,7 +39,7 @@ export default function NewTransactionPage() {
   const typeRef = useRef<HTMLSelectElement>(null);
   const [membersList, setMembersList] = useState(new Array<IMember>());
 
-  if (isLoading) {
+  if (isLoading || !groupId) {
     return displayBackdrop();
   }
   if (error) {
@@ -63,10 +65,11 @@ export default function NewTransactionPage() {
     requestBody.groupId = data!.groupId;
     requestBody.payer = payerRef.current!.value;
     requestBody.type = typeRef.current!.value;
-    requestBody.totalCost = totalCost;
+    requestBody.amount = totalCost;
     requestBody.date = dateRef.current!.value;
     requestBody.description = descriptionRef.current!.value;
-    requestBody.split = calculateSplit(membersList!);
+    requestBody.split = JSON.stringify(calculateSplit(membersList!));
+    requestBody.currency = data!.currency;
 
     const nextApiClient = new NextApiClient().jsonBody();
     const response = await nextApiClient.transactions.create(requestBody);
@@ -149,7 +152,7 @@ export default function NewTransactionPage() {
           />
         </div>
         <div className="w-11/12 p-2">
-          <button className="rounded bg-red-700 p-2" type="button">
+          <button className="rounded bg-red-700 p-2" type="submit">
             Create
           </button>
         </div>

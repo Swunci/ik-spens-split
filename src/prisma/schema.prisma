@@ -18,6 +18,7 @@ model Transaction {
 	split Json
 	date DateTime
 	type String
+	currency String
 }
 
 model History {

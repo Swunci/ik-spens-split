@@ -8,8 +8,9 @@ export interface TransactionCreation {
   groupId: string;
   payer: string;
   description: string;
-  totalCost: number;
-  split: Map<string, number>;
+  amount: number;
+  split: string;
   type: string;
   date: string;
+  currency: string;
 }
