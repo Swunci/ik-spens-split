@@ -21,24 +21,34 @@ const schema = Joi.object({
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
 
-router.post(
-  validate({ body: schema }),
-  async (req: NextApiRequest, res: NextApiResponse) => {
-    const body = req.body as TransactionCreation;
-    const transaction: Transaction = await prisma.transaction
-      .create({
-        data: {
-          ...body,
-          date: new Date(body.date),
-        },
-      })
-      .catch((err) => {
-        console.log(err);
-        throw Error('Database problem');
-      });
-    res.status(200).json(transaction);
-  }
-);
+router
+  .get(async (req: NextApiRequest, res: NextApiResponse) => {
+    const params = req.query;
+    const groupId = params.groupId ? (params.groupId as string) : '';
+    const transactions: Transaction[] = await prisma.transaction.findMany({
+      where: {
+        groupId,
+      },
+    });
+    res.status(200).json({ transactions });
+  })
+  .post(
+    validate({ body: schema }),
+    async (req: NextApiRequest, res: NextApiResponse) => {
+      const body = req.body as TransactionCreation;
+      const transaction: Transaction = await prisma.transaction
+        .create({
+          data: {
+            ...body,
+            date: new Date(body.date),
+          },
+        })
+        .catch((_err) => {
+          throw Error('Database problem');
+        });
+      res.status(200).json(transaction);
+    }
+  );
 
 export default router.handler({
   onError: (err: any, _req, res) => {

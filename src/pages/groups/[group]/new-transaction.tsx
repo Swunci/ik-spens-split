@@ -68,7 +68,9 @@ export default function NewTransactionPage() {
     requestBody.amount = totalCost;
     requestBody.date = dateRef.current!.value;
     requestBody.description = descriptionRef.current!.value;
-    requestBody.split = JSON.stringify(calculateSplit(membersList!));
+    requestBody.split = JSON.stringify(
+      Object.fromEntries(calculateSplit(membersList!))
+    );
     requestBody.currency = data!.currency;
 
     const nextApiClient = new NextApiClient().jsonBody();
