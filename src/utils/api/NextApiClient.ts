@@ -22,6 +22,7 @@ class NextApiClient extends HttpClient {
     return {
       create: (body: TransactionCreation) =>
         this.post(`/api/groups/${body.groupId}/transactions`, body),
+      get: (groupId: string) => this.get(`/api/groups/${groupId}/transactions`),
     };
   }
 

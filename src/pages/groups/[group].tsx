@@ -1,42 +1,68 @@
 import { FormControl, MenuItem, Select, Typography } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import useSwr from 'swr';
 
 import type CustomError from '@/errors/customError';
-import type { Group } from '@/interfaces/response';
+import type { Group, TransactionResponse } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop } from '@/utils/component/helpers';
 import { fetcher } from '@/utils/fetcherWrapper';
 
+import { getOverviewStats } from './[group]-helpers';
+
 export default function GroupPage() {
   const currency: string = '$';
-  const amount: number = 100.1;
 
   const router = useRouter();
   const currentPath = usePathname();
+
+  const [currentMember, setCurrentMember] = useState('');
 
   const handleAddExpense = (e: React.MouseEvent) => {
     e.preventDefault();
     router.push(`${currentPath}/new-transaction`);
   };
 
-  const { data, error, isLoading } = useSwr<Group, CustomError>(
-    `/api${currentPath}`,
+  const {
+    data: groupData,
+    error: groupError,
+    isLoading: isLoadingGroup,
+  } = useSwr<Group, CustomError>(`/api${currentPath}`, fetcher);
+
+  const {
+    data: transactionsData,
+    error: transactionsError,
+    isLoading: isLoadingTransactions,
+  } = useSwr<TransactionResponse, CustomError>(
+    `/api${currentPath}/transactions`,
     fetcher
   );
 
-  if (isLoading) {
+  useEffect(() => {
+    setCurrentMember(groupData?.memberNames.at(0)!);
+  }, [groupData]);
+
+  if (isLoadingGroup || isLoadingTransactions) {
     return displayBackdrop();
   }
 
-  if (error) {
-    return error.status === 404 ? router.push('/404') : router.push('/500');
+  if (groupError || transactionsError) {
+    if (groupError?.status === 404 || transactionsError?.status === 404) {
+      return router.push('/404');
+    }
+    router.push('/500');
   }
+
+  const [groupCost, membersMap] = getOverviewStats(
+    transactionsData!.transactions,
+    groupData!.memberNames
+  );
 
   return (
     <RootLayout>
       <Typography className="min-w-fit whitespace-normal break-words p-1 text-center text-3xl">
-        {data?.groupName}
+        {groupData?.groupName}
       </Typography>
       <div className="flexbox-row max-w-11/12 items-center justify-start p-2">
         <Typography className="min-w-fit p-1">View as</Typography>
@@ -44,9 +70,10 @@ export default function GroupPage() {
           <Select
             className="static bg-white"
             autoWidth
-            defaultValue={data?.memberNames.at(0)}
+            defaultValue={groupData?.memberNames.at(0)}
+            onChange={(e) => setCurrentMember(e.target.value)}
           >
-            {data?.memberNames.map((name: string) => {
+            {groupData?.memberNames.map((name: string) => {
               return (
                 <MenuItem key={name} value={name}>
                   <Typography className="whitespace-normal break-words" noWrap>
@@ -66,45 +93,45 @@ export default function GroupPage() {
           <div>Total group cost:</div>
           <div>
             {currency}
-            {amount}
+            {groupCost}
           </div>
         </div>
         <div className="flexbox-row p-2">
           <div>Your cost:</div>
           <div>
             {currency}
-            {amount}
+            {membersMap.get(currentMember)?.cost}
           </div>
         </div>
         <div className="flexbox-row p-2">
           <div className="text-red-500">{`You've paid`}:</div>
           <div className="text-red-500">
             {currency}
-            {amount}
+            {membersMap.get(currentMember)?.paid}
           </div>
         </div>
         <div className="flexbox-row p-2">
           <div className="text-green-500">{`You've received`}:</div>
           <div className="text-green-500">
             {currency}
-            {amount}
+            {membersMap.get(currentMember)?.received}
           </div>
         </div>
         <div className="flexbox-row p-2">
           <div
-            className={`${amount < 0 ? 'text-red-500' : ''} ${
-              amount > 0 ? 'text-green-500' : ''
+            className={`${groupCost < 0 ? 'text-red-500' : ''} ${
+              groupCost > 0 ? 'text-green-500' : ''
             }`}
           >
-            {amount <= 0 ? 'You owe' : 'You are owed'}:
+            {groupCost <= 0 ? 'You owe' : 'You are owed'}:
           </div>
           <div
-            className={`${amount < 0 ? 'text-red-500' : ''} ${
-              amount > 0 ? 'text-green-500' : ''
+            className={`${groupCost < 0 ? 'text-red-500' : ''} ${
+              groupCost > 0 ? 'text-green-500' : ''
             }`}
           >
             {currency}
-            {amount}
+            {groupCost}
           </div>
         </div>
       </div>
