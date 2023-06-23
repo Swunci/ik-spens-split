@@ -2,10 +2,16 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 
 import type { IMember } from './helpers';
-import { setSelectAllMembers, updateMembersSplitCost } from './helpers';
+import {
+  getInitialMemberList,
+  getNewSplitMemberList,
+  setSelectAllMembers,
+} from './helpers';
 import Member from './Member';
 
 interface MemberDetails {
+  payer: string;
+  transactionType: string;
   totalCost: number;
   memberNames: string[];
   setParentMembersList: Dispatch<SetStateAction<IMember[]>>;
@@ -14,18 +20,11 @@ interface MemberDetails {
 export default function MembersList({
   totalCost,
   memberNames,
+  payer,
+  transactionType,
   setParentMembersList,
 }: MemberDetails) {
-  const [numSelected, setNumSelected] = useState(memberNames.length);
-  const [membersList, setMembersList] = useState(
-    memberNames.map((name: string) => {
-      const member = {} as IMember;
-      member.name = name;
-      member.isSelected = true;
-      member.amount = totalCost / numSelected;
-      return member;
-    })
-  );
+  const [membersList, setMembersList] = useState(new Array<IMember>());
 
   const handleSelectAll = (isAllSelected: boolean) => {
     setSelectAllMembers(
@@ -34,18 +33,22 @@ export default function MembersList({
       setParentMembersList,
       isAllSelected
     );
-    setNumSelected(isAllSelected ? membersList.length : 0);
   };
 
   useEffect(() => {
-    updateMembersSplitCost(
-      membersList,
-      totalCost,
-      numSelected,
-      setMembersList,
-      setParentMembersList
+    const list = getNewSplitMemberList(membersList, totalCost);
+    setParentMembersList(list);
+  }, [membersList, totalCost]);
+
+  useEffect(() => {
+    const list = getInitialMemberList(
+      memberNames,
+      transactionType,
+      payer,
+      totalCost
     );
-  }, [totalCost, numSelected]);
+    setMembersList(list);
+  }, [transactionType, payer]);
 
   return (
     <>
@@ -73,18 +76,24 @@ export default function MembersList({
         </div>
       </div>
       <ul className="max-w-screen-md space-y-4 pt-2">
-        {[...membersList].map((member: IMember) => {
-          return (
-            <div key={member.name}>
-              <Member
-                member={member}
-                membersList={membersList}
-                numSelected={numSelected}
-                setNumSelected={setNumSelected}
-              />
-            </div>
-          );
-        })}
+        {[...membersList]
+          .filter((member: IMember) => {
+            if (transactionType === 'loan') {
+              return payer !== member.name;
+            }
+            return true;
+          })
+          .map((member: IMember) => {
+            return (
+              <div key={member.name}>
+                <Member
+                  member={member}
+                  membersList={membersList}
+                  setMembersList={setMembersList}
+                />
+              </div>
+            );
+          })}
       </ul>
     </>
   );

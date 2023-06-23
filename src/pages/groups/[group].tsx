@@ -1,4 +1,5 @@
 import { FormControl, MenuItem, Select, Typography } from '@mui/material';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useSwr from 'swr';
@@ -18,11 +19,6 @@ export default function GroupPage() {
   const currentPath = usePathname();
 
   const [currentMember, setCurrentMember] = useState('');
-
-  const handleAddExpense = (e: React.MouseEvent) => {
-    e.preventDefault();
-    router.push(`${currentPath}/new-transaction`);
-  };
 
   const {
     data: groupData,
@@ -139,13 +135,11 @@ export default function GroupPage() {
         <button className="rounded bg-orange-500 p-2" type="button">
           View expenses
         </button>
-        <button
-          className="rounded bg-orange-500 p-2"
-          type="button"
-          onClick={handleAddExpense}
-        >
-          Add expense
-        </button>
+        <Link href={`${currentPath}/new-transaction`} passHref>
+          <button className="rounded bg-orange-500 p-2" type="button">
+            Add expense
+          </button>
+        </Link>
       </div>
       <div className="flexbox-row w-11/12 p-2">
         <div className="text-2xl">Debts</div>

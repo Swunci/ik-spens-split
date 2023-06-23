@@ -26,14 +26,12 @@ export function setSelectAllMembers(
 export function updateMembersSplitCost(
   membersList: IMember[],
   totalCost: number,
-  numSelected: number,
   setMembersList: Dispatch<SetStateAction<IMember[]>>,
   setParentMembersList: Dispatch<SetStateAction<IMember[]>>
 ): void {
   const updatedList = membersList.map((mem: IMember) => {
     const newMem = mem;
-    newMem.amount =
-      numSelected !== 0 && newMem.isSelected ? totalCost / numSelected : 0;
+    newMem.amount = newMem.isSelected ? totalCost / membersList.length : 0;
     return newMem;
   });
   setMembersList(updatedList);
@@ -51,11 +49,13 @@ const transactionMap = new Map(Object.entries(transactionType));
 
 export function handleTypeChange(
   e: ChangeEvent<HTMLSelectElement>,
-  setAction: Dispatch<SetStateAction<string>>
+  setAction: Dispatch<SetStateAction<string>>,
+  setTransactionType: Dispatch<SetStateAction<string>>
 ) {
   const newType = e.target.value.toLowerCase();
   const newAction = transactionMap.get(newType);
   setAction(newAction!);
+  setTransactionType(newType);
 }
 
 export function handleHowMuch(
@@ -85,4 +85,42 @@ export function handleDateChange(
     return;
   }
   setDate(e.target.value);
+}
+
+export function getInitialMemberList(
+  memberNames: string[],
+  type: string,
+  payer: string,
+  totalCost: number
+) {
+  const names = memberNames.filter((name: string) => {
+    if (type === 'loan') return payer !== name;
+    return true;
+  });
+  const list = names.map((name: string) => {
+    const member = {} as IMember;
+    member.name = name;
+    member.isSelected = true;
+    member.amount = totalCost / names.length;
+    return member;
+  });
+  return list;
+}
+
+export function getNewSplitMemberList(
+  membersList: Array<IMember>,
+  totalCost: number
+) {
+  const selectedCount = membersList.reduce((count: number, member: IMember) => {
+    if (member.isSelected) {
+      return count + 1;
+    }
+    return count;
+  }, 0);
+  const list = membersList.map((selectedMember: IMember) => {
+    const member = selectedMember;
+    member.amount = member.isSelected ? totalCost / selectedCount : 0;
+    return member;
+  });
+  return list;
 }

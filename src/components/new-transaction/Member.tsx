@@ -1,30 +1,28 @@
 import Typography from '@mui/material/Typography';
+import type { Dispatch, SetStateAction } from 'react';
 
 import type { IMember } from './helpers';
 
 export default function Member({
   member,
   membersList,
-  numSelected,
-  setNumSelected,
+  setMembersList,
 }: {
   member: IMember;
   membersList: IMember[];
-  numSelected: number;
-  setNumSelected: Function;
+  setMembersList: Dispatch<SetStateAction<IMember[]>>;
 }) {
   const handleSelect = (e: React.MouseEvent) => {
     e.preventDefault();
-    let newNumSelected = numSelected;
-    membersList.map((mem: IMember) => {
-      const newMem = mem;
-      if (mem.name === member.name) {
-        newMem.isSelected = !mem.isSelected;
-        newNumSelected = newMem.isSelected ? numSelected + 1 : numSelected - 1;
-        setNumSelected(newNumSelected);
-      }
-      return newMem;
-    });
+    setMembersList(
+      membersList.map((mem: IMember) => {
+        const newMem = mem;
+        if (mem.name === member.name) {
+          newMem.isSelected = !mem.isSelected;
+        }
+        return newMem;
+      })
+    );
   };
 
   return (

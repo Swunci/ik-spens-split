@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import useSwr from 'swr';
 
 import type { IMember } from '@/components/new-transaction/helpers';
@@ -32,12 +32,17 @@ export default function NewTransactionPage() {
   const [amountError, setAmountError] = useState(false);
   const [totalCost, setTotalCost] = useState(0);
   const [action, setAction] = useState('paid');
-
-  const payerRef = useRef<HTMLSelectElement>(null);
+  const [payer, setPayer] = useState('');
   const descriptionRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
-  const typeRef = useRef<HTMLSelectElement>(null);
+  const [transactionType, setTransactionType] = useState('Expense');
   const [membersList, setMembersList] = useState(new Array<IMember>());
+
+  useEffect(() => {
+    if (data) {
+      setPayer(data!.memberNames.at(0)!);
+    }
+  }, [data]);
 
   if (isLoading || !groupId) {
     return displayBackdrop();
@@ -63,8 +68,8 @@ export default function NewTransactionPage() {
     e.preventDefault();
     const requestBody: TransactionCreation = {} as TransactionCreation;
     requestBody.groupId = data!.groupId;
-    requestBody.payer = payerRef.current!.value;
-    requestBody.type = typeRef.current!.value;
+    requestBody.payer = payer;
+    requestBody.type = transactionType.toLowerCase();
     requestBody.amount = totalCost;
     requestBody.date = dateRef.current!.value;
     requestBody.description = descriptionRef.current!.value;
@@ -88,7 +93,10 @@ export default function NewTransactionPage() {
         onSubmit={handleCreation}
       >
         <div className="flexbox-row w-11/12 place-content-start gap-2 p-2">
-          <select className="w-full bg-white p-2" ref={payerRef}>
+          <select
+            className="w-full bg-white p-2"
+            onChange={(e) => setPayer(e.target.value)}
+          >
             {data!.memberNames.map((member: string) => {
               return <option key={member}>{member}</option>;
             })}
@@ -96,8 +104,7 @@ export default function NewTransactionPage() {
           <div className="bg-blue-400 p-2">{action}</div>
           <select
             className="bg-white p-2"
-            onChange={(e) => handleTypeChange(e, setAction)}
-            ref={typeRef}
+            onChange={(e) => handleTypeChange(e, setAction, setTransactionType)}
           >
             <option>Expense</option>
             <option>Loan</option>
@@ -151,6 +158,8 @@ export default function NewTransactionPage() {
             totalCost={totalCost}
             memberNames={data!.memberNames}
             setParentMembersList={setMembersList}
+            transactionType={transactionType}
+            payer={payer}
           />
         </div>
         <div className="w-11/12 p-2">
