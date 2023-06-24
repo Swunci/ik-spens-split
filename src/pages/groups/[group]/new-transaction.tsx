@@ -8,6 +8,7 @@ import {
   handleTypeChange,
 } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
+import { TransactionContext } from '@/context/TransactionContext';
 import type CustomError from '@/errors/customError';
 import type { TransactionCreation } from '@/interfaces/request';
 import type { Group } from '@/interfaces/response';
@@ -38,11 +39,29 @@ export default function NewTransactionPage() {
   const [transactionType, setTransactionType] = useState('Expense');
   const [membersList, setMembersList] = useState(new Array<IMember>());
 
+  const contextValue = React.useMemo(
+    () => ({
+      payer,
+      setPayer,
+      membersList,
+      setMembersList,
+      totalCost,
+      setTotalCost,
+      transactionType,
+      setTransactionType,
+    }),
+    [payer, membersList, totalCost, transactionType]
+  );
+
   useEffect(() => {
     if (data) {
-      setPayer(data!.memberNames.at(0)!);
+      setPayer(data.memberNames.at(0)!);
     }
   }, [data]);
+
+  useEffect(() => {
+    console.log('new-transaction');
+  }, [transactionType, payer, totalCost, membersList]);
 
   if (isLoading || !groupId) {
     return displayBackdrop();
@@ -74,7 +93,7 @@ export default function NewTransactionPage() {
     requestBody.date = dateRef.current!.value;
     requestBody.description = descriptionRef.current!.value;
     requestBody.split = JSON.stringify(
-      Object.fromEntries(calculateSplit(membersList!))
+      Object.fromEntries(calculateSplit(membersList))
     );
     requestBody.currency = data!.currency;
 
@@ -154,13 +173,9 @@ export default function NewTransactionPage() {
         </div>
         <div className="w-11/12 p-2">
           <div className="py-2">How to split?</div>
-          <MembersList
-            totalCost={totalCost}
-            memberNames={data!.memberNames}
-            setParentMembersList={setMembersList}
-            transactionType={transactionType}
-            payer={payer}
-          />
+          <TransactionContext.Provider value={contextValue}>
+            <MembersList memberNames={data!.memberNames} />
+          </TransactionContext.Provider>
         </div>
         <div className="w-11/12 p-2">
           <button className="rounded bg-red-700 p-2" type="submit">

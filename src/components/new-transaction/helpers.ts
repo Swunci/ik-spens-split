@@ -8,44 +8,12 @@ export interface IMember {
   isSelected: boolean;
 }
 
-export function setSelectAllMembers(
-  membersList: IMember[],
-  setMembersList: Dispatch<SetStateAction<IMember[]>>,
-  setParentMembersList: Dispatch<SetStateAction<IMember[]>>,
-  isAllSelected: boolean
-): void {
-  const newList = membersList.map((mem: IMember) => {
-    const newMem = mem;
-    newMem.isSelected = isAllSelected;
-    return newMem;
-  });
-  setMembersList(newList);
-  setParentMembersList(newList);
-}
-
-export function updateMembersSplitCost(
-  membersList: IMember[],
-  totalCost: number,
-  setMembersList: Dispatch<SetStateAction<IMember[]>>,
-  setParentMembersList: Dispatch<SetStateAction<IMember[]>>
-): void {
-  const updatedList = membersList.map((mem: IMember) => {
-    const newMem = mem;
-    newMem.amount = newMem.isSelected ? totalCost / membersList.length : 0;
-    return newMem;
-  });
-  setMembersList(updatedList);
-  setParentMembersList(updatedList);
-}
-
-// New transaction page handlers and dummy data
-
-const transactionType = {
+const transactionTypes = {
   expense: 'paid',
   loan: 'gave',
   income: 'received',
 };
-const transactionMap = new Map(Object.entries(transactionType));
+const transactionMap = new Map(Object.entries(transactionTypes));
 
 export function handleTypeChange(
   e: ChangeEvent<HTMLSelectElement>,
@@ -89,12 +57,12 @@ export function handleDateChange(
 
 export function getInitialMemberList(
   memberNames: string[],
-  type: string,
+  transactionType: string,
   payer: string,
   totalCost: number
 ) {
   const names = memberNames.filter((name: string) => {
-    if (type === 'loan') return payer !== name;
+    if (transactionType === 'loan') return payer !== name;
     return true;
   });
   const list = names.map((name: string) => {
@@ -107,7 +75,7 @@ export function getInitialMemberList(
   return list;
 }
 
-export function getNewSplitMemberList(
+export function getEqualSplitMemberList(
   membersList: Array<IMember>,
   totalCost: number
 ) {
@@ -123,4 +91,51 @@ export function getNewSplitMemberList(
     return member;
   });
   return list;
+}
+
+export function getCustomSplitMemberList(membersList: Array<IMember>) {
+  const list = membersList.map((selectedMember: IMember) => {
+    const member = selectedMember;
+    if (!member.isSelected) {
+      member.amount = 0;
+    }
+    return member;
+  });
+  return list;
+}
+
+export function getMembersListBySplitType(
+  splitType: string,
+  members: IMember[],
+  totalCost: number
+) {
+  let list = new Array<IMember>();
+  switch (splitType.toLowerCase()) {
+    case 'equal':
+      list = getEqualSplitMemberList(members, totalCost);
+      break;
+    case 'weight':
+      break;
+    case 'custom':
+      list = getCustomSplitMemberList(members);
+      break;
+    default:
+  }
+  return list;
+}
+
+export function setSelectAllMembers(
+  membersList: IMember[],
+  setMembersList: Dispatch<SetStateAction<IMember[]>>,
+  isAllSelected: boolean,
+  splitType: string,
+  totalCost: number
+): void {
+  const members = membersList.map((mem: IMember) => {
+    const newMem = mem;
+    newMem.isSelected = isAllSelected;
+    return newMem;
+  });
+  const newList = getMembersListBySplitType(splitType, members, totalCost);
+  setMembersList(newList);
 }

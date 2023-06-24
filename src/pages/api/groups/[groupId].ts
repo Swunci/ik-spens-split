@@ -10,12 +10,15 @@ router
   .get(async (req: NextApiRequest, res: NextApiResponse) => {
     const params = req.query;
     const groupId = params.groupId ? (params.groupId as string) : '';
-    const group: Group = await prisma.group.findUniqueOrThrow({
+    const group: Group | null = await prisma.group.findUnique({
       where: {
         groupId,
       },
     });
-    res.status(200).json(group);
+    if (!group) {
+      return res.status(404).json({ message: 'Not found' });
+    }
+    return res.status(200).json(group);
   })
   .put((_req: NextApiRequest, res: NextApiResponse) => {
     res.status(200).json({});

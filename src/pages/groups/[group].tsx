@@ -44,10 +44,10 @@ export default function GroupPage() {
   }
 
   if (groupError || transactionsError) {
-    if (groupError?.status === 404 || transactionsError?.status === 404) {
+    if (groupError?.status === 404) {
       return router.push('/404');
     }
-    router.push('/500');
+    return router.push('/500');
   }
 
   const [groupCost, membersMap] = getOverviewStats(

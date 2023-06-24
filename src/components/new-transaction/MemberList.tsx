@@ -1,60 +1,69 @@
-import type { Dispatch, SetStateAction } from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
+import { TransactionContext } from '@/context/TransactionContext';
 
 import type { IMember } from './helpers';
-import {
-  getInitialMemberList,
-  getNewSplitMemberList,
-  setSelectAllMembers,
-} from './helpers';
+import { getMembersListBySplitType, setSelectAllMembers } from './helpers';
 import Member from './Member';
 
-interface MemberDetails {
-  payer: string;
-  transactionType: string;
-  totalCost: number;
-  memberNames: string[];
-  setParentMembersList: Dispatch<SetStateAction<IMember[]>>;
-}
-
 export default function MembersList({
-  totalCost,
   memberNames,
-  payer,
-  transactionType,
-  setParentMembersList,
-}: MemberDetails) {
-  const [membersList, setMembersList] = useState(new Array<IMember>());
+}: {
+  memberNames: string[];
+}) {
+  const transactionContext = React.useContext(TransactionContext);
+  const [splitType, setSplitType] = useState('equal');
 
   const handleSelectAll = (isAllSelected: boolean) => {
     setSelectAllMembers(
-      membersList,
-      setMembersList,
-      setParentMembersList,
-      isAllSelected
+      transactionContext!.membersList,
+      transactionContext!.setMembersList,
+      isAllSelected,
+      splitType,
+      transactionContext!.totalCost
     );
   };
 
   useEffect(() => {
-    const list = getNewSplitMemberList(membersList, totalCost);
-    setParentMembersList(list);
-  }, [membersList, totalCost]);
+    console.log(transactionContext!.membersList);
+  }, [transactionContext!.membersList]);
 
   useEffect(() => {
-    const list = getInitialMemberList(
-      memberNames,
-      transactionType,
-      payer,
-      totalCost
+    if (transactionContext) {
+      transactionContext.setMembersList(
+        getMembersListBySplitType(
+          splitType,
+          transactionContext!.membersList,
+          transactionContext!.totalCost
+        )
+      );
+    }
+  }, [transactionContext!.payer, transactionContext!.totalCost, splitType]);
+
+  useEffect(() => {
+    transactionContext!.setMembersList(
+      memberNames.map((name: string) => {
+        const member = {} as IMember;
+        member.name = name;
+        member.isSelected = true;
+        member.amount = transactionContext!.totalCost / memberNames.length;
+        return member;
+      })
     );
-    setMembersList(list);
-  }, [transactionType, payer]);
+  }, [memberNames]);
+
+  useEffect(() => {
+    console.log('MemberList - memberNames changed');
+  }, [memberNames]);
 
   return (
     <>
       <div className="flexbox-row gap-2 py-2">
-        <select className="my-2 bg-white p-1">
-          <option>Equally</option>
+        <select
+          className="my-2 bg-white p-1"
+          onChange={(e) => setSplitType(e.target.value.toLowerCase())}
+        >
+          <option>Equal</option>
           <option>Weight</option>
           <option>Custom</option>
         </select>
@@ -76,10 +85,10 @@ export default function MembersList({
         </div>
       </div>
       <ul className="max-w-screen-md space-y-4 pt-2">
-        {[...membersList]
+        {transactionContext!.membersList
           .filter((member: IMember) => {
-            if (transactionType === 'loan') {
-              return payer !== member.name;
+            if (transactionContext!.transactionType === 'loan') {
+              return transactionContext!.payer !== member.name;
             }
             return true;
           })
@@ -87,9 +96,9 @@ export default function MembersList({
             return (
               <div key={member.name}>
                 <Member
+                  totalCost={transactionContext!.totalCost}
                   member={member}
-                  membersList={membersList}
-                  setMembersList={setMembersList}
+                  splitType={splitType.toLowerCase()}
                 />
               </div>
             );
