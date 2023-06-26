@@ -2,10 +2,11 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import React, { useRef, useState } from 'react';
 
-import { TransactionContext } from '@/context/TransactionContext';
+import { TransactionContext } from '@/components/hooks/TransactionContext';
 
 import Custom from './Custom';
 import { getMembersListBySplitType, type IMember } from './helpers';
+import Weight from './Weight';
 
 export default function Member({
   member,
@@ -18,6 +19,7 @@ export default function Member({
 }) {
   const transactionContext = React.useContext(TransactionContext);
   const splitValueRef = useRef<HTMLInputElement>();
+  const weightRef = useRef<HTMLInputElement>();
   const [isOver, setIsOver] = useState(false);
 
   const handleSelect = (e: React.MouseEvent) => {
@@ -37,7 +39,7 @@ export default function Member({
     transactionContext!.setMembersList(list);
   };
 
-  const renderSwitch = () => {
+  const renderMember = () => {
     switch (splitType.toLowerCase()) {
       case 'equal':
         return (
@@ -61,7 +63,9 @@ export default function Member({
           </>
         );
       case 'weight':
-        return <div />;
+        return (
+          <Weight weightRef={weightRef} member={member} totalCost={totalCost} />
+        );
       case 'custom':
         return (
           <Custom
@@ -83,15 +87,13 @@ export default function Member({
       } ${isOver ? 'bg-red-300' : ''}`}
     >
       <button
-        className="flexbox-row w-full max-w-11/12 break-words p-2 py-3 mobile-disable-highlight"
+        className="flexbox-row w-full max-w-6/12 break-words p-2 py-3 mobile-disable-highlight"
         type="button"
         onClick={handleSelect}
       >
-        <Typography className="max-w-11/12" noWrap>
-          {member.name}
-        </Typography>
+        <Typography noWrap>{member.name}AAAAAAAAAAAAAAAAAAAAA</Typography>
       </button>
-      {renderSwitch()}
+      {renderMember()}
     </li>
   );
 }

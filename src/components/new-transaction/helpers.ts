@@ -6,6 +6,7 @@ export interface IMember {
   name: string;
   amount: number;
   isSelected: boolean;
+  weight: number;
 }
 
 const transactionTypes = {
@@ -70,6 +71,7 @@ export function getInitialMemberList(
     member.name = name;
     member.isSelected = true;
     member.amount = totalCost / names.length;
+    member.weight = 0;
     return member;
   });
   return list;
@@ -85,8 +87,8 @@ export function getEqualSplitMemberList(
     }
     return count;
   }, 0);
-  const list = membersList.map((selectedMember: IMember) => {
-    const member = selectedMember;
+  const list = membersList.map((currentMember: IMember) => {
+    const member = currentMember;
     member.amount = member.isSelected ? totalCost / selectedCount : 0;
     return member;
   });
@@ -94,11 +96,33 @@ export function getEqualSplitMemberList(
 }
 
 export function getCustomSplitMemberList(membersList: Array<IMember>) {
-  const list = membersList.map((selectedMember: IMember) => {
-    const member = selectedMember;
+  const list = membersList.map((currentMember: IMember) => {
+    const member = currentMember;
     if (!member.isSelected) {
       member.amount = 0;
     }
+    return member;
+  });
+  return list;
+}
+
+export function getWeightSplitMemberList(
+  membersList: Array<IMember>,
+  totalCost: number
+) {
+  const totalWeight = membersList.reduce((weight: number, member: IMember) => {
+    if (member.isSelected) {
+      return weight + member.weight;
+    }
+    return weight;
+  }, 0);
+
+  if (totalWeight === 0) {
+    return membersList;
+  }
+  const list = membersList.map((currentMember: IMember) => {
+    const member = currentMember;
+    member.amount = totalCost * (member.weight / totalWeight);
     return member;
   });
   return list;
@@ -115,6 +139,7 @@ export function getMembersListBySplitType(
       list = getEqualSplitMemberList(members, totalCost);
       break;
     case 'weight':
+      list = getWeightSplitMemberList(members, totalCost);
       break;
     case 'custom':
       list = getCustomSplitMemberList(members);

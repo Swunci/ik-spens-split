@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { TransactionContext } from '@/context/TransactionContext';
+import { TransactionContext } from '@/components/hooks/TransactionContext';
 
 import type { IMember } from './helpers';
 import { getMembersListBySplitType, setSelectAllMembers } from './helpers';
@@ -47,6 +47,7 @@ export default function MembersList({
         member.name = name;
         member.isSelected = true;
         member.amount = transactionContext!.totalCost / memberNames.length;
+        member.weight = 0;
         return member;
       })
     );

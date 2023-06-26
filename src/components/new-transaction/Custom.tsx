@@ -1,7 +1,7 @@
 import { TextField } from '@mui/material';
 import { type Dispatch, type SetStateAction, useContext } from 'react';
 
-import { TransactionContext } from '@/context/TransactionContext';
+import { TransactionContext } from '@/components/hooks/TransactionContext';
 
 import type { IMember } from './helpers';
 

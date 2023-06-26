@@ -1,14 +1,21 @@
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useReducer, useRef, useState } from 'react';
 import useSwr from 'swr';
 
+import {
+  ACTION_TYPES,
+  initialState,
+  snackbarReducer,
+} from '@/components/hooks/snackbarReducer';
+import { TransactionContext } from '@/components/hooks/TransactionContext';
 import type { IMember } from '@/components/new-transaction/helpers';
 import {
   handleHowMuch,
   handleTypeChange,
 } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
-import { TransactionContext } from '@/context/TransactionContext';
 import type CustomError from '@/errors/customError';
 import type { TransactionCreation } from '@/interfaces/request';
 import type { Group } from '@/interfaces/response';
@@ -30,14 +37,15 @@ export default function NewTransactionPage() {
     fetcher
   );
 
-  const [amountError, setAmountError] = useState(false);
+  const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);
   const [totalCost, setTotalCost] = useState(0);
-  const [action, setAction] = useState('paid');
   const [payer, setPayer] = useState('');
-  const descriptionRef = useRef<HTMLInputElement>(null);
-  const dateRef = useRef<HTMLInputElement>(null);
   const [transactionType, setTransactionType] = useState('Expense');
   const [membersList, setMembersList] = useState(new Array<IMember>());
+  const [amountError, setAmountError] = useState(false);
+  const [action, setAction] = useState('paid');
+  const descriptionRef = useRef<HTMLInputElement>(null);
+  const dateRef = useRef<HTMLInputElement>(null);
 
   const contextValue = React.useMemo(
     () => ({
@@ -101,8 +109,21 @@ export default function NewTransactionPage() {
     const response = await nextApiClient.transactions.create(requestBody);
 
     if (!response.ok) {
-      // show error
+      dispatch({
+        type: ACTION_TYPES.OPEN,
+        message:
+          response.status === 400
+            ? 'Field validation failed'
+            : 'Services currently unavailable',
+        alertType: 'error',
+      });
+      return;
     }
+    dispatch({
+      type: ACTION_TYPES.OPEN,
+      message: `${transactionType} has been added`,
+      alertType: 'success',
+    });
   };
 
   return (
@@ -183,6 +204,25 @@ export default function NewTransactionPage() {
           </button>
         </div>
       </form>
+      <Snackbar
+        open={snackbarState.isOpen}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        onClick={() =>
+          dispatch({
+            type: ACTION_TYPES.CLOSE,
+            message: '',
+            alertType: 'info',
+          })
+        }
+      >
+        {snackbarState.isOpen ? (
+          <Alert severity={snackbarState.alertType}>
+            {snackbarState.message}
+          </Alert>
+        ) : (
+          <div />
+        )}
+      </Snackbar>
     </RootLayout>
   );
 }
