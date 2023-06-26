@@ -17,13 +17,15 @@ import {
 } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
 import type CustomError from '@/errors/customError';
-import type { TransactionCreation } from '@/interfaces/request';
 import type { Group } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import NextApiClient from '@/utils/api/NextApiClient';
 import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { getTodaysDate } from '@/utils/timeUtils';
+
+import type { FormDetails } from './new-transaction-helpers';
+import { handleCreation } from './new-transaction-helpers';
 
 export default function NewTransactionPage() {
   const todaysDate = getTodaysDate();
@@ -78,59 +80,26 @@ export default function NewTransactionPage() {
     return displaySnackbar('BACKEND BUSTED');
   }
 
-  function calculateSplit(members: IMember[]) {
-    const split: Map<string, number> = members.reduce(
-      (splitMap: Map<string, number>, member: IMember) => {
-        if (member.isSelected) {
-          splitMap.set(member.name, member.amount);
-        }
-        return splitMap;
-      },
-      new Map<string, number>()
-    );
-    return split;
-  }
-
-  const handleCreation = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const requestBody: TransactionCreation = {} as TransactionCreation;
-    requestBody.groupId = data!.groupId;
-    requestBody.payer = payer;
-    requestBody.type = transactionType.toLowerCase();
-    requestBody.amount = totalCost;
-    requestBody.date = dateRef.current!.value;
-    requestBody.description = descriptionRef.current!.value;
-    requestBody.split = JSON.stringify(
-      Object.fromEntries(calculateSplit(membersList))
-    );
-    requestBody.currency = data!.currency;
-
-    const nextApiClient = new NextApiClient().jsonBody();
-    const response = await nextApiClient.transactions.create(requestBody);
-
-    if (!response.ok) {
-      dispatch({
-        type: ACTION_TYPES.OPEN,
-        message:
-          response.status === 400
-            ? 'Field validation failed'
-            : 'Services currently unavailable',
-        alertType: 'error',
-      });
-      return;
-    }
-    dispatch({
-      type: ACTION_TYPES.OPEN,
-      message: `${transactionType} has been added`,
-      alertType: 'success',
-    });
-  };
-
   return (
     <RootLayout>
       <form
         className="flex w-full flex-col items-center"
-        onSubmit={handleCreation}
+        onSubmit={(e) => {
+          handleCreation(
+            e,
+            {
+              groupId: data!.groupId,
+              date: dateRef.current!.value,
+              description: descriptionRef.current!.value,
+              payer,
+              totalCost,
+              membersList,
+              transactionType,
+              currency: data!.currency,
+            } as FormDetails,
+            dispatch
+          );
+        }}
       >
         <div className="flexbox-row w-11/12 place-content-start gap-2 p-2">
           <select
@@ -205,9 +174,17 @@ export default function NewTransactionPage() {
         </div>
       </form>
       <Snackbar
+        autoHideDuration={5000}
         open={snackbarState.isOpen}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         onClick={() =>
+          dispatch({
+            type: ACTION_TYPES.CLOSE,
+            message: '',
+            alertType: 'info',
+          })
+        }
+        onClose={() =>
           dispatch({
             type: ACTION_TYPES.CLOSE,
             message: '',
