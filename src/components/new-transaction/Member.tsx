@@ -1,6 +1,6 @@
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
 
@@ -21,6 +21,16 @@ export default function Member({
   const splitValueRef = useRef<HTMLInputElement>();
   const weightRef = useRef<HTMLInputElement>();
   const [isOver, setIsOver] = useState(false);
+
+  useEffect(() => {
+    const total = transactionContext!.membersList.reduce(
+      (cost: number, mem: IMember) => {
+        return cost + mem.amount;
+      },
+      0
+    );
+    setIsOver(total > transactionContext!.totalCost);
+  }, [transactionContext!.membersList]);
 
   const handleSelect = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -84,7 +94,7 @@ export default function Member({
       key={member.name}
       className={`flex flex-row place-content-between items-center rounded border align-middle text-lg ${
         member.isSelected ? 'border-black bg-green-400' : 'border-gray-200'
-      } ${isOver ? 'bg-red-300' : ''}`}
+      } ${isOver && member.isSelected ? 'bg-red-300' : ''}`}
     >
       <button
         className="flexbox-row w-full max-w-6/12 break-words p-2 py-3 mobile-disable-highlight"

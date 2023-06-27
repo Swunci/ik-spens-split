@@ -117,7 +117,6 @@ export default function NewGroupPage() {
           dispatch({
             type: ACTION_TYPES.CLOSE,
             message: '',
-            alertType: 'info',
           })
         }
       >

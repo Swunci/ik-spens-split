@@ -53,12 +53,11 @@ export async function handleSubmit(
 
   if (!response.ok) {
     dispatch({
-      type: ACTION_TYPES.OPEN,
+      type: ACTION_TYPES.OPEN_ERROR,
       message:
         response.status === 400
           ? 'Please add at least 2 members to group'
           : 'Services currently unavailable',
-      alertType: 'error',
     });
     return;
   }

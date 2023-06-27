@@ -30,12 +30,23 @@ export type FormDetails = {
   transactionType: string;
 };
 
+function mathChecksOut(membersList: IMember[], totalCost: number) {
+  return (
+    totalCost ===
+    membersList.reduce((cost: number, member: IMember) => {
+      if (member.isSelected) {
+        return cost + member.amount;
+      }
+      return cost;
+    }, 0)
+  );
+}
+
 export async function handleCreation(
   e: React.FormEvent<HTMLFormElement>,
   formDetails: FormDetails,
   dispatch: Dispatch<ActionType>
 ) {
-  e.preventDefault();
   const requestBody: TransactionCreation = {} as TransactionCreation;
   requestBody.groupId = formDetails.groupId;
   requestBody.payer = formDetails.payer;
@@ -48,25 +59,33 @@ export async function handleCreation(
   );
   requestBody.currency = formDetails.currency;
 
+  if (!mathChecksOut(formDetails.membersList, formDetails.totalCost)) {
+    e.preventDefault();
+    dispatch({
+      type: ACTION_TYPES.OPEN_WARNING,
+      message: 'Please check if sum adds up to total cost',
+    });
+    return;
+  }
+
   const nextApiClient = new NextApiClient().jsonBody();
   const response = await nextApiClient.transactions.create(requestBody);
 
   if (!response.ok) {
+    e.preventDefault();
     dispatch({
-      type: ACTION_TYPES.OPEN,
+      type: ACTION_TYPES.OPEN_ERROR,
       message:
         response.status === 400
           ? 'Field validation failed'
           : 'Services currently unavailable',
-      alertType: 'error',
     });
     return;
   }
   dispatch({
-    type: ACTION_TYPES.OPEN,
+    type: ACTION_TYPES.OPEN_SUCCESS,
     message: `Added ${formDetails.transactionType.toLowerCase()}: ${
       formDetails.description
     }`,
-    alertType: 'success',
   });
 }

@@ -65,11 +65,7 @@ export default function Custom({
             },
             parseFloat(num)
           );
-          if (total > transactionContext!.totalCost) {
-            setIsOver(true);
-          } else {
-            setIsOver(false);
-          }
+          setIsOver(total > transactionContext!.totalCost);
           transactionContext!.setMembersList(
             transactionContext!.membersList.map((mem: IMember) => {
               const newMem = mem;

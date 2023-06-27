@@ -1,5 +1,9 @@
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import useSwr from 'swr';
@@ -31,6 +35,8 @@ export default function NewTransactionPage() {
   const todaysDate = getTodaysDate();
 
   const router = useRouter();
+
+  const currentPath = usePathname();
 
   const { group: groupId } = router.query;
 
@@ -82,6 +88,16 @@ export default function NewTransactionPage() {
 
   return (
     <RootLayout>
+      <div className="w-11/12 p-2">
+        <Link
+          href={currentPath.substring(0, currentPath.lastIndexOf('/'))}
+          passHref
+        >
+          <Button variant="outlined" startIcon={<ArrowBackIosIcon />}>
+            Back
+          </Button>
+        </Link>
+      </div>
       <form
         className="flex w-full flex-col items-center"
         onSubmit={(e) => {
@@ -177,20 +193,8 @@ export default function NewTransactionPage() {
         autoHideDuration={5000}
         open={snackbarState.isOpen}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        onClick={() =>
-          dispatch({
-            type: ACTION_TYPES.CLOSE,
-            message: '',
-            alertType: 'info',
-          })
-        }
-        onClose={() =>
-          dispatch({
-            type: ACTION_TYPES.CLOSE,
-            message: '',
-            alertType: 'info',
-          })
-        }
+        onClick={() => dispatch({ type: ACTION_TYPES.CLOSE })}
+        onClose={() => dispatch({ type: ACTION_TYPES.CLOSE })}
       >
         {snackbarState.isOpen ? (
           <Alert severity={snackbarState.alertType}>
