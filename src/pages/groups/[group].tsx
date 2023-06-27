@@ -8,13 +8,12 @@ import type CustomError from '@/errors/customError';
 import type { Group, TransactionResponse } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop } from '@/utils/component/helpers';
+import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 
 import { getOverviewStats } from './[group]-helpers';
 
 export default function GroupPage() {
-  const currency: string = '$';
-
   const router = useRouter();
   const currentPath = usePathname();
 
@@ -49,11 +48,17 @@ export default function GroupPage() {
     }
     return router.push('/500');
   }
+  const currencySymbol: string =
+    currencyCodeSymbolMap.get(groupData!.currency) || '';
 
   const [groupCost, membersMap] = getOverviewStats(
     transactionsData!.transactions,
     groupData!.memberNames
   );
+
+  const debt =
+    (membersMap.get(currentMember)?.paid || 0) -
+    (membersMap.get(currentMember)?.cost || 0);
 
   return (
     <RootLayout>
@@ -84,50 +89,50 @@ export default function GroupPage() {
       <div className="flexbox-row w-11/12 p-2">
         <div className="text-2xl">Overview</div>
       </div>
-      <div className="flexbox-col w-11/12 space-y-2 bg-white p-2">
+      <div className="flexbox-col w-11/12 space-y-2 bg-white p-2 text-lg">
         <div className="flexbox-row p-2">
           <div>Total group cost:</div>
           <div>
-            {currency}
-            {groupCost}
+            {currencySymbol}
+            {groupCost.toFixed(2)}
           </div>
         </div>
         <div className="flexbox-row p-2">
           <div>Your cost:</div>
           <div>
-            {currency}
-            {membersMap.get(currentMember)?.cost}
+            {currencySymbol}
+            {membersMap.get(currentMember)?.cost.toFixed(2)}
           </div>
         </div>
         <div className="flexbox-row p-2">
           <div className="text-red-500">{`You've paid`}:</div>
           <div className="text-red-500">
-            {currency}
-            {membersMap.get(currentMember)?.paid}
+            {currencySymbol}
+            {membersMap.get(currentMember)?.paid.toFixed(2)}
           </div>
         </div>
         <div className="flexbox-row p-2">
           <div className="text-green-500">{`You've received`}:</div>
           <div className="text-green-500">
-            {currency}
-            {membersMap.get(currentMember)?.received}
+            {currencySymbol}
+            {membersMap.get(currentMember)?.received.toFixed(2)}
           </div>
         </div>
         <div className="flexbox-row p-2">
           <div
-            className={`${groupCost < 0 ? 'text-red-500' : ''} ${
-              groupCost > 0 ? 'text-green-500' : ''
+            className={`${debt < 0 ? 'text-red-500' : ''} ${
+              debt > 0 ? 'text-green-500' : ''
             }`}
           >
-            {groupCost <= 0 ? 'You owe' : 'You are owed'}:
+            {debt < 0 ? 'You owe' : 'You are owed'}:
           </div>
           <div
-            className={`${groupCost < 0 ? 'text-red-500' : ''} ${
-              groupCost > 0 ? 'text-green-500' : ''
+            className={`${debt < 0 ? 'text-red-500' : ''} ${
+              debt > 0 ? 'text-green-500' : ''
             }`}
           >
-            {currency}
-            {groupCost}
+            {currencySymbol}
+            {Math.abs(debt)}
           </div>
         </div>
       </div>

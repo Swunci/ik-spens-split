@@ -8,6 +8,7 @@ import {
 import type { GroupCreation } from '@/interfaces/request';
 import type { Group } from '@/interfaces/response';
 import NextApiClient from '@/utils/api/NextApiClient';
+import { currencyNameCodeMap } from '@/utils/currencyUtil';
 
 export function onAddMember(
   e: React.MouseEvent,
@@ -45,7 +46,7 @@ export async function handleSubmit(
   e.preventDefault();
   const data: GroupCreation = <GroupCreation>{};
   data.groupName = groupNameRef.current!.value;
-  data.currency = currencyRef.current!.value;
+  data.currency = currencyNameCodeMap.revGet(currencyRef.current!.value) || '';
   data.members = [...currentMembers];
 
   const nextApiClient = new NextApiClient().jsonBody();

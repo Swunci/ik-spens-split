@@ -10,6 +10,7 @@ import {
 } from '@/components/hooks/snackbarReducer';
 import MembersList from '@/components/new-group/MembersList';
 import { RootLayout } from '@/layouts/RootLayout';
+import { currencyNameCodeMap } from '@/utils/currencyUtil';
 
 import { handleSubmit, onAddMember } from './new-group-helpers';
 
@@ -27,6 +28,12 @@ export default function NewGroupPage() {
     currentMembers.delete(member);
     setCurrentMembers(new Set([...currentMembers]));
   };
+
+  function populateCurrencies() {
+    return [...currencyNameCodeMap.map.keys()].map((currencyName) => {
+      return <option key={currencyName}>{currencyName}</option>;
+    });
+  }
 
   return (
     <RootLayout>
@@ -65,12 +72,7 @@ export default function NewGroupPage() {
             required
             ref={currencyRef}
           >
-            <option>USD</option>
-            <option>EUR</option>
-            <option>CAD</option>
-            <option>YEN</option>
-            <option>RMB</option>
-            <option>WON</option>
+            {populateCurrencies()}
           </select>
         </label>
         <label className="flex w-full flex-col p-2" htmlFor="addMembers">
