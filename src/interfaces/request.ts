@@ -14,3 +14,14 @@ export interface TransactionCreation {
   date: string;
   currency: string;
 }
+
+export interface PaidDebtCreation {
+  groupId: string;
+  creditor: string;
+  debtor: string;
+  amount: number;
+}
+
+export interface PaidDebtDeletion {
+  debtId: string;
+}

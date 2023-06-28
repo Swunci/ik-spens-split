@@ -1,4 +1,4 @@
-import type { Transaction } from '@/interfaces/response';
+import type { PaidDebt, Transaction } from '@/interfaces/response';
 
 export interface MemberDetails {
   cost: number;
@@ -9,7 +9,8 @@ export interface MemberDetails {
 
 export function getOverviewStats(
   transactions: Array<Transaction>,
-  memberNames: Array<string>
+  memberNames: Array<string>,
+  paidDebts: Array<PaidDebt>
 ): [number, Map<string, MemberDetails>] {
   let groupCost = 0;
   const membersMap = memberNames.reduce(
@@ -24,6 +25,11 @@ export function getOverviewStats(
     },
     new Map<string, MemberDetails>()
   );
+  paidDebts.forEach((paidDebt: PaidDebt) => {
+    const { creditor, debtor, amount } = paidDebt;
+    membersMap.get(creditor)!.received += amount;
+    membersMap.get(debtor)!.paid += amount;
+  });
   transactions.forEach((transaction: Transaction) => {
     const type = transaction.type.toLowerCase();
     const { payer, amount } = transaction;
@@ -49,7 +55,8 @@ export function getOverviewStats(
   });
   membersMap.forEach((memberDetails, _memberName) => {
     const details = memberDetails;
-    details.debt = memberDetails.paid - memberDetails.cost;
+    details.debt =
+      memberDetails.paid - memberDetails.cost - memberDetails.received;
   });
   return [groupCost, membersMap];
 }

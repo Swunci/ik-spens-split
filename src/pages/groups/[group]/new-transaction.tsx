@@ -23,7 +23,6 @@ import MembersList from '@/components/new-transaction/MemberList';
 import type CustomError from '@/errors/customError';
 import type { Group } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
-import NextApiClient from '@/utils/api/NextApiClient';
 import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { getTodaysDate } from '@/utils/timeUtils';
@@ -41,7 +40,7 @@ export default function NewTransactionPage() {
   const { group: groupId } = router.query;
 
   const { data, error, isLoading } = useSwr<Group, CustomError>(
-    () => (groupId ? `${NextApiClient.groupsURL}/${groupId}` : null),
+    () => (groupId ? `/api/groups/${groupId}` : null),
     fetcher
   );
 

@@ -20,3 +20,15 @@ export interface Transaction {
 export interface TransactionResponse {
   transactions: Array<Transaction>;
 }
+
+export interface PaidDebt {
+  groupId: string;
+  debtId: string;
+  creditor: string;
+  debtor: string;
+  amount: number;
+}
+
+export interface PaidDebtResponse {
+  paidDebts: Array<PaidDebt>;
+}

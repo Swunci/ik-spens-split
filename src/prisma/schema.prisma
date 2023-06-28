@@ -5,6 +5,7 @@ model Group {
 	memberNames String[]
 	transactions Transaction[]
 	history History[]
+	paidDebts PaidDebt[]
 }
 
 model Transaction {
@@ -27,6 +28,15 @@ model History {
 	historyId String @id @default(uuid())
 	details Json
 	createdDate DateTime
+}
+
+model PaidDebt {
+	group Group @relation(fields: [groupId], references: [groupId])
+	groupId String
+	debtId String @id @default(uuid())
+	creditor String
+	debtor String
+	amount Int
 }
 
 datasource db {

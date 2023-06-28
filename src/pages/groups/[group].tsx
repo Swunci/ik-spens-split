@@ -1,12 +1,26 @@
-import { FormControl, MenuItem, Select, Typography } from '@mui/material';
+import Alert from '@mui/material/Alert';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import Snackbar from '@mui/material/Snackbar';
+import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import useSwr from 'swr';
 
-import DebtsList from '@/components/[group]/DebtsList';
+import DebtList from '@/components/[group]/DebtList';
+import {
+  ACTION_TYPES,
+  initialState,
+  snackbarReducer,
+} from '@/components/hooks/snackbarReducer';
 import type CustomError from '@/errors/customError';
-import type { Group, TransactionResponse } from '@/interfaces/response';
+import type {
+  Group,
+  PaidDebtResponse,
+  TransactionResponse,
+} from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop } from '@/utils/component/helpers';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
@@ -19,6 +33,8 @@ export default function GroupPage() {
   const currentPath = usePathname();
 
   const [currentMember, setCurrentMember] = useState('');
+
+  const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);
 
   const {
     data: groupData,
@@ -35,15 +51,24 @@ export default function GroupPage() {
     fetcher
   );
 
+  const {
+    data: paidDebtsData,
+    error: paidDebtsError,
+    isLoading: isLoadingPaidDebts,
+  } = useSwr<PaidDebtResponse, CustomError>(
+    `/api${currentPath}/debts`,
+    fetcher
+  );
+
   useEffect(() => {
     setCurrentMember(groupData?.memberNames.at(0)!);
   }, [groupData]);
 
-  if (isLoadingGroup || isLoadingTransactions) {
+  if (isLoadingGroup || isLoadingTransactions || isLoadingPaidDebts) {
     return displayBackdrop();
   }
 
-  if (groupError || transactionsError) {
+  if (groupError || transactionsError || paidDebtsError) {
     if (groupError?.status === 404) {
       return router.push('/404');
     }
@@ -54,7 +79,8 @@ export default function GroupPage() {
 
   const [groupCost, membersMap] = getOverviewStats(
     transactionsData!.transactions,
-    groupData!.memberNames
+    groupData!.memberNames,
+    paidDebtsData!.paidDebts
   );
 
   const debtAmount = membersMap.get(currentMember)?.debt || 0;
@@ -137,8 +163,12 @@ export default function GroupPage() {
       <div className="flexbox-row w-11/12 p-2">
         <div className="text-2xl">Debts</div>
       </div>
-      <div className="flexbox-col w-11/12 space-y-2 bg-white p-2">
-        <DebtsList membersMap={membersMap} currencySymbol={currencySymbol} />
+      <div className="flexbox-col w-11/12 space-y-2 bg-white p-2 text-lg">
+        <DebtList
+          membersMap={membersMap}
+          currencySymbol={currencySymbol}
+          dispatch={dispatch}
+        />
       </div>
       <div className="flexbox-col w-11/12 space-y-2 bg-white p-2">{}</div>
       <div className="flexbox-row w-11/12 p-2">
@@ -153,6 +183,21 @@ export default function GroupPage() {
           Send
         </button>
       </div>
+      <Snackbar
+        autoHideDuration={5000}
+        open={snackbarState.isOpen}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        onClick={() => dispatch({ type: ACTION_TYPES.CLOSE })}
+        onClose={() => dispatch({ type: ACTION_TYPES.CLOSE })}
+      >
+        {snackbarState.isOpen ? (
+          <Alert severity={snackbarState.alertType}>
+            {snackbarState.message}
+          </Alert>
+        ) : (
+          <div />
+        )}
+      </Snackbar>
     </RootLayout>
   );
 }
