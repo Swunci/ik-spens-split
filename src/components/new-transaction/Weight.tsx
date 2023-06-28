@@ -50,9 +50,9 @@ export default function Weight({
           e.preventDefault();
           const nums = e.target.value.replace(/\D/g, '');
           // eslint-disable-next-line no-param-reassign
-          weightRef.current!.value =
+          const weight = weightRef.current!;
+          weight.value =
             nums.length === 0 ? '0' : parseInt(nums, 10).toFixed(0);
-
           const changedMembers = transactionContext!.membersList.map(
             (mem: IMember) => {
               const newMem = mem;

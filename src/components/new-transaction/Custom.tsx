@@ -54,8 +54,8 @@ export default function Custom({
             nums = `0${nums}`;
           }
           const num = `${nums.slice(0, -2)}.${nums.slice(-2)}`;
-          // eslint-disable-next-line no-param-reassign
-          splitValueRef.current!.value = parseFloat(num).toFixed(2);
+          const splitValue = splitValueRef.current!;
+          splitValue.value = parseFloat(num).toFixed(2);
           const total = transactionContext!.membersList.reduce(
             (cost: number, mem: IMember) => {
               if (member.name !== mem.name) {

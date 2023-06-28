@@ -1,4 +1,4 @@
-import type { Dispatch } from 'react';
+import type { Dispatch, RefObject, SetStateAction } from 'react';
 
 import type { ActionType } from '@/components/hooks/snackbarReducer';
 import { ACTION_TYPES } from '@/components/hooks/snackbarReducer';
@@ -45,8 +45,11 @@ function mathChecksOut(membersList: IMember[], totalCost: number) {
 export async function handleCreation(
   e: React.FormEvent<HTMLFormElement>,
   formDetails: FormDetails,
-  dispatch: Dispatch<ActionType>
+  dispatch: Dispatch<ActionType>,
+  setTotalCost: Dispatch<SetStateAction<number>>,
+  descriptionRef: RefObject<HTMLInputElement>
 ) {
+  e.preventDefault();
   const requestBody: TransactionCreation = {} as TransactionCreation;
   requestBody.groupId = formDetails.groupId;
   requestBody.payer = formDetails.payer;
@@ -60,7 +63,6 @@ export async function handleCreation(
   requestBody.currency = formDetails.currency;
 
   if (!mathChecksOut(formDetails.membersList, formDetails.totalCost)) {
-    e.preventDefault();
     dispatch({
       type: ACTION_TYPES.OPEN_WARNING,
       message: 'Please check if sum adds up to total cost',
@@ -72,7 +74,6 @@ export async function handleCreation(
   const response = await nextApiClient.transactions.create(requestBody);
 
   if (!response.ok) {
-    e.preventDefault();
     dispatch({
       type: ACTION_TYPES.OPEN_ERROR,
       message:
@@ -88,4 +89,7 @@ export async function handleCreation(
       formDetails.description
     }`,
   });
+  setTotalCost(0);
+  const description = descriptionRef.current!;
+  description.value = '';
 }

@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import useSwr from 'swr';
 
+import DebtsList from '@/components/[group]/DebtsList';
 import type CustomError from '@/errors/customError';
 import type { Group, TransactionResponse } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
@@ -56,9 +57,7 @@ export default function GroupPage() {
     groupData!.memberNames
   );
 
-  const debt =
-    (membersMap.get(currentMember)?.paid || 0) -
-    (membersMap.get(currentMember)?.cost || 0);
+  const debtAmount = membersMap.get(currentMember)?.debt || 0;
 
   return (
     <RootLayout>
@@ -70,7 +69,6 @@ export default function GroupPage() {
         <FormControl fullWidth>
           <Select
             className="static bg-white"
-            autoWidth
             defaultValue={groupData?.memberNames.at(0)}
             onChange={(e) => setCurrentMember(e.target.value)}
           >
@@ -119,20 +117,10 @@ export default function GroupPage() {
           </div>
         </div>
         <div className="flexbox-row p-2">
-          <div
-            className={`${debt < 0 ? 'text-red-500' : ''} ${
-              debt > 0 ? 'text-green-500' : ''
-            }`}
-          >
-            {debt < 0 ? 'You owe' : 'You are owed'}:
-          </div>
-          <div
-            className={`${debt < 0 ? 'text-red-500' : ''} ${
-              debt > 0 ? 'text-green-500' : ''
-            }`}
-          >
+          <div>{debtAmount < 0 ? 'You owe' : 'You are owed'}:</div>
+          <div>
             {currencySymbol}
-            {Math.abs(debt)}
+            {Math.abs(debtAmount).toFixed(2)}
           </div>
         </div>
       </div>
@@ -150,15 +138,9 @@ export default function GroupPage() {
         <div className="text-2xl">Debts</div>
       </div>
       <div className="flexbox-col w-11/12 space-y-2 bg-white p-2">
-        <div className="flexbox-row p-2">
-          <div>X owes Y $100</div>
-          <button type="button">Settle</button>
-        </div>
-        <div className="flexbox-row p-2">
-          <div>X settled debt with Y</div>
-          <button type="button">Undo</button>
-        </div>
+        <DebtsList membersMap={membersMap} currencySymbol={currencySymbol} />
       </div>
+      <div className="flexbox-col w-11/12 space-y-2 bg-white p-2">{}</div>
       <div className="flexbox-row w-11/12 p-2">
         <div className="text-2xl">Comments</div>
       </div>

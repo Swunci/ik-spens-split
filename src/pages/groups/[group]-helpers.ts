@@ -47,5 +47,9 @@ export function getOverviewStats(
         throw Error('Unknown transaction type');
     }
   });
+  membersMap.forEach((memberDetails, _memberName) => {
+    const details = memberDetails;
+    details.debt = memberDetails.paid - memberDetails.cost;
+  });
   return [groupCost, membersMap];
 }

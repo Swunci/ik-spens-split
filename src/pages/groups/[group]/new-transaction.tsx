@@ -113,7 +113,9 @@ export default function NewTransactionPage() {
               transactionType,
               currency: data!.currency,
             } as FormDetails,
-            dispatch
+            dispatch,
+            setTotalCost,
+            descriptionRef
           );
         }}
       >
@@ -147,6 +149,7 @@ export default function NewTransactionPage() {
               step="0.01"
               placeholder="Amount"
               required
+              value={totalCost === 0 ? '' : totalCost}
               onChange={(e) => handleHowMuch(e, setTotalCost, setAmountError)}
             />
           </label>
