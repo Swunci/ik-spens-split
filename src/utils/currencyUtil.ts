@@ -215,6 +215,6 @@ const codeSymbolMap = Object.entries(currencyDetails).reduce(
   new Map<string, string>()
 );
 
-export const currencyNameSymbolMap = new TwoWayReadonlyMap(nameSymbolMap);
+export const currencyNameSymbolMap = nameSymbolMap;
 export const currencyNameCodeMap = new TwoWayReadonlyMap(nameCodeMap);
-export const currencyCodeSymbolMap = new TwoWayReadonlyMap(codeSymbolMap);
+export const currencyCodeSymbolMap = codeSymbolMap;

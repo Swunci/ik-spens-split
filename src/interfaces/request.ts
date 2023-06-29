@@ -20,6 +20,7 @@ export interface PaidDebtCreation {
   creditor: string;
   debtor: string;
   amount: number;
+  currency: string;
 }
 
 export interface PaidDebtDeletion {

@@ -18,11 +18,11 @@ export type Debt = {
 
 export default function DebtList({
   membersMap,
-  currencySymbol,
+  currencyCode,
   dispatch,
 }: {
   membersMap: Map<string, MemberDetails>;
-  currencySymbol: string;
+  currencyCode: string;
   dispatch: Dispatch<ActionType>;
 }) {
   const creditors = new Array<MemberAmount>();
@@ -70,14 +70,16 @@ export default function DebtList({
       debtor.amount += creditor.amount;
     }
   }
-  return (
+  return debts.length === 0 ? (
+    <div className="flexbox-row p-2">All settled up</div>
+  ) : (
     <ul>
       {debts.map((debt: Debt) => {
         return (
           <DebtItem
             key={`${debt.creditor}${debt.debtor}`}
             debt={debt}
-            currencySymbol={currencySymbol}
+            currencyCode={currencyCode}
             dispatch={dispatch}
           />
         );

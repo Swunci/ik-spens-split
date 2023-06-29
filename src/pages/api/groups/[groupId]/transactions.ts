@@ -29,6 +29,7 @@ router
       where: {
         groupId,
       },
+      orderBy: [{ date: 'desc' }, { amount: 'desc' }],
     });
     res.status(200).json({ transactions });
   })

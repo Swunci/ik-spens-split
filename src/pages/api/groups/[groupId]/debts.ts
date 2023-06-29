@@ -13,6 +13,7 @@ const schema = Joi.object({
   creditor: Joi.string().required(),
   debtor: Joi.string().required(),
   amount: Joi.number().precision(2).required(),
+  currency: Joi.string().min(3).max(3).required(),
 });
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
@@ -25,6 +26,7 @@ router
       where: {
         groupId,
       },
+      orderBy: [{ date: 'desc' }, { amount: 'desc' }],
     });
     res.status(200).json({ paidDebts });
   })

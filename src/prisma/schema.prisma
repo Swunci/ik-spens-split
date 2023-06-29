@@ -15,7 +15,7 @@ model Transaction {
 	transactionId String @id @default(uuid())
 	payer String
 	description String
-	amount Int
+	amount Float
 	split Json
 	date DateTime
 	type String
@@ -36,7 +36,9 @@ model PaidDebt {
 	debtId String @id @default(uuid())
 	creditor String
 	debtor String
-	amount Int
+	amount Float
+	date DateTime @default(now())
+	currency String
 }
 
 datasource db {

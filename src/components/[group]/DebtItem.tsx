@@ -5,17 +5,18 @@ import { useState } from 'react';
 import type { PaidDebtCreation } from '@/interfaces/request';
 import type { PaidDebt } from '@/interfaces/response';
 import NextApiClient from '@/utils/api/NextApiClient';
+import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 
 import { ACTION_TYPES, type ActionType } from '../hooks/snackbarReducer';
 import type { Debt } from './DebtList';
 
 export default function DebtItem({
   debt,
-  currencySymbol,
+  currencyCode,
   dispatch,
 }: {
   debt: Debt;
-  currencySymbol: string;
+  currencyCode: string;
   dispatch: Dispatch<ActionType>;
 }) {
   const router = useRouter();
@@ -25,6 +26,8 @@ export default function DebtItem({
   const [isSettled, setIsSettled] = useState(false);
   const [debtId, setDebtId] = useState('');
 
+  const currencySymbol = currencyCodeSymbolMap.get(currencyCode) || '';
+
   async function createPaidDebt(e: React.MouseEvent) {
     e.preventDefault();
     const body: PaidDebtCreation = {} as PaidDebtCreation;
@@ -32,6 +35,7 @@ export default function DebtItem({
     body.creditor = debt.creditor;
     body.debtor = debt.debtor;
     body.groupId = groupId as string;
+    body.currency = currencyCode;
     const nextApiClient = new NextApiClient().jsonBody();
     const response = await nextApiClient.paidDebts.create(body);
     if (!response.ok) {

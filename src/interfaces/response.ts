@@ -27,6 +27,7 @@ export interface PaidDebt {
   creditor: string;
   debtor: string;
   amount: number;
+  currency: string;
 }
 
 export interface PaidDebtResponse {

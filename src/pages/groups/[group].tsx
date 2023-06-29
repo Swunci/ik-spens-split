@@ -74,6 +74,9 @@ export default function GroupPage() {
     }
     return router.push('/500');
   }
+
+  const currencyCode = groupData!.currency || '';
+
   const currencySymbol: string =
     currencyCodeSymbolMap.get(groupData!.currency) || '';
 
@@ -151,9 +154,11 @@ export default function GroupPage() {
         </div>
       </div>
       <div className="flexbox-row w-11/12 p-2">
-        <button className="rounded bg-orange-500 p-2" type="button">
-          View expenses
-        </button>
+        <Link href={`${currentPath}/transactions`} passHref>
+          <button className="rounded bg-orange-500 p-2" type="button">
+            View expenses
+          </button>
+        </Link>
         <Link href={`${currentPath}/new-transaction`} passHref>
           <button className="rounded bg-orange-500 p-2" type="button">
             Add expense
@@ -166,7 +171,7 @@ export default function GroupPage() {
       <div className="flexbox-col w-11/12 space-y-2 bg-white p-2 text-lg">
         <DebtList
           membersMap={membersMap}
-          currencySymbol={currencySymbol}
+          currencyCode={currencyCode}
           dispatch={dispatch}
         />
       </div>
