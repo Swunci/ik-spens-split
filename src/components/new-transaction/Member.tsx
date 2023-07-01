@@ -109,7 +109,7 @@ export default function Member({
         type="button"
         onClick={handleSelect}
       >
-        <Typography noWrap>{member.name}AAAAAAAAAAAAAAAAAAAAA</Typography>
+        <Typography noWrap>{member.name}</Typography>
       </button>
       {renderMember()}
     </li>

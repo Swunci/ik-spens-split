@@ -16,8 +16,8 @@ import {
 import { TransactionContext } from '@/components/hooks/TransactionContext';
 import type { IMember } from '@/components/new-transaction/helpers';
 import {
+  getActionByTransactionType,
   handleHowMuch,
-  handleTypeChange,
 } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
 import type CustomError from '@/errors/customError';
@@ -50,7 +50,6 @@ export default function NewTransactionPage() {
   const [transactionType, setTransactionType] = useState('expense');
   const [membersList, setMembersList] = useState(new Array<IMember>());
   const [amountError, setAmountError] = useState(false);
-  const [action, setAction] = useState('paid');
   const descriptionRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
 
@@ -127,10 +126,12 @@ export default function NewTransactionPage() {
               return <option key={member}>{member}</option>;
             })}
           </select>
-          <div className="bg-blue-400 p-2">{action}</div>
+          <div className="bg-blue-400 p-2">
+            {getActionByTransactionType(transactionType)}
+          </div>
           <select
             className="bg-white p-2"
-            onChange={(e) => handleTypeChange(e, setAction, setTransactionType)}
+            onChange={(e) => setTransactionType(e.currentTarget.value)}
           >
             <option>expense</option>
             <option>loan</option>

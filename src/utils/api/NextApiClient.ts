@@ -29,6 +29,8 @@ class NextApiClient extends HttpClient {
           `/api/groups/${body.groupId}/transactions/${body.transactionId}`,
           body
         ),
+      delete: (groupId: string, transactionId: string) =>
+        this.delete(`/api/groups/${groupId}/transactions/${transactionId}`),
     };
   }
 

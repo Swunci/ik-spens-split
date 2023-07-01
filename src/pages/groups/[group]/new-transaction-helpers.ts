@@ -112,9 +112,7 @@ export async function handleCreation(
 export async function handleUpdate(
   e: React.FormEvent<HTMLFormElement>,
   formDetails: UpdateTransactionForm,
-  dispatch: Dispatch<ActionType>,
-  setTotalCost: Dispatch<SetStateAction<number>>,
-  descriptionRef: RefObject<HTMLInputElement>
+  dispatch: Dispatch<ActionType>
 ) {
   e.preventDefault();
   const requestBody: TransactionUpdate = {} as TransactionUpdate;
@@ -153,11 +151,35 @@ export async function handleUpdate(
   }
   dispatch({
     type: ACTION_TYPES.OPEN_SUCCESS,
-    message: `Added ${formDetails.transactionType.toLowerCase()}: ${
+    message: `Updated ${formDetails.transactionType.toLowerCase()}: ${
       formDetails.description
     }`,
   });
-  setTotalCost(0);
-  const description = descriptionRef.current!;
-  description.value = '';
+}
+
+export async function handleDelete(
+  e: React.MouseEvent,
+  groupId: string,
+  transactionId: string,
+  dispatch: Dispatch<ActionType>
+) {
+  e.preventDefault();
+
+  const nextApiClient = new NextApiClient().jsonBody();
+  const response = await nextApiClient.transactions.delete(
+    groupId,
+    transactionId
+  );
+
+  if (!response.ok) {
+    dispatch({
+      type: ACTION_TYPES.OPEN_ERROR,
+      message:
+        response.status === 400
+          ? 'Field validation failed'
+          : 'Services currently unavailable',
+    });
+    return false;
+  }
+  return true;
 }

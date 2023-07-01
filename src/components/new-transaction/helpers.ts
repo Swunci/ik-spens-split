@@ -16,15 +16,8 @@ const transactionTypes = {
 };
 const transactionMap = new Map(Object.entries(transactionTypes));
 
-export function handleTypeChange(
-  e: ChangeEvent<HTMLSelectElement>,
-  setAction: Dispatch<SetStateAction<string>>,
-  setTransactionType: Dispatch<SetStateAction<string>>
-) {
-  const newType = e.target.value.toLowerCase();
-  const newAction = transactionMap.get(newType);
-  setAction(newAction!);
-  setTransactionType(newType);
+export function getActionByTransactionType(transactionType: string) {
+  return transactionMap.get(transactionType.toLowerCase()) || '';
 }
 
 export function handleHowMuch(

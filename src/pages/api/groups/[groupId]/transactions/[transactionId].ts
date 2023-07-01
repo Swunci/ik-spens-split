@@ -9,6 +9,7 @@ import { prisma } from '@/prisma/db';
 import validate from '../../../../../middleware/validation';
 
 const schema = Joi.object({
+  groupId: Joi.string().required(),
   transactionId: Joi.string().required(),
   payer: Joi.string().required(),
   description: Joi.string().required(),
@@ -16,6 +17,7 @@ const schema = Joi.object({
   split: Joi.string().required(),
   type: Joi.string().required(),
   date: Joi.string().required(),
+  currency: Joi.string().min(3).max(3).required(),
 });
 
 const router = createRouter<NextApiRequest, NextApiResponse>();
@@ -60,7 +62,23 @@ router
         });
       res.status(200).json(transaction);
     }
-  );
+  )
+  .delete(async (req: NextApiRequest, res: NextApiResponse) => {
+    const params = req.query;
+    const transactionId = params.transactionId
+      ? (params.transactionId as string)
+      : '';
+    const transaction: Transaction = await prisma.transaction
+      .delete({
+        where: {
+          transactionId,
+        },
+      })
+      .catch((_err) => {
+        throw Error('Database problem');
+      });
+    res.status(200).json(transaction);
+  });
 
 export default router.handler({
   onError: (err: any, _req, res) => {

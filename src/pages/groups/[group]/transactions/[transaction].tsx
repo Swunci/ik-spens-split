@@ -16,8 +16,8 @@ import {
 import { TransactionContext } from '@/components/hooks/TransactionContext';
 import type { IMember } from '@/components/new-transaction/helpers';
 import {
+  getActionByTransactionType,
   handleHowMuch,
-  handleTypeChange,
 } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
 import type CustomError from '@/errors/customError';
@@ -28,7 +28,7 @@ import { fetcher } from '@/utils/fetcherWrapper';
 import { getLocaleDateString } from '@/utils/timeUtils';
 
 import type { UpdateTransactionForm } from '../new-transaction-helpers';
-import { handleUpdate } from '../new-transaction-helpers';
+import { handleDelete, handleUpdate } from '../new-transaction-helpers';
 
 export default function EditTransactionPage() {
   const router = useRouter();
@@ -61,7 +61,6 @@ export default function EditTransactionPage() {
   const [transactionType, setTransactionType] = useState('expense');
   const [membersList, setMembersList] = useState(new Array<IMember>());
   const [amountError, setAmountError] = useState(false);
-  const [action, setAction] = useState('paid');
   const descriptionRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
 
@@ -146,9 +145,7 @@ export default function EditTransactionPage() {
               transactionType,
               currency: groupData!.currency,
             } as UpdateTransactionForm,
-            dispatch,
-            setTotalCost,
-            descriptionRef
+            dispatch
           );
         }}
       >
@@ -162,10 +159,12 @@ export default function EditTransactionPage() {
               return <option key={member}>{member}</option>;
             })}
           </select>
-          <div className="bg-blue-400 p-2">{action}</div>
+          <div className="bg-blue-400 p-2">
+            {getActionByTransactionType(transactionType)}
+          </div>
           <select
             className="bg-white p-2"
-            onChange={(e) => handleTypeChange(e, setAction, setTransactionType)}
+            onChange={(e) => setTransactionType(e.currentTarget.value)}
             defaultValue={transactionData!.type}
           >
             <option>expense</option>
@@ -223,9 +222,26 @@ export default function EditTransactionPage() {
             <MembersList memberNames={groupData!.memberNames} />
           </TransactionContext.Provider>
         </div>
-        <div className="w-11/12 p-2">
+        <div className="flexbox-row w-11/12 p-2">
           <button className="rounded bg-red-700 p-2" type="submit">
             Update
+          </button>
+          <button
+            className="rounded bg-red-700 p-2"
+            type="button"
+            onClick={async (e) => {
+              const isDeleted = await handleDelete(
+                e,
+                groupData!.groupId,
+                transactionData!.transactionId,
+                dispatch
+              );
+              if (isDeleted && currentPath) {
+                router.push(currentPath.slice(0, currentPath.lastIndexOf('/')));
+              }
+            }}
+          >
+            Delete
           </button>
         </div>
       </form>
