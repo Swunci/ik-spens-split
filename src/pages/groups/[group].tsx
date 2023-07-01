@@ -62,7 +62,15 @@ export default function GroupPage() {
 
   useEffect(() => {
     setCurrentMember(groupData?.memberNames.at(0)!);
+    localStorage.setItem(
+      'groupSize',
+      JSON.stringify(groupData?.memberNames.length || 0)
+    );
   }, [groupData]);
+
+  useEffect(() => {
+    localStorage.setItem('currentMember', currentMember);
+  }, [currentMember]);
 
   if (isLoadingGroup || isLoadingTransactions || isLoadingPaidDebts) {
     return displayBackdrop();

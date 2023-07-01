@@ -21,26 +21,37 @@ import {
 } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
 import type CustomError from '@/errors/customError';
-import type { Group } from '@/interfaces/response';
+import type { Group, Transaction } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
 import { fetcher } from '@/utils/fetcherWrapper';
-import { getTodaysDate } from '@/utils/timeUtils';
+import { getLocaleDateString } from '@/utils/timeUtils';
 
-import type { CreateTransactionForm } from './new-transaction-helpers';
-import { handleCreation } from './new-transaction-helpers';
+import type { UpdateTransactionForm } from '../new-transaction-helpers';
+import { handleUpdate } from '../new-transaction-helpers';
 
-export default function NewTransactionPage() {
-  const todaysDate = getTodaysDate();
-
+export default function EditTransactionPage() {
   const router = useRouter();
 
   const currentPath = usePathname();
 
-  const { group: groupId } = router.query;
+  const { group: groupId, transaction: transactionId } = router.query;
 
-  const { data, error, isLoading } = useSwr<Group, CustomError>(
+  const {
+    data: groupData,
+    error: groupError,
+    isLoading: isLoadingGroup,
+  } = useSwr<Group, CustomError>(
     () => (groupId ? `/api/groups/${groupId}` : null),
+    fetcher
+  );
+
+  const {
+    data: transactionData,
+    error: transactionError,
+    isLoading: isLoadingTransaction,
+  } = useSwr<Transaction, CustomError>(
+    () => (currentPath ? `/api${currentPath}` : null),
     fetcher
   );
 
@@ -53,6 +64,8 @@ export default function NewTransactionPage() {
   const [action, setAction] = useState('paid');
   const descriptionRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
+
+  const [isInitialMemberList, setIsInitialMemberList] = useState(true);
 
   const contextValue = React.useMemo(
     () => ({
@@ -69,19 +82,39 @@ export default function NewTransactionPage() {
   );
 
   useEffect(() => {
-    if (data) {
-      setPayer(data.memberNames.at(0)!);
+    if (transactionData) {
+      setPayer(transactionData.payer);
+      setTotalCost(transactionData.amount);
+      setTransactionType(transactionData.type);
     }
-  }, [data]);
+  }, [transactionData]);
 
   useEffect(() => {
-    console.log('new-transaction');
+    console.log('edit-transaction');
   }, [transactionType, payer, totalCost, membersList]);
 
-  if (isLoading || !groupId) {
+  useEffect(() => {
+    if (isInitialMemberList && membersList.length !== 0) {
+      const splitObj = JSON.parse(transactionData!.split);
+      const updatedMembersList = membersList.map((member: IMember) => {
+        const updatedMember = member;
+        if (member.name in splitObj) {
+          updatedMember.amount = splitObj[member.name];
+        } else {
+          updatedMember.isSelected = false;
+          updatedMember.amount = 0;
+        }
+        return updatedMember;
+      });
+      setMembersList(updatedMembersList);
+      setIsInitialMemberList(false);
+    }
+  }, [membersList]);
+
+  if (isLoadingGroup || isLoadingTransaction || !groupId || !transactionId) {
     return displayBackdrop();
   }
-  if (error) {
+  if (groupError || transactionError) {
     return displaySnackbar('BACKEND BUSTED');
   }
 
@@ -100,18 +133,19 @@ export default function NewTransactionPage() {
       <form
         className="flex w-full flex-col items-center"
         onSubmit={(e) => {
-          handleCreation(
+          handleUpdate(
             e,
             {
-              groupId: data!.groupId,
+              groupId: groupData!.groupId,
+              transactionId: transactionData!.transactionId,
               date: dateRef.current!.value,
               description: descriptionRef.current!.value,
               payer,
               totalCost,
               membersList,
               transactionType,
-              currency: data!.currency,
-            } as CreateTransactionForm,
+              currency: groupData!.currency,
+            } as UpdateTransactionForm,
             dispatch,
             setTotalCost,
             descriptionRef
@@ -122,8 +156,9 @@ export default function NewTransactionPage() {
           <select
             className="w-full bg-white p-2"
             onChange={(e) => setPayer(e.target.value)}
+            defaultValue={transactionData!.payer}
           >
-            {data!.memberNames.map((member: string) => {
+            {groupData!.memberNames.map((member: string) => {
               return <option key={member}>{member}</option>;
             })}
           </select>
@@ -131,6 +166,7 @@ export default function NewTransactionPage() {
           <select
             className="bg-white p-2"
             onChange={(e) => handleTypeChange(e, setAction, setTransactionType)}
+            defaultValue={transactionData!.type}
           >
             <option>expense</option>
             <option>loan</option>
@@ -149,6 +185,7 @@ export default function NewTransactionPage() {
               placeholder="Amount"
               required
               value={totalCost === 0 ? '' : totalCost}
+              defaultValue={transactionData!.amount}
               onChange={(e) => handleHowMuch(e, setTotalCost, setAmountError)}
             />
           </label>
@@ -163,6 +200,7 @@ export default function NewTransactionPage() {
               placeholder="Food"
               required
               ref={descriptionRef}
+              defaultValue={transactionData!.description}
             />
           </label>
         </div>
@@ -173,21 +211,21 @@ export default function NewTransactionPage() {
               className="mt-2 rounded bg-white p-1"
               id="when"
               type="date"
-              defaultValue={todaysDate}
               required
               ref={dateRef}
+              defaultValue={getLocaleDateString(transactionData!.date)}
             />
           </label>
         </div>
         <div className="w-11/12 p-2">
           <div className="py-2">How to split?</div>
           <TransactionContext.Provider value={contextValue}>
-            <MembersList memberNames={data!.memberNames} />
+            <MembersList memberNames={groupData!.memberNames} />
           </TransactionContext.Provider>
         </div>
         <div className="w-11/12 p-2">
           <button className="rounded bg-red-700 p-2" type="submit">
-            Create
+            Update
           </button>
         </div>
       </form>

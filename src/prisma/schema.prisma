@@ -9,8 +9,8 @@ model Group {
 }
 
 model Transaction {
-	group Group @relation(fields: [groupId], references: [groupId])
 	groupId String
+	group Group @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
 
 	transactionId String @id @default(uuid())
 	payer String
@@ -20,19 +20,23 @@ model Transaction {
 	date DateTime
 	type String
 	currency String
+
+	@@unique([groupId, transactionId])
 }
 
 model History {
-	group Group @relation(fields: [groupId], references: [groupId])
 	groupId String
+	group Group @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
+	
 	historyId String @id @default(uuid())
 	details Json
 	createdDate DateTime
 }
 
 model PaidDebt {
-	group Group @relation(fields: [groupId], references: [groupId])
 	groupId String
+	group Group @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
+
 	debtId String @id @default(uuid())
 	creditor String
 	debtor String

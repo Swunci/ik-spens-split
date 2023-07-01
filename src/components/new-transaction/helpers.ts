@@ -87,6 +87,7 @@ export function getEqualSplitMemberList(
     }
     return count;
   }, 0);
+
   const list = membersList.map((currentMember: IMember) => {
     const member = currentMember;
     member.amount = member.isSelected ? totalCost / selectedCount : 0;
@@ -117,12 +118,10 @@ export function getWeightSplitMemberList(
     return weight;
   }, 0);
 
-  if (totalWeight === 0) {
-    return membersList;
-  }
   const list = membersList.map((currentMember: IMember) => {
     const member = currentMember;
-    member.amount = totalCost * (member.weight / totalWeight);
+    member.amount =
+      totalWeight !== 0 ? totalCost * (member.weight / totalWeight) : 0;
     return member;
   });
   return list;
@@ -131,18 +130,29 @@ export function getWeightSplitMemberList(
 export function getMembersListBySplitType(
   splitType: string,
   members: IMember[],
-  totalCost: number
+  totalCost: number,
+  transactionType: string,
+  payer: string
 ) {
   let list = new Array<IMember>();
+  const updatedMembers = members.map((member: IMember) => {
+    const updatedMember = member;
+    if (transactionType === 'loan' && member.name === payer) {
+      updatedMember.amount = 0;
+      updatedMember.isSelected = false;
+      updatedMember.weight = 0;
+    }
+    return updatedMember;
+  });
   switch (splitType.toLowerCase()) {
     case 'equal':
-      list = getEqualSplitMemberList(members, totalCost);
+      list = getEqualSplitMemberList(updatedMembers, totalCost);
       break;
     case 'weight':
-      list = getWeightSplitMemberList(members, totalCost);
+      list = getWeightSplitMemberList(updatedMembers, totalCost);
       break;
     case 'custom':
-      list = getCustomSplitMemberList(members);
+      list = getCustomSplitMemberList(updatedMembers);
       break;
     default:
   }
@@ -154,13 +164,21 @@ export function setSelectAllMembers(
   setMembersList: Dispatch<SetStateAction<IMember[]>>,
   isAllSelected: boolean,
   splitType: string,
-  totalCost: number
+  totalCost: number,
+  transactionType: string,
+  payer: string
 ): void {
   const members = membersList.map((mem: IMember) => {
     const newMem = mem;
     newMem.isSelected = isAllSelected;
     return newMem;
   });
-  const newList = getMembersListBySplitType(splitType, members, totalCost);
+  const newList = getMembersListBySplitType(
+    splitType,
+    members,
+    totalCost,
+    transactionType,
+    payer
+  );
   setMembersList(newList);
 }

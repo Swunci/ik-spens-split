@@ -11,11 +11,9 @@ import Weight from './Weight';
 export default function Member({
   member,
   splitType,
-  totalCost,
 }: {
   member: IMember;
   splitType: string;
-  totalCost: number;
 }) {
   const transactionContext = React.useContext(TransactionContext);
   const splitValueRef = useRef<HTMLInputElement>();
@@ -45,7 +43,13 @@ export default function Member({
       }
       return newMem;
     });
-    list = getMembersListBySplitType(splitType, list, totalCost);
+    list = getMembersListBySplitType(
+      splitType,
+      list,
+      transactionContext!.totalCost,
+      transactionContext!.transactionType,
+      transactionContext!.payer
+    );
     transactionContext!.setMembersList(list);
   };
 
@@ -74,7 +78,11 @@ export default function Member({
         );
       case 'weight':
         return (
-          <Weight weightRef={weightRef} member={member} totalCost={totalCost} />
+          <Weight
+            weightRef={weightRef}
+            member={member}
+            totalCost={transactionContext!.totalCost}
+          />
         );
       case 'custom':
         return (

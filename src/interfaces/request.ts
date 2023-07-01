@@ -15,6 +15,10 @@ export interface TransactionCreation {
   currency: string;
 }
 
+export interface TransactionUpdate extends TransactionCreation {
+  transactionId: string;
+}
+
 export interface PaidDebtCreation {
   groupId: string;
   creditor: string;

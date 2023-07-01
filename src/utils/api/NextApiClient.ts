@@ -2,6 +2,7 @@ import type {
   GroupCreation,
   PaidDebtCreation,
   TransactionCreation,
+  TransactionUpdate,
 } from '@/interfaces/request';
 
 import HttpClient from './HttpClient';
@@ -23,6 +24,11 @@ class NextApiClient extends HttpClient {
       create: (body: TransactionCreation) =>
         this.post(`/api/groups/${body.groupId}/transactions`, body),
       get: (groupId: string) => this.get(`/api/groups/${groupId}/transactions`),
+      update: (body: TransactionUpdate) =>
+        this.put(
+          `/api/groups/${body.groupId}/transactions/${body.transactionId}`,
+          body
+        ),
     };
   }
 

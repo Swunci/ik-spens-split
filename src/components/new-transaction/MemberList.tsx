@@ -20,7 +20,9 @@ export default function MembersList({
       transactionContext!.setMembersList,
       isAllSelected,
       splitType,
-      transactionContext!.totalCost
+      transactionContext!.totalCost,
+      transactionContext!.transactionType,
+      transactionContext!.payer
     );
   };
 
@@ -33,12 +35,19 @@ export default function MembersList({
       transactionContext.setMembersList(
         getMembersListBySplitType(
           splitType,
-          transactionContext!.membersList,
-          transactionContext!.totalCost
+          transactionContext.membersList,
+          transactionContext.totalCost,
+          transactionContext.transactionType,
+          transactionContext.payer
         )
       );
     }
-  }, [transactionContext!.payer, transactionContext!.totalCost, splitType]);
+  }, [
+    transactionContext!.payer,
+    transactionContext!.totalCost,
+    splitType,
+    transactionContext!.transactionType,
+  ]);
 
   useEffect(() => {
     transactionContext!.setMembersList(
@@ -96,11 +105,7 @@ export default function MembersList({
           .map((member: IMember) => {
             return (
               <div key={member.name}>
-                <Member
-                  totalCost={transactionContext!.totalCost}
-                  member={member}
-                  splitType={splitType.toLowerCase()}
-                />
+                <Member member={member} splitType={splitType.toLowerCase()} />
               </div>
             );
           })}
