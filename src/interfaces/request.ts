@@ -27,6 +27,10 @@ export interface PaidDebtCreation {
   currency: string;
 }
 
+export interface PaidDebtUpdate extends PaidDebtCreation {
+  debtId: string;
+}
+
 export interface PaidDebtDeletion {
   debtId: string;
 }

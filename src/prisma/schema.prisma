@@ -43,6 +43,8 @@ model PaidDebt {
 	amount Float
 	date DateTime @default(now())
 	currency String
+
+	@@unique([groupId, debtId])
 }
 
 datasource db {

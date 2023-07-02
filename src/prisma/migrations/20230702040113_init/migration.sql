@@ -49,6 +49,9 @@ CREATE TABLE "PaidDebt" (
 -- CreateIndex
 CREATE UNIQUE INDEX "Transaction_groupId_transactionId_key" ON "Transaction"("groupId", "transactionId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "PaidDebt_groupId_debtId_key" ON "PaidDebt"("groupId", "debtId");
+
 -- AddForeignKey
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("groupId") ON DELETE CASCADE ON UPDATE CASCADE;
 

@@ -28,7 +28,10 @@ import { fetcher } from '@/utils/fetcherWrapper';
 import { getLocaleDateString } from '@/utils/timeUtils';
 
 import type { UpdateTransactionForm } from '../new-transaction-helpers';
-import { handleDelete, handleUpdate } from '../new-transaction-helpers';
+import {
+  handleTransactionDelete,
+  handleTransactionUpdate,
+} from '../new-transaction-helpers';
 
 export default function EditTransactionPage() {
   const router = useRouter();
@@ -132,7 +135,7 @@ export default function EditTransactionPage() {
       <form
         className="flex w-full flex-col items-center"
         onSubmit={(e) => {
-          handleUpdate(
+          handleTransactionUpdate(
             e,
             {
               groupId: groupData!.groupId,
@@ -230,7 +233,7 @@ export default function EditTransactionPage() {
             className="rounded bg-red-700 p-2"
             type="button"
             onClick={async (e) => {
-              const isDeleted = await handleDelete(
+              const isDeleted = await handleTransactionDelete(
                 e,
                 groupData!.groupId,
                 transactionData!.transactionId,

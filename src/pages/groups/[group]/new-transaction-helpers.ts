@@ -4,6 +4,7 @@ import type { ActionType } from '@/components/hooks/snackbarReducer';
 import { ACTION_TYPES } from '@/components/hooks/snackbarReducer';
 import type { IMember } from '@/components/new-transaction/helpers';
 import type {
+  PaidDebtUpdate,
   TransactionCreation,
   TransactionUpdate,
 } from '@/interfaces/request';
@@ -30,6 +31,14 @@ export type UpdateTransactionForm = {
   membersList: IMember[];
   currency: string;
   transactionType: string;
+};
+
+export type UpdatePaidDebtForm = {
+  groupId: string;
+  debtId: string;
+  creditor: string;
+  debtor: string;
+  amount: number;
 };
 
 export function calculateSplit(members: IMember[]) {
@@ -109,7 +118,7 @@ export async function handleCreation(
   description.value = '';
 }
 
-export async function handleUpdate(
+export async function handleTransactionUpdate(
   e: React.FormEvent<HTMLFormElement>,
   formDetails: UpdateTransactionForm,
   dispatch: Dispatch<ActionType>
@@ -157,7 +166,7 @@ export async function handleUpdate(
   });
 }
 
-export async function handleDelete(
+export async function handleTransactionDelete(
   e: React.MouseEvent,
   groupId: string,
   transactionId: string,
@@ -182,4 +191,60 @@ export async function handleDelete(
     return false;
   }
   return true;
+}
+
+export async function handlePaidDebtDelete(
+  e: React.MouseEvent,
+  groupId: string,
+  debtId: string,
+  dispatch: Dispatch<ActionType>
+) {
+  e.preventDefault();
+
+  const nextApiClient = new NextApiClient().jsonBody();
+  const response = await nextApiClient.paidDebts.delete(groupId, debtId);
+
+  if (!response.ok) {
+    dispatch({
+      type: ACTION_TYPES.OPEN_ERROR,
+      message:
+        response.status === 400
+          ? 'Field validation failed'
+          : 'Services currently unavailable',
+    });
+    return false;
+  }
+  return true;
+}
+
+export async function handlePaidDebtUpdate(
+  e: React.FormEvent<HTMLFormElement>,
+  formDetails: UpdatePaidDebtForm,
+  dispatch: Dispatch<ActionType>
+) {
+  e.preventDefault();
+  const requestBody: PaidDebtUpdate = {} as PaidDebtUpdate;
+  requestBody.groupId = formDetails.groupId;
+  requestBody.debtId = formDetails.debtId;
+  requestBody.creditor = formDetails.creditor;
+  requestBody.debtor = formDetails.debtor;
+  requestBody.amount = formDetails.amount;
+
+  const nextApiClient = new NextApiClient().jsonBody();
+  const response = await nextApiClient.paidDebts.update(requestBody);
+
+  if (!response.ok) {
+    dispatch({
+      type: ACTION_TYPES.OPEN_ERROR,
+      message:
+        response.status === 400
+          ? 'Field validation failed'
+          : 'Services currently unavailable',
+    });
+    return;
+  }
+  dispatch({
+    type: ACTION_TYPES.OPEN_SUCCESS,
+    message: 'Updated paid debt',
+  });
 }
