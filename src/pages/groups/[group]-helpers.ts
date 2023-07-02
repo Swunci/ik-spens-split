@@ -46,7 +46,6 @@ export function getOverviewStats(
     }
     if (type === 'income') {
       groupCost -= amount;
-      membersMap.get(payer)!.paid -= amount;
       membersMap.get(payer)!.received += amount;
       split.forEach((share: number, name: string) => {
         membersMap.get(name)!.cost -= share;
