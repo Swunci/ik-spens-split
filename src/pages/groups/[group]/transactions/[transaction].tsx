@@ -122,7 +122,7 @@ export default function EditTransactionPage() {
 
   return (
     <RootLayout>
-      <div className="w-11/12 p-2">
+      <div className="w-full p-2">
         <Link
           href={currentPath.substring(0, currentPath.lastIndexOf('/'))}
           passHref
@@ -152,7 +152,7 @@ export default function EditTransactionPage() {
           );
         }}
       >
-        <div className="flexbox-row w-11/12 place-content-start gap-2 p-2">
+        <div className="flexbox-row w-full place-content-start gap-2 p-2">
           <select
             className="w-full bg-white p-2"
             onChange={(e) => setPayer(e.target.value)}
@@ -175,7 +175,7 @@ export default function EditTransactionPage() {
             <option>income</option>
           </select>
         </div>
-        <div className="w-11/12 p-2">
+        <div className="w-full p-2">
           <label className="flex w-full flex-col" htmlFor="howMuch">
             How much?
             <input
@@ -192,7 +192,7 @@ export default function EditTransactionPage() {
             />
           </label>
         </div>
-        <div className="w-11/12 p-2">
+        <div className="w-full p-2">
           <label className="flex w-full flex-col" htmlFor="whatFor">
             What for?
             <input
@@ -206,7 +206,7 @@ export default function EditTransactionPage() {
             />
           </label>
         </div>
-        <div className="w-11/12 p-2">
+        <div className="w-full p-2">
           <label className="flex w-full flex-col" htmlFor="when">
             When?
             <input
@@ -219,13 +219,13 @@ export default function EditTransactionPage() {
             />
           </label>
         </div>
-        <div className="w-11/12 p-2">
+        <div className="w-full p-2">
           <div className="py-2">How to split?</div>
           <TransactionContext.Provider value={contextValue}>
             <MembersList memberNames={groupData!.memberNames} />
           </TransactionContext.Provider>
         </div>
-        <div className="flexbox-row w-11/12 p-2">
+        <div className="flexbox-row w-full p-2">
           <button className="rounded bg-red-700 p-2" type="submit">
             Update
           </button>

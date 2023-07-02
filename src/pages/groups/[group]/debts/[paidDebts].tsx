@@ -79,7 +79,9 @@ export default function PaidDebtsPage() {
         <Link
           href={
             currentPath
-              ? currentPath.substring(0, currentPath.lastIndexOf('/'))
+              ? currentPath
+                  .substring(0, currentPath.lastIndexOf('/'))
+                  .replace('/debts', '/transactions')
               : ''
           }
           passHref

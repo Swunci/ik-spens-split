@@ -101,100 +101,105 @@ export default function GroupPage() {
       <Typography className="min-w-fit whitespace-normal break-words p-1 text-center text-3xl">
         {groupData?.groupName}
       </Typography>
-      <div className="flexbox-row max-w-11/12 items-center justify-start p-2">
-        <Typography className="min-w-fit p-1">View as</Typography>
-        <FormControl fullWidth>
-          <Select
-            className="static bg-white"
-            defaultValue={groupData?.memberNames.at(0)}
-            onChange={(e) => setCurrentMember(e.target.value)}
-          >
-            {groupData?.memberNames.map((name: string) => {
-              return (
-                <MenuItem key={name} value={name}>
-                  <Typography className="whitespace-normal break-words" noWrap>
-                    {name}
-                  </Typography>
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-      </div>
-      <div className="flexbox-row w-11/12 p-2">
-        <div className="text-2xl">Overview</div>
-      </div>
-      <div className="flexbox-col w-11/12 space-y-2 bg-white p-2 text-lg">
-        <div className="flexbox-row p-2">
-          <div>Total group cost:</div>
-          <div>
-            {currencySymbol}
-            {groupCost.toFixed(2)}
+      <div className="w-full p-2">
+        <div className="flexbox-row max-w-full items-center justify-start p-2">
+          <Typography className="min-w-fit p-1">View as</Typography>
+          <FormControl fullWidth>
+            <Select
+              className="static bg-white"
+              defaultValue={groupData?.memberNames.at(0)}
+              onChange={(e) => setCurrentMember(e.target.value)}
+            >
+              {groupData?.memberNames.map((name: string) => {
+                return (
+                  <MenuItem key={name} value={name}>
+                    <Typography
+                      className="whitespace-normal break-words"
+                      noWrap
+                    >
+                      {name}
+                    </Typography>
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+        </div>
+        <div className="flexbox-row w-full p-2">
+          <div className="text-2xl">Overview</div>
+        </div>
+        <div className="flexbox-col w-full space-y-2 bg-white p-2 text-lg">
+          <div className="flexbox-row p-2">
+            <div>Total group cost:</div>
+            <div>
+              {currencySymbol}
+              {groupCost.toFixed(2)}
+            </div>
+          </div>
+          <div className="flexbox-row p-2">
+            <div>Your cost:</div>
+            <div>
+              {currencySymbol}
+              {membersMap.get(currentMember)?.cost.toFixed(2)}
+            </div>
+          </div>
+          <div className="flexbox-row p-2">
+            <div className="text-red-500">{`You've paid`}:</div>
+            <div className="text-red-500">
+              {currencySymbol}
+              {membersMap.get(currentMember)?.paid.toFixed(2)}
+            </div>
+          </div>
+          <div className="flexbox-row p-2">
+            <div className="text-green-500">{`You've received`}:</div>
+            <div className="text-green-500">
+              {currencySymbol}
+              {membersMap.get(currentMember)?.received.toFixed(2)}
+            </div>
+          </div>
+          <div className="flexbox-row p-2">
+            <div>{debtAmount < 0 ? 'You owe' : 'You are owed'}:</div>
+            <div>
+              {currencySymbol}
+              {Math.abs(debtAmount).toFixed(2)}
+            </div>
           </div>
         </div>
-        <div className="flexbox-row p-2">
-          <div>Your cost:</div>
-          <div>
-            {currencySymbol}
-            {membersMap.get(currentMember)?.cost.toFixed(2)}
-          </div>
+        <div className="flexbox-row w-full p-2">
+          <Link href={`${currentPath}/transactions`} passHref>
+            <button className="rounded bg-orange-500 p-2" type="button">
+              View expenses
+            </button>
+          </Link>
+          <Link href={`${currentPath}/new-transaction`} passHref>
+            <button className="rounded bg-orange-500 p-2" type="button">
+              Add expense
+            </button>
+          </Link>
         </div>
-        <div className="flexbox-row p-2">
-          <div className="text-red-500">{`You've paid`}:</div>
-          <div className="text-red-500">
-            {currencySymbol}
-            {membersMap.get(currentMember)?.paid.toFixed(2)}
-          </div>
+        <div className="flexbox-row w-full p-2">
+          <div className="text-2xl">Debts</div>
         </div>
-        <div className="flexbox-row p-2">
-          <div className="text-green-500">{`You've received`}:</div>
-          <div className="text-green-500">
-            {currencySymbol}
-            {membersMap.get(currentMember)?.received.toFixed(2)}
-          </div>
+        <div className="flexbox-col w-full space-y-2 bg-white p-2 text-lg">
+          <DebtList
+            membersMap={membersMap}
+            currencyCode={currencyCode}
+            dispatch={dispatch}
+          />
         </div>
-        <div className="flexbox-row p-2">
-          <div>{debtAmount < 0 ? 'You owe' : 'You are owed'}:</div>
-          <div>
-            {currencySymbol}
-            {Math.abs(debtAmount).toFixed(2)}
-          </div>
+        <div className="flexbox-col w-full space-y-2 bg-white p-2">{}</div>
+        <div className="flexbox-row w-full p-2">
+          <div className="text-2xl">Comments</div>
         </div>
-      </div>
-      <div className="flexbox-row w-11/12 p-2">
-        <Link href={`${currentPath}/transactions`} passHref>
-          <button className="rounded bg-orange-500 p-2" type="button">
-            View expenses
+        <div className="w-full">
+          <textarea
+            className="my-2 inline-block w-full overflow-hidden rounded p-1"
+            id="commentText"
+          />
+          <button className="rounded bg-blue-500 p-2" type="button">
+            Send
           </button>
-        </Link>
-        <Link href={`${currentPath}/new-transaction`} passHref>
-          <button className="rounded bg-orange-500 p-2" type="button">
-            Add expense
-          </button>
-        </Link>
-      </div>
-      <div className="flexbox-row w-11/12 p-2">
-        <div className="text-2xl">Debts</div>
-      </div>
-      <div className="flexbox-col w-11/12 space-y-2 bg-white p-2 text-lg">
-        <DebtList
-          membersMap={membersMap}
-          currencyCode={currencyCode}
-          dispatch={dispatch}
-        />
-      </div>
-      <div className="flexbox-col w-11/12 space-y-2 bg-white p-2">{}</div>
-      <div className="flexbox-row w-11/12 p-2">
-        <div className="text-2xl">Comments</div>
-      </div>
-      <div className="w-11/12">
-        <textarea
-          className="my-2 inline-block w-full overflow-hidden rounded p-1"
-          id="commentText"
-        />
-        <button className="rounded bg-blue-500 p-2" type="button">
-          Send
-        </button>
+        </div>
       </div>
       <Snackbar
         autoHideDuration={5000}

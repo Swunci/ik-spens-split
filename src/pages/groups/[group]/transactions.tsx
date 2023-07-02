@@ -1,12 +1,14 @@
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { Button, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import useSwr from 'swr';
 
 import type CustomError from '@/errors/customError';
 import type {
+  Group,
   PaidDebt,
   PaidDebtResponse,
   Transaction,
@@ -22,6 +24,8 @@ export default function Transactions() {
   const router = useRouter();
   const currentPath = usePathname();
 
+  const { group: groupId } = router.query;
+
   const [dataOwner, setDataOwner] = useState('all');
   const [dataType, setDataType] = useState('transactions');
 
@@ -29,6 +33,11 @@ export default function Transactions() {
     typeof window !== 'undefined'
       ? localStorage.getItem('currentMember') ?? ''
       : '';
+
+  const { error: groupError, isLoading: isLoadingGroup } = useSwr<
+    Group,
+    CustomError
+  >(() => (groupId ? `/api/groups/${groupId}` : null), fetcher);
 
   const {
     data: transactionsData,
@@ -50,11 +59,19 @@ export default function Transactions() {
     fetcher
   );
 
-  if (isLoadingTransactions || isLoadingPaidDebts) {
+  if (
+    isLoadingTransactions ||
+    isLoadingPaidDebts ||
+    isLoadingGroup ||
+    !currentPath
+  ) {
     return displayBackdrop();
   }
 
-  if (transactionsError || paidDebtsError) {
+  if (transactionsError || paidDebtsError || groupError) {
+    if (groupError?.status === 404) {
+      return router.push('/404');
+    }
     return router.push('/500');
   }
 
@@ -105,25 +122,25 @@ export default function Transactions() {
                   href={`${currentPath}/${transaction.transactionId}`}
                   passHref
                 >
-                  <div className="text-lg">
+                  <div className="text-base">
                     <div>{`${
                       transaction.payer
                     } paid ${currencyCodeSymbolMap.get(transaction.currency)}${
                       transaction.amount
                     } for ${transaction.description}`}</div>
                   </div>
-                  <div className="flexbox-row">
-                    <div className="text-sm">
-                      People involved: {getInvolvedMembers(transaction.split)}
+                  <div className="flexbox-row gap-2 pt-1">
+                    <div className="text-xs">
+                      People involved: {getInvolvedMembers(transaction.split)}.
                     </div>
-                    <div className="text-sm">
+                    <div className="text-xs">
                       {isMemberInvolved(transaction.split, currentMember)
                         ? `Your share: ${currencyCodeSymbolMap.get(
                             transaction.currency
                           )}${getYourShare(transaction.split)}`
                         : null}
                     </div>
-                    <div className="text-sm">
+                    <div className="min-w-fit text-xs">
                       {getLocaleDateString(transaction.date)}
                     </div>
                   </div>
@@ -165,16 +182,25 @@ export default function Transactions() {
                 className="flexbox-col w-full rounded border-2 border-teal-400 p-2"
                 key={paidDebt.debtId}
               >
-                <div>
-                  {`${paidDebt.debtor} settled up with ${
-                    paidDebt.creditor
-                  } for ${currencyCodeSymbolMap.get(paidDebt.currency)} ${
-                    paidDebt.amount
-                  }`}
-                </div>
-                <div className="flexbox-row place-content-end text-sm">
-                  {getLocaleDateString(paidDebt.date)}
-                </div>
+                <Link
+                  href={
+                    currentPath
+                      ? `${currentPath.slice(
+                          0,
+                          currentPath.lastIndexOf('/')
+                        )}/debts/${paidDebt.debtId}`
+                      : ''
+                  }
+                  passHref
+                >
+                  <div className="text-base">
+                    {`${paidDebt.debtor} paid ${
+                      paidDebt.creditor
+                    } ${currencyCodeSymbolMap.get(paidDebt.currency)}${
+                      paidDebt.amount
+                    } on ${getLocaleDateString(paidDebt.date)}`}
+                  </div>
+                </Link>
               </li>
             );
           })}
@@ -194,7 +220,7 @@ export default function Transactions() {
   }
   return (
     <RootLayout>
-      <div className="w-11/12 p-2">
+      <div className="w-full p-2">
         <Link
           href={
             currentPath
@@ -208,7 +234,7 @@ export default function Transactions() {
           </Button>
         </Link>
       </div>
-      <div className="w-11/12 p-2">
+      <div className="w-full p-2">
         <ToggleButtonGroup
           value={dataType}
           exclusive
@@ -220,7 +246,7 @@ export default function Transactions() {
           <ToggleButton value="debts">Paid Debts</ToggleButton>
         </ToggleButtonGroup>
       </div>
-      <div className="w-11/12 p-2">
+      <div className="w-full p-2">
         <ToggleButtonGroup
           value={dataOwner}
           exclusive
@@ -233,7 +259,7 @@ export default function Transactions() {
           <ToggleButton value="others">Others</ToggleButton>
         </ToggleButtonGroup>
       </div>
-      <div className="w-11/12 p-2">{renderByDataType()}</div>
+      <div className="w-full p-2">{renderByDataType()}</div>
     </RootLayout>
   );
 }

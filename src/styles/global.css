@@ -12,11 +12,9 @@ a {
 }
 
 html {
-	overscroll-behavior: none;
 	background-color: #F0F8FF;
 }
 body {
-  overscroll-behavior: none;
 	background-color: #F0F8FF;
 }
 

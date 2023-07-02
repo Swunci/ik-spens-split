@@ -37,20 +37,20 @@ export function getOverviewStats(
       Object.entries(JSON.parse(transaction.split))
     );
 
-    switch (type) {
-      case 'expense':
-        groupCost += amount;
-        membersMap.get(payer)!.paid += amount;
-        split.forEach((share: number, name: string) => {
-          membersMap.get(name)!.cost += share;
-        });
-        break;
-      case 'loan':
-        break;
-      case 'income':
-        break;
-      default:
-        throw Error('Unknown transaction type');
+    if (type === 'expense' || type === 'loan') {
+      groupCost += amount;
+      membersMap.get(payer)!.paid += amount;
+      split.forEach((share: number, name: string) => {
+        membersMap.get(name)!.cost += share;
+      });
+    }
+    if (type === 'income') {
+      groupCost -= amount;
+      membersMap.get(payer)!.paid -= amount;
+      membersMap.get(payer)!.received += amount;
+      split.forEach((share: number, name: string) => {
+        membersMap.get(name)!.cost -= share;
+      });
     }
   });
   membersMap.forEach((memberDetails, _memberName) => {
