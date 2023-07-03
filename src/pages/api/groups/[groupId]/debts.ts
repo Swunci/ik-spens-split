@@ -43,6 +43,15 @@ router
         .catch((_err) => {
           throw Error('Database problem');
         });
+      await prisma.history.create({
+        data: {
+          groupId: body.groupId,
+          table: 'paidDebt',
+          action: 'post',
+          createdDate: new Date(),
+          details: JSON.stringify(paidDebt),
+        },
+      });
       res.status(200).json(paidDebt);
     }
   );

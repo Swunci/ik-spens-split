@@ -60,11 +60,21 @@ router
         .catch((_err) => {
           throw Error('Database problem');
         });
+      await prisma.history.create({
+        data: {
+          groupId: body.groupId,
+          table: 'transaction',
+          action: 'put',
+          createdDate: new Date(),
+          details: JSON.stringify(transaction),
+        },
+      });
       res.status(200).json(transaction);
     }
   )
   .delete(async (req: NextApiRequest, res: NextApiResponse) => {
     const params = req.query;
+    const groupId = params.groupId ? (params.groupId as string) : '';
     const transactionId = params.transactionId
       ? (params.transactionId as string)
       : '';
@@ -77,6 +87,15 @@ router
       .catch((_err) => {
         throw Error('Database problem');
       });
+    await prisma.history.create({
+      data: {
+        groupId,
+        table: 'transaction',
+        action: 'delete',
+        createdDate: new Date(),
+        details: '',
+      },
+    });
     res.status(200).json(transaction);
   });
 

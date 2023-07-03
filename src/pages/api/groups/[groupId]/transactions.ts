@@ -47,6 +47,15 @@ router
         .catch((_err) => {
           throw Error('Database problem');
         });
+      await prisma.history.create({
+        data: {
+          groupId: body.groupId,
+          table: 'transaction',
+          action: 'post',
+          createdDate: new Date(),
+          details: JSON.stringify(transaction),
+        },
+      });
       res.status(200).json(transaction);
     }
   );

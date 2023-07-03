@@ -29,8 +29,12 @@ model History {
 	group Group @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
 	
 	historyId String @id @default(uuid())
+	table String
+	action String
 	details Json
 	createdDate DateTime
+
+	@@unique([groupId, historyId])
 }
 
 model PaidDebt {

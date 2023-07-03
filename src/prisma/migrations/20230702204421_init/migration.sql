@@ -27,6 +27,8 @@ CREATE TABLE "Transaction" (
 CREATE TABLE "History" (
     "groupId" TEXT NOT NULL,
     "historyId" TEXT NOT NULL,
+    "table" TEXT NOT NULL,
+    "action" TEXT NOT NULL,
     "details" JSONB NOT NULL,
     "createdDate" TIMESTAMP(3) NOT NULL,
 
@@ -48,6 +50,9 @@ CREATE TABLE "PaidDebt" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Transaction_groupId_transactionId_key" ON "Transaction"("groupId", "transactionId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "History_groupId_historyId_key" ON "History"("groupId", "historyId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "PaidDebt_groupId_debtId_key" ON "PaidDebt"("groupId", "debtId");

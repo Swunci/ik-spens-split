@@ -52,15 +52,34 @@ router
         .catch((_err) => {
           throw Error('Database problem');
         });
+      await prisma.history.create({
+        data: {
+          groupId: body.groupId,
+          table: 'paidDebt',
+          action: 'put',
+          createdDate: new Date(),
+          details: JSON.stringify(paidDebt),
+        },
+      });
       res.status(200).json(paidDebt);
     }
   )
   .delete(async (req: NextApiRequest, res: NextApiResponse) => {
     const params = req.query;
+    const groupId = params.groupId ? (params.groupId as string) : '';
     const debtId = params.debtId ? (params.debtId as string) : '';
     const deleted: PaidDebt = await prisma.paidDebt.delete({
       where: {
         debtId,
+      },
+    });
+    await prisma.history.create({
+      data: {
+        groupId,
+        table: 'paidDebt',
+        action: 'delete',
+        createdDate: new Date(),
+        details: '',
       },
     });
     res.status(200).json(deleted);

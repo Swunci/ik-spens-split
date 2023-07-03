@@ -75,7 +75,7 @@ export default function PaidDebtsPage() {
 
   return (
     <RootLayout>
-      <div className="w-11/12 p-2">
+      <div className="w-full p-2">
         <Link
           href={
             currentPath
@@ -107,7 +107,7 @@ export default function PaidDebtsPage() {
           );
         }}
       >
-        <div className="flexbox-row w-11/12 place-content-start gap-2 p-2">
+        <div className="flexbox-row w-full place-content-start gap-2 p-2">
           <select
             className="w-full bg-white p-2"
             onChange={(e) => setDebtor(e.target.value)}
@@ -138,7 +138,7 @@ export default function PaidDebtsPage() {
               })}
           </select>
         </div>
-        <div className="w-11/12 p-2">
+        <div className="w-full p-2">
           <label className="flex w-full flex-col" htmlFor="howMuch">
             How much?
             <input
@@ -154,7 +154,7 @@ export default function PaidDebtsPage() {
             />
           </label>
         </div>
-        <div className="flexbox-row w-11/12 p-2">
+        <div className="flexbox-row w-full p-2">
           <button className="rounded bg-red-700 p-2" type="submit">
             Update
           </button>
@@ -169,7 +169,11 @@ export default function PaidDebtsPage() {
                 dispatch
               );
               if (isDeleted && currentPath) {
-                router.push(currentPath.slice(0, currentPath.lastIndexOf('/')));
+                router.push(
+                  currentPath
+                    .slice(0, currentPath.lastIndexOf('/'))
+                    .replace('/debts', '/transactions')
+                );
               }
             }}
           >

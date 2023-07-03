@@ -30,6 +30,15 @@ router.post(
       .catch(() => {
         throw Error('Database problem');
       });
+    await prisma.history.create({
+      data: {
+        groupId: group.groupId,
+        table: 'group',
+        action: 'post',
+        createdDate: new Date(),
+        details: JSON.stringify(group),
+      },
+    });
     res.status(200).json(group);
   }
 );

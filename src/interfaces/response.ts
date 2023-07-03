@@ -34,3 +34,16 @@ export interface PaidDebt {
 export interface PaidDebtResponse {
   paidDebts: Array<PaidDebt>;
 }
+
+export interface History {
+  groupId: string;
+  historyId: string;
+  table: string;
+  action: string;
+  details: string;
+  createdDate: Date;
+}
+
+export interface HistoryResponse {
+  history: Array<History>;
+}
