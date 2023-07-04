@@ -1,4 +1,6 @@
+import TextareaAutosize from '@mui/base/TextareaAutosize';
 import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -17,6 +19,8 @@ import {
 } from '@/components/hooks/snackbarReducer';
 import type CustomError from '@/errors/customError';
 import type {
+  Comment,
+  CommentResponse,
   Group,
   PaidDebtResponse,
   TransactionResponse,
@@ -25,14 +29,16 @@ import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop } from '@/utils/component/helpers';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
+import { getHowLongAgo } from '@/utils/timeUtils';
 
-import { getOverviewStats } from './[group]-helpers';
+import { createComment, getOverviewStats } from './[group]-helpers';
 
 export default function GroupPage() {
   const router = useRouter();
   const currentPath = usePathname();
 
   const [currentMember, setCurrentMember] = useState('');
+  const [commentText, setCommentText] = useState('');
 
   const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);
 
@@ -40,14 +46,17 @@ export default function GroupPage() {
     data: groupData,
     error: groupError,
     isLoading: isLoadingGroup,
-  } = useSwr<Group, CustomError>(`/api${currentPath}`, fetcher);
+  } = useSwr<Group, CustomError>(
+    () => (currentPath ? `/api${currentPath}` : null),
+    fetcher
+  );
 
   const {
     data: transactionsData,
     error: transactionsError,
     isLoading: isLoadingTransactions,
   } = useSwr<TransactionResponse, CustomError>(
-    `/api${currentPath}/transactions`,
+    () => (currentPath ? `/api${currentPath}/transactions` : null),
     fetcher
   );
 
@@ -56,7 +65,16 @@ export default function GroupPage() {
     error: paidDebtsError,
     isLoading: isLoadingPaidDebts,
   } = useSwr<PaidDebtResponse, CustomError>(
-    `/api${currentPath}/debts`,
+    () => (currentPath ? `/api${currentPath}/debts` : null),
+    fetcher
+  );
+
+  const {
+    data: commentsData,
+    error: commentsError,
+    isLoading: isLoadingComments,
+  } = useSwr<CommentResponse, CustomError>(
+    () => (currentPath ? `/api${currentPath}/comments` : null),
     fetcher
   );
 
@@ -72,7 +90,12 @@ export default function GroupPage() {
     localStorage.setItem('currentMember', currentMember);
   }, [currentMember]);
 
-  if (isLoadingGroup || isLoadingTransactions || isLoadingPaidDebts) {
+  if (
+    isLoadingGroup ||
+    isLoadingTransactions ||
+    isLoadingPaidDebts ||
+    !currentPath
+  ) {
     return displayBackdrop();
   }
 
@@ -83,10 +106,10 @@ export default function GroupPage() {
     return router.push('/500');
   }
 
-  const currencyCode = groupData!.currency || '';
+  const currencyCode = groupData?.currency || '';
 
   const currencySymbol: string =
-    currencyCodeSymbolMap.get(groupData!.currency) || '';
+    currencyCodeSymbolMap.get(groupData?.currency || '') || '';
 
   const [groupCost, membersMap] = getOverviewStats(
     transactionsData!.transactions,
@@ -95,6 +118,27 @@ export default function GroupPage() {
   );
 
   const debtAmount = membersMap.get(currentMember)?.debt || 0;
+
+  function displayComments() {
+    return (
+      <ul className="space-y-2">
+        {commentsData!.comments.map((commentRecord: Comment) => {
+          return (
+            <li
+              className="flexbox-col w-full rounded border-2 border-teal-400 p-2"
+              key={commentRecord.commentId}
+            >
+              <div className="flexbox-row">
+                <div>{commentRecord.commenter}</div>
+                <div>{getHowLongAgo(commentRecord.createdDate)}</div>
+              </div>
+              <div>{commentRecord.comment}</div>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
 
   return (
     <RootLayout>
@@ -187,18 +231,44 @@ export default function GroupPage() {
             dispatch={dispatch}
           />
         </div>
-        <div className="flexbox-col w-full space-y-2 bg-white p-2">{}</div>
         <div className="flexbox-row w-full p-2">
           <div className="text-2xl">Comments</div>
         </div>
         <div className="w-full">
-          <textarea
+          <TextareaAutosize
             className="my-2 inline-block w-full overflow-hidden rounded p-1"
             id="commentText"
+            onChange={(e) => setCommentText(e.target.value)}
           />
-          <button className="rounded bg-blue-500 p-2" type="button">
+          <button
+            className="rounded bg-blue-500 p-2"
+            type="button"
+            onClick={(e) =>
+              createComment(
+                e,
+                groupData!.groupId,
+                currentMember,
+                commentText,
+                currentPath,
+                dispatch
+              )
+            }
+          >
             Send
           </button>
+        </div>
+        <div>
+          {commentsData?.comments.length !== 0 ? (
+            <div className="flexbox-col mt-2 w-full space-y-2 p-2">
+              {isLoadingComments || commentsError ? (
+                <CircularProgress />
+              ) : (
+                displayComments()
+              )}
+            </div>
+          ) : (
+            <div />
+          )}
         </div>
       </div>
       <Snackbar

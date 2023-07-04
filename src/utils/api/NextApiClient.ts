@@ -1,4 +1,6 @@
 import type {
+  CommentCreation,
+  CommentUpdate,
   GroupCreation,
   PaidDebtCreation,
   PaidDebtUpdate,
@@ -44,6 +46,21 @@ class NextApiClient extends HttpClient {
         this.put(`/api/groups/${body.groupId}/debts/${body.debtId}`, body),
       delete: (groupId: string, debtId: string) =>
         this.delete(`/api/groups/${groupId}/debts/${debtId}`),
+    };
+  }
+
+  get comments() {
+    return {
+      create: (body: CommentCreation) =>
+        this.post(`/api/groups/${body.groupId}/comments`, body),
+      get: (groupId: string) => this.get(`/api/groups/${groupId}/comments`),
+      update: (body: CommentUpdate) =>
+        this.put(
+          `/api/groups/${body.groupId}/comments/${body.commentId}`,
+          body
+        ),
+      delete: (groupId: string, commentId: string) =>
+        this.delete(`/api/groups/${groupId}/comments/${commentId}`),
     };
   }
 }

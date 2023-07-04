@@ -1,4 +1,11 @@
+import type { Dispatch } from 'react';
+import { mutate } from 'swr';
+
+import type { ActionType } from '@/components/hooks/snackbarReducer';
+import { ACTION_TYPES } from '@/components/hooks/snackbarReducer';
+import type { CommentCreation } from '@/interfaces/request';
 import type { PaidDebt, Transaction } from '@/interfaces/response';
+import NextApiClient from '@/utils/api/NextApiClient';
 
 export interface MemberDetails {
   cost: number;
@@ -58,4 +65,38 @@ export function getOverviewStats(
       memberDetails.paid - memberDetails.cost - memberDetails.received;
   });
   return [groupCost, membersMap];
+}
+
+export async function createComment(
+  e: React.MouseEvent,
+  groupId: string,
+  commenter: string,
+  comment: string,
+  currentPath: string,
+  dispatch: Dispatch<ActionType>
+) {
+  e.preventDefault();
+  const requestBody = {} as CommentCreation;
+  requestBody.groupId = groupId;
+  requestBody.commenter = commenter;
+  requestBody.comment = comment;
+
+  const nextApiClient = new NextApiClient().jsonBody();
+  const response = await nextApiClient.comments.create(requestBody);
+
+  if (!response.ok) {
+    dispatch({
+      type: ACTION_TYPES.OPEN_ERROR,
+      message:
+        response.status === 400
+          ? 'Field validation failed'
+          : 'Failed to create comment',
+    });
+    return;
+  }
+  dispatch({
+    type: ACTION_TYPES.OPEN_SUCCESS,
+    message: 'Comment created',
+  });
+  mutate(`/api${currentPath}/comments`);
 }

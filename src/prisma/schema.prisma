@@ -6,6 +6,7 @@ model Group {
 	transactions Transaction[]
 	history History[]
 	paidDebts PaidDebt[]
+	comments Comment[]
 }
 
 model Transaction {
@@ -49,6 +50,18 @@ model PaidDebt {
 	currency String
 
 	@@unique([groupId, debtId])
+}
+
+model Comment {
+	groupId String
+	group Group @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
+
+	commentId String @id @default(uuid())
+	commenter String
+	comment String
+	createdDate DateTime
+
+	@@unique([groupId, commentId])
 }
 
 datasource db {

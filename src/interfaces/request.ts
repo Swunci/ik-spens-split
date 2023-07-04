@@ -34,3 +34,13 @@ export interface PaidDebtUpdate extends PaidDebtCreation {
 export interface PaidDebtDeletion {
   debtId: string;
 }
+
+export interface CommentCreation {
+  groupId: string;
+  commenter: string;
+  comment: string;
+}
+
+export interface CommentUpdate extends CommentCreation {
+  commentId: string;
+}

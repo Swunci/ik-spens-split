@@ -48,6 +48,17 @@ CREATE TABLE "PaidDebt" (
     CONSTRAINT "PaidDebt_pkey" PRIMARY KEY ("debtId")
 );
 
+-- CreateTable
+CREATE TABLE "Comment" (
+    "groupId" TEXT NOT NULL,
+    "commentId" TEXT NOT NULL,
+    "commenter" TEXT NOT NULL,
+    "comment" TEXT NOT NULL,
+    "createdDate" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Comment_pkey" PRIMARY KEY ("commentId")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Transaction_groupId_transactionId_key" ON "Transaction"("groupId", "transactionId");
 
@@ -57,6 +68,9 @@ CREATE UNIQUE INDEX "History_groupId_historyId_key" ON "History"("groupId", "his
 -- CreateIndex
 CREATE UNIQUE INDEX "PaidDebt_groupId_debtId_key" ON "PaidDebt"("groupId", "debtId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Comment_groupId_commentId_key" ON "Comment"("groupId", "commentId");
+
 -- AddForeignKey
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("groupId") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -65,3 +79,6 @@ ALTER TABLE "History" ADD CONSTRAINT "History_groupId_fkey" FOREIGN KEY ("groupI
 
 -- AddForeignKey
 ALTER TABLE "PaidDebt" ADD CONSTRAINT "PaidDebt_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("groupId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Comment" ADD CONSTRAINT "Comment_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("groupId") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -47,3 +47,15 @@ export interface History {
 export interface HistoryResponse {
   history: Array<History>;
 }
+
+export interface Comment {
+  groupId: string;
+  commentId: string;
+  commenter: string;
+  comment: string;
+  createdDate: Date;
+}
+
+export interface CommentResponse {
+  comments: Array<Comment>;
+}
