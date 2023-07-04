@@ -79,7 +79,15 @@ export async function createComment(
   const requestBody = {} as CommentCreation;
   requestBody.groupId = groupId;
   requestBody.commenter = commenter;
-  requestBody.comment = comment;
+  requestBody.comment = comment.trim();
+
+  if (requestBody.comment === '') {
+    dispatch({
+      type: ACTION_TYPES.OPEN_ERROR,
+      message: 'Comment is empty',
+    });
+    return;
+  }
 
   const nextApiClient = new NextApiClient().jsonBody();
   const response = await nextApiClient.comments.create(requestBody);
@@ -87,10 +95,7 @@ export async function createComment(
   if (!response.ok) {
     dispatch({
       type: ACTION_TYPES.OPEN_ERROR,
-      message:
-        response.status === 400
-          ? 'Field validation failed'
-          : 'Failed to create comment',
+      message: 'Failed to create comment',
     });
     return;
   }

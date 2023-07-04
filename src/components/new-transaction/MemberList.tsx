@@ -1,3 +1,7 @@
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
@@ -69,24 +73,43 @@ export default function MembersList({
   return (
     <>
       <div className="flexbox-row gap-2 py-2">
-        <select
-          className="my-2 bg-white p-1"
-          onChange={(e) => setSplitType(e.target.value.toLowerCase())}
+        <FormControl
+          size="small"
+          fullWidth={false}
+          className="h-fit border-alice-main"
         >
-          <option>Equal</option>
-          <option>Weight</option>
-          <option>Custom</option>
-        </select>
+          <Select
+            className="static bg-alice-base py-0"
+            defaultValue="Equal"
+            onChange={(e) => setSplitType(e.target.value.toLowerCase())}
+          >
+            <MenuItem key="Equal" value="Equal">
+              <Typography className="whitespace-normal break-words" noWrap>
+                Equal
+              </Typography>
+            </MenuItem>
+            <MenuItem key="Weight" value="Weight">
+              <Typography className="whitespace-normal break-words" noWrap>
+                Weight
+              </Typography>
+            </MenuItem>
+            <MenuItem key="Custom" value="Custom">
+              <Typography className="whitespace-normal break-words" noWrap>
+                Custom
+              </Typography>
+            </MenuItem>
+          </Select>
+        </FormControl>
         <div className="flexbox-row max-w-fit gap-1 p-2">
           <button
-            className="rounded bg-blue-300 p-2"
+            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
             type="button"
             onClick={() => handleSelectAll(true)}
           >
             Select All
           </button>
           <button
-            className="rounded bg-blue-300 p-2"
+            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
             type="button"
             onClick={() => handleSelectAll(false)}
           >
@@ -94,7 +117,7 @@ export default function MembersList({
           </button>
         </div>
       </div>
-      <ul className="max-w-screen-md space-y-4 pt-2">
+      <ul className="max-w-screen-md space-y-4 rounded bg-alice-main p-2">
         {transactionContext!.membersList
           .filter((member: IMember) => {
             if (transactionContext!.transactionType === 'loan') {

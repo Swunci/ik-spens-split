@@ -69,23 +69,34 @@ export default function DebtItem({
   }
 
   return (
-    <li className="flexbox-row p-2" key={`${debt.creditor}${debt.debtor}`}>
+    <li
+      className="flexbox-row bg-alice-base p-2 shadow-md"
+      key={`${debt.creditor}${debt.debtor}`}
+    >
       {isSettled ? (
         <>
-          <div>
+          <div className="p-1">
             {debt.debtor} settled up with {debt.creditor}
           </div>
-          <button type="button" onClick={(e) => undoPaidDebt(e)}>
+          <button
+            className="rounded bg-alice-accent px-2 py-1 text-alice-base shadow-md"
+            type="button"
+            onClick={(e) => undoPaidDebt(e)}
+          >
             Undo
           </button>
         </>
       ) : (
         <>
-          <div>
+          <div className="p-1">
             {debt.debtor} owes {debt.creditor} {currencySymbol}
             {Math.abs(debt.paidAmount).toFixed(2)}
           </div>
-          <button type="button" onClick={(e) => createPaidDebt(e)}>
+          <button
+            className="rounded bg-alice-accent px-2 py-1 text-alice-base shadow-md"
+            type="button"
+            onClick={(e) => createPaidDebt(e)}
+          >
             Settle
           </button>
         </>

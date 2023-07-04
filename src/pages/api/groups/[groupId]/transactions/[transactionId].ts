@@ -78,7 +78,7 @@ router
     const transactionId = params.transactionId
       ? (params.transactionId as string)
       : '';
-    const transaction: Transaction = await prisma.transaction
+    const deleted: Transaction = await prisma.transaction
       .delete({
         where: {
           transactionId,
@@ -93,10 +93,10 @@ router
         table: 'transaction',
         action: 'delete',
         createdDate: new Date(),
-        details: '',
+        details: JSON.stringify(deleted),
       },
     });
-    res.status(200).json(transaction);
+    res.status(200).json(deleted);
   });
 
 export default router.handler({

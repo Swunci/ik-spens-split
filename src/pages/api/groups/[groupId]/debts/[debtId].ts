@@ -79,7 +79,7 @@ router
         table: 'paidDebt',
         action: 'delete',
         createdDate: new Date(),
-        details: '',
+        details: JSON.stringify(deleted),
       },
     });
     res.status(200).json(deleted);

@@ -71,7 +71,9 @@ export default function DebtList({
     }
   }
   return debts.length === 0 ? (
-    <div className="flexbox-row p-2">All settled up</div>
+    <div className="flexbox-row rounded bg-alice-base p-2 shadow-md">
+      All settled up
+    </div>
   ) : (
     <ul>
       {debts.map((debt: Debt) => {

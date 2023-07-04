@@ -100,9 +100,9 @@ export default function Member({
   return (
     <li
       key={member.name}
-      className={`flex flex-row place-content-between items-center rounded border align-middle text-lg ${
-        member.isSelected ? 'border-black bg-green-400' : 'border-gray-200'
-      } ${isOver && member.isSelected ? 'bg-red-300' : ''}`}
+      className={`flex flex-row place-content-between items-center rounded border-2 bg-alice-base align-middle text-lg ${
+        member.isSelected ? 'border-alice-accent' : ''
+      } ${isOver && member.isSelected ? ' border-red-400' : ''}`}
     >
       <button
         className="flexbox-row w-full max-w-6/12 break-words p-2 py-3 mobile-disable-highlight"

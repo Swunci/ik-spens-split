@@ -1,5 +1,4 @@
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import { Button, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
@@ -115,7 +114,7 @@ export default function Transactions() {
           .map((transaction: Transaction) => {
             return (
               <li
-                className="flexbox-col w-full rounded border-2 border-teal-400 p-2"
+                className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
                 key={transaction.transactionId}
               >
                 <Link
@@ -158,7 +157,7 @@ export default function Transactions() {
     }
 
     return (
-      <ul>
+      <ul className="space-y-2">
         {paidDebtsData?.paidDebts
           .filter((paidDebt: PaidDebt) => {
             switch (dataOwner) {
@@ -179,7 +178,7 @@ export default function Transactions() {
           .map((paidDebt: PaidDebt) => {
             return (
               <li
-                className="flexbox-col w-full rounded border-2 border-teal-400 p-2"
+                className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
                 key={paidDebt.debtId}
               >
                 <Link
@@ -229,9 +228,12 @@ export default function Transactions() {
           }
           passHref
         >
-          <Button variant="outlined" startIcon={<ArrowBackIosIcon />}>
+          <button
+            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+            type="button"
+          >
             Back
-          </Button>
+          </button>
         </Link>
       </div>
       <div className="w-full p-2">
@@ -259,7 +261,9 @@ export default function Transactions() {
           <ToggleButton value="others">Others</ToggleButton>
         </ToggleButtonGroup>
       </div>
-      <div className="w-full p-2">{renderByDataType()}</div>
+      <div className="flexbox-col h-full w-full space-y-2 rounded bg-alice-main p-2 py-4">
+        {renderByDataType()}
+      </div>
     </RootLayout>
   );
 }

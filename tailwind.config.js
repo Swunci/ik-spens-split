@@ -81,6 +81,28 @@ export const theme = {
         800: '#2c5282',
         900: '#2a4365',
       },
+      celestial: {
+        blue: '#2892D7',
+      },
+      sea: {
+        green: '#5E8C61',
+      },
+      alice: {
+        base: '#F0F8FF',
+        main: '#D5E0FF',
+        accent: '#7E7DFF',
+        secondary: '#B6C9FF',
+      },
+      lilac: '#C8A2C8',
+      olivia: {
+        desert: '#E5C3B8',
+        jet: '#363434',
+        lavender: '#A586E6',
+        lotion: '#FAFAFA',
+      },
+      dark: {
+        grey: '#121212',
+      },
     },
     maxWidth: {
       '1/12': ' 8.333333%',

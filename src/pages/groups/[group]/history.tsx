@@ -9,6 +9,7 @@ import useSwr from 'swr';
 
 import type CustomError from '@/errors/customError';
 import type {
+  Comment,
   History,
   HistoryResponse,
   PaidDebt,
@@ -84,14 +85,14 @@ export default function HistoryPage() {
 
   function showHistory() {
     return (
-      <ul className="space-y-1">
+      <ul className="space-y-2">
         {historyData?.history.map((record: History) => {
           switch (record.table) {
             case 'group': {
               const group: Group = JSON.parse(record.details);
               return (
                 <li
-                  className="flexbox-col w-full rounded border-2 border-teal-400 p-2"
+                  className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
                   key={record.historyId}
                 >
                   <div className="flexbox-row">
@@ -114,7 +115,7 @@ export default function HistoryPage() {
               const transaction: Transaction = JSON.parse(record.details);
               return (
                 <li
-                  className="flexbox-col w-full rounded border-2 border-teal-400 p-2"
+                  className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
                   key={record.historyId}
                 >
                   <div className="flexbox-row">
@@ -146,7 +147,7 @@ export default function HistoryPage() {
               const paidDebt: PaidDebt = JSON.parse(record.details);
               return (
                 <li
-                  className="flexbox-col w-full rounded border-2 border-teal-400 p-2"
+                  className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
                   key={record.historyId}
                 >
                   <div className="flexbox-row">
@@ -167,9 +168,36 @@ export default function HistoryPage() {
                 </li>
               );
             }
+            case 'comment': {
+              const comment: Comment = JSON.parse(record.details);
+              return (
+                <li
+                  className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
+                  key={record.historyId}
+                >
+                  <div className="flexbox-row">
+                    <div className="text-base">
+                      {`${getAction(record.action)} comment`}
+                    </div>
+                    <div className="min-w-fit text-xs">
+                      {getHowLongAgo(record.createdDate)}
+                    </div>
+                  </div>
+                  <div className="flexbox-col gap-1 pt-1">
+                    <div className="text-xs">{comment.commenter}</div>
+                    <div className="text-xs">{comment.comment}</div>
+                  </div>
+                </li>
+              );
+            }
             default:
               return (
-                <div key={record.historyId}>Missing switch case for table</div>
+                <div
+                  className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
+                  key={record.historyId}
+                >
+                  Missing switch case for {record.table}
+                </div>
               );
           }
         })}
@@ -194,7 +222,7 @@ export default function HistoryPage() {
         </Link>
       </div>
       <Typography>History</Typography>
-      <div className="w-full p-2">{showHistory()}</div>
+      <div className="w-full rounded bg-alice-main p-2">{showHistory()}</div>
     </RootLayout>
   );
 }
