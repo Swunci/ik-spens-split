@@ -54,10 +54,6 @@ select {
 }
 
 @layer base {
-  
-}
- 
-@layer base {
 	html {
 		font-family: Inter, sans-serif
 	}

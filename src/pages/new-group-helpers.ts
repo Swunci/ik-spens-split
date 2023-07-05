@@ -9,6 +9,7 @@ import type { GroupCreation } from '@/interfaces/request';
 import type { Group } from '@/interfaces/response';
 import NextApiClient from '@/utils/api/NextApiClient';
 import { currencyNameCodeMap } from '@/utils/currencyUtil';
+import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
 
 export function onAddMember(
   e: React.MouseEvent,
@@ -62,14 +63,9 @@ export async function handleSubmit(
     });
     return;
   }
-  const body: Group = await response.json();
+  const group: Group = await response.json();
 
-  if (!localStorage.getItem('groups')) {
-    localStorage.setItem('groups', JSON.stringify(new Array<Group>()));
-  }
-  const groups: Array<Group> = JSON.parse(localStorage.getItem('groups')!);
-  groups.push(body);
-  localStorage.setItem('groups', JSON.stringify(groups));
+  saveGroupToLocalStorage(group);
 
-  router.push(`/groups/${body.groupId}`);
+  router.push(`/groups/${group.groupId}`);
 }

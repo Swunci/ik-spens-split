@@ -29,6 +29,7 @@ import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop } from '@/utils/component/helpers';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
+import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
 import { getHowLongAgo } from '@/utils/timeUtils';
 
 import { createComment, getOverviewStats } from './[group]-helpers';
@@ -79,11 +80,14 @@ export default function GroupPage() {
   );
 
   useEffect(() => {
-    setCurrentMember(groupData?.memberNames.at(0)!);
-    localStorage.setItem(
-      'groupSize',
-      JSON.stringify(groupData?.memberNames.length ?? 0)
-    );
+    if (groupData) {
+      setCurrentMember(groupData.memberNames.at(0)!);
+      localStorage.setItem(
+        'groupSize',
+        JSON.stringify(groupData.memberNames.length ?? 0)
+      );
+      saveGroupToLocalStorage(groupData);
+    }
   }, [groupData]);
 
   useEffect(() => {
