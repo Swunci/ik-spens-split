@@ -17,7 +17,7 @@ const transactionTypes = {
 const transactionMap = new Map(Object.entries(transactionTypes));
 
 export function getActionByTransactionType(transactionType: string) {
-  return transactionMap.get(transactionType.toLowerCase()) || '';
+  return transactionMap.get(transactionType.toLowerCase()) ?? '';
 }
 
 export function handleHowMuch(

@@ -17,5 +17,14 @@ module.exports = withBundleAnalyzer({
 });
 
 module.exports = {
-  pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
+  pageExtensions: [
+    'page.tsx',
+    'page.ts',
+    'page.jsx',
+    'page.js',
+    'route.tsx',
+    'route.ts',
+    'route.jsx',
+    'route.js',
+  ],
 };

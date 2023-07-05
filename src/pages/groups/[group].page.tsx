@@ -82,7 +82,7 @@ export default function GroupPage() {
     setCurrentMember(groupData?.memberNames.at(0)!);
     localStorage.setItem(
       'groupSize',
-      JSON.stringify(groupData?.memberNames.length || 0)
+      JSON.stringify(groupData?.memberNames.length ?? 0)
     );
   }, [groupData]);
 
@@ -106,10 +106,10 @@ export default function GroupPage() {
     return router.push('/500');
   }
 
-  const currencyCode = groupData?.currency || '';
+  const currencyCode = groupData?.currency ?? '';
 
-  const currencySymbol: string =
-    currencyCodeSymbolMap.get(groupData?.currency || '') || '';
+  const currencySymbol: string | undefined =
+    currencyCodeSymbolMap.get(currencyCode);
 
   const [groupCost, membersMap] = getOverviewStats(
     transactionsData!.transactions,
@@ -117,7 +117,7 @@ export default function GroupPage() {
     paidDebtsData!.paidDebts
   );
 
-  const debtAmount = membersMap.get(currentMember)?.debt || 0;
+  const debtAmount = membersMap.get(currentMember)?.debt ?? 0;
 
   function displayComments() {
     return (

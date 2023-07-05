@@ -224,7 +224,7 @@ export default function NewTransactionPage() {
           </div>
         </div>
 
-        <div className="w-full p-2">
+        <div className="w-full py-2">
           <div className="py-2">How to split?</div>
           <TransactionContext.Provider value={contextValue}>
             <MembersList memberNames={data!.memberNames} />
