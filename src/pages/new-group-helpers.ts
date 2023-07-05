@@ -46,7 +46,7 @@ export async function handleSubmit(
   e.preventDefault();
   const data: GroupCreation = <GroupCreation>{};
   data.groupName = groupNameRef.current!.value;
-  data.currency = currencyNameCodeMap.get(currencyRef.current!.value) || '';
+  data.currency = currencyNameCodeMap.get(currencyRef.current!.value) ?? '';
   data.members = [...currentMembers];
 
   const nextApiClient = new NextApiClient().jsonBody();
