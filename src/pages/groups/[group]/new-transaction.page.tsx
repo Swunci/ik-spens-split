@@ -75,10 +75,6 @@ export default function NewTransactionPage() {
     }
   }, [data]);
 
-  useEffect(() => {
-    console.log('new-transaction');
-  }, [transactionType, payer, totalCost, membersList]);
-
   if (isLoading || !groupId) {
     return displayBackdrop();
   }

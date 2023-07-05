@@ -31,10 +31,6 @@ export default function MembersList({
   };
 
   useEffect(() => {
-    console.log(transactionContext!.membersList);
-  }, [transactionContext!.membersList]);
-
-  useEffect(() => {
     if (transactionContext) {
       transactionContext.setMembersList(
         getMembersListBySplitType(
@@ -64,10 +60,6 @@ export default function MembersList({
         return member;
       })
     );
-  }, [memberNames]);
-
-  useEffect(() => {
-    console.log('MemberList - memberNames changed');
   }, [memberNames]);
 
   return (

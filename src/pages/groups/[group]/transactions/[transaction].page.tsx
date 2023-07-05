@@ -92,10 +92,6 @@ export default function EditTransactionPage() {
   }, [transactionData]);
 
   useEffect(() => {
-    console.log('edit-transaction');
-  }, [transactionType, payer, totalCost, membersList]);
-
-  useEffect(() => {
     if (isInitialMemberList && membersList.length !== 0) {
       const splitObj = JSON.parse(transactionData!.split);
       const updatedMembersList = membersList.map((member: IMember) => {
