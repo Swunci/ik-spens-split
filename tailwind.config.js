@@ -1,6 +1,4 @@
-/* eslint-disable global-require */
 /** @type {import('tailwindcss').Config} */
-import { fontFamily } from 'tailwindcss/defaultTheme';
 
 export const darkMode = ['class'];
 export const content = ['./src/**/*.{js,ts,jsx,tsx}'];
@@ -26,82 +24,11 @@ export const theme = {
   },
   extend: {
     colors: {
-      border: 'hsl(var(--border))',
-      input: 'hsl(var(--input))',
-      ring: 'hsl(var(--ring))',
-      background: 'hsl(var(--background))',
-      foreground: 'hsl(var(--foreground))',
-      primary: {
-        DEFAULT: 'hsl(var(--primary))',
-        foreground: 'hsl(var(--primary-foreground))',
-      },
-      secondary: {
-        DEFAULT: 'hsl(var(--secondary))',
-        foreground: 'hsl(var(--secondary-foreground))',
-      },
-      destructive: {
-        DEFAULT: 'hsl(var(--destructive))',
-        foreground: 'hsl(var(--destructive-foreground))',
-      },
-      muted: {
-        DEFAULT: 'hsl(var(--muted))',
-        foreground: 'hsl(var(--muted-foreground))',
-      },
-      accent: {
-        DEFAULT: 'hsl(var(--accent))',
-        foreground: 'hsl(var(--accent-foreground))',
-      },
-      popover: {
-        DEFAULT: 'hsl(var(--popover))',
-        foreground: 'hsl(var(--popover-foreground))',
-      },
-      card: {
-        DEFAULT: 'hsl(var(--card))',
-        foreground: 'hsl(var(--card-foreground))',
-      },
-      gray: {
-        100: '#f7fafc',
-        200: '#edf2f7',
-        300: '#e2e8f0',
-        400: '#cbd5e0',
-        500: '#a0aec0',
-        600: '#718096',
-        700: '#4a5568',
-        800: '#2d3748',
-        900: '#1a202c',
-      },
-      blue: {
-        100: '#ebf8ff',
-        200: '#bee3f8',
-        300: '#90cdf4',
-        400: '#63b3ed',
-        500: '#4299e1',
-        600: '#3182ce',
-        700: '#2b6cb0',
-        800: '#2c5282',
-        900: '#2a4365',
-      },
-      celestial: {
-        blue: '#2892D7',
-      },
-      sea: {
-        green: '#5E8C61',
-      },
       alice: {
         base: '#F0F8FF',
         main: '#D5E0FF',
         accent: '#7E7DFF',
         secondary: '#B6C9FF',
-      },
-      lilac: '#C8A2C8',
-      olivia: {
-        desert: '#E5C3B8',
-        jet: '#363434',
-        lavender: '#A586E6',
-        lotion: '#FAFAFA',
-      },
-      dark: {
-        grey: '#121212',
       },
     },
     maxWidth: {
@@ -117,28 +44,6 @@ export const theme = {
       '10/12': '83.333333%',
       '11/12': '91.666667%',
     },
-    borderRadius: {
-      lg: `var(--radius)`,
-      md: `calc(var(--radius) - 2px)`,
-      sm: 'calc(var(--radius) - 4px)',
-    },
-    fontFamily: {
-      sans: ['var(--font-sans)', ...fontFamily.sans],
-    },
-    keyframes: {
-      'accordion-down': {
-        from: { height: 0 },
-        to: { height: 'var(--radix-accordion-content-height)' },
-      },
-      'accordion-up': {
-        from: { height: 'var(--radix-accordion-content-height)' },
-        to: { height: 0 },
-      },
-    },
-    animation: {
-      'accordion-down': 'accordion-down 0.2s ease-out',
-      'accordion-up': 'accordion-up 0.2s ease-out',
-    },
   },
 };
 export const plugins = [
@@ -149,5 +54,4 @@ export const plugins = [
       },
     });
   },
-  require('tailwindcss-animate'),
 ];
