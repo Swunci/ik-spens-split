@@ -41,7 +41,7 @@ export default function NewGroupPage() {
         Create a new group
       </div>
       <form
-        className="flex w-full flex-col items-start"
+        className="flex w-full flex-col items-start space-y-4"
         onSubmit={(e) =>
           handleSubmit(
             e,
@@ -53,7 +53,10 @@ export default function NewGroupPage() {
           )
         }
       >
-        <label className="flex w-full flex-col p-2" htmlFor="groupName">
+        <label
+          className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
+          htmlFor="groupName"
+        >
           Group name
           <input
             className="mt-2 rounded p-1"
@@ -64,7 +67,10 @@ export default function NewGroupPage() {
             ref={groupNameRef}
           />
         </label>
-        <label className="flex flex-col p-2" htmlFor="mainCurrency">
+        <label
+          className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
+          htmlFor="mainCurrency"
+        >
           Main currency
           <select
             className="mt-2 rounded bg-white p-1"
@@ -75,7 +81,10 @@ export default function NewGroupPage() {
             {populateCurrencies()}
           </select>
         </label>
-        <label className="flex w-full flex-col p-2" htmlFor="addMembers">
+        <label
+          className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
+          htmlFor="addMembers"
+        >
           Add member(s)
           <div className="flex flex-row place-content-between">
             <input
@@ -86,7 +95,7 @@ export default function NewGroupPage() {
               ref={memberInputRef}
             />
             <button
-              className="mt-2 rounded bg-orange-400 p-2 px-4"
+              className="mt-2 rounded bg-alice-accent p-2 px-4 text-alice-base shadow-md"
               type="button"
               onClick={(e) =>
                 onAddMember(
@@ -101,15 +110,18 @@ export default function NewGroupPage() {
             </button>
           </div>
         </label>
-        <div className="flex w-fit max-w-full flex-col space-y-2 p-2">
+        <div className="flex w-full max-w-full flex-col space-y-2 rounded bg-alice-main p-2 shadow-md">
           <div>Current members ({currentMembers.size})</div>
           <MembersList
             currentMembers={currentMembers}
             onDelete={onDeleteMember}
           />
         </div>
-        <button className="m-2 bg-green-700 p-2" type="submit">
-          Create group
+        <button
+          className="m-1 rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+          type="submit"
+        >
+          Create
         </button>
       </form>
       <Snackbar

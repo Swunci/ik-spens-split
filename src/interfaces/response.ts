@@ -3,6 +3,7 @@ export interface Group {
   groupName: string;
   currency: string;
   memberNames: string[];
+  createdDate: Date;
 }
 
 export interface Transaction {

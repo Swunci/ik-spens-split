@@ -7,6 +7,7 @@ model Group {
 	history History[]
 	paidDebts PaidDebt[]
 	comments Comment[]
+	createdDate DateTime
 }
 
 model Transaction {

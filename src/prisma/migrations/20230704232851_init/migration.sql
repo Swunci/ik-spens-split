@@ -4,6 +4,7 @@ CREATE TABLE "Group" (
     "groupName" TEXT NOT NULL,
     "currency" TEXT NOT NULL,
     "memberNames" TEXT[],
+    "createdDate" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Group_pkey" PRIMARY KEY ("groupId")
 );

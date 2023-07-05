@@ -63,5 +63,13 @@ export async function handleSubmit(
     return;
   }
   const body: Group = await response.json();
+
+  if (!localStorage.getItem('groups')) {
+    localStorage.setItem('groups', JSON.stringify(new Array<Group>()));
+  }
+  const groups: Array<Group> = JSON.parse(localStorage.getItem('groups')!);
+  groups.push(body);
+  localStorage.setItem('groups', JSON.stringify(groups));
+
   router.push(`/groups/${body.groupId}`);
 }

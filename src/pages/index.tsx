@@ -1,185 +1,181 @@
-import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
+import type { Group } from '@/interfaces/response';
+import { HomeLayout } from '@/layouts/HomeLayout';
 import { Meta } from '@/layouts/Meta';
-import { Main } from '@/templates/Main';
+import { getLocaleDateString } from '@/utils/timeUtils';
 
 const Index = () => {
-  const router = useRouter();
+  const [groups, setGroups] = useState(new Array<Group>());
+  function displayRecentGroups() {
+    return groups.length === 0 ? (
+      <div />
+    ) : (
+      <div className="rounded bg-alice-main p-3 shadow-md">
+        <ul className="space-y-2">
+          {groups.map((group: Group) => {
+            return (
+              <li
+                className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
+                key={group.groupId}
+              >
+                <Link href={`/groups/${group.groupId}`} passHref>
+                  <div className="flexbox-row">
+                    <div className="text-base">{group.groupName}</div>
+                    <div className="text-xs">
+                      {getLocaleDateString(group.createdDate)}
+                    </div>
+                  </div>
+                  <div className="flexbox-row">
+                    <div className="text-xs">
+                      Members: {group.memberNames?.join(', ')}
+                    </div>
+                    <div className="text-xs">Currency: {group.currency}</div>
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  }
+
+  useEffect(() => {
+    if (
+      typeof window !== 'undefined' &&
+      localStorage.getItem('groups') !== null
+    ) {
+      setGroups(JSON.parse(localStorage.getItem('groups')!));
+    }
+  }, []);
 
   return (
-    <Main
-      meta={
-        <Meta
-          title="Next.js Boilerplate Presentation"
-          description="Next js Boilerplate is the perfect starter code for your project. Build your React application with the Next.js framework."
-        />
-      }
-    >
-      <a href="https://github.com/ixartz/Next-js-Boilerplate">
-        <img
-          src={`${router.basePath}/assets/images/nextjs-starter-banner.png`}
-          alt="Nextjs starter banner"
-        />
-      </a>
-      <h2 className="text-2xl font-bold">
-        Boilerplate code for your Nextjs project with Tailwind CSS
-      </h2>
-      <p>
-        <span role="img" aria-label="rocket">
-          🚀
-        </span>{' '}
-        Next.js Boilerplate is a starter code for your Next js project by
-        putting developer experience first .{' '}
-        <span role="img" aria-label="zap">
-          ⚡️
-        </span>{' '}
-        Made with Next.js, TypeScript, ESLint, Prettier, Husky, Lint-Staged,
-        VSCode, Netlify, PostCSS, Tailwind CSS.
-      </p>
-      <h3 className="text-lg font-semibold">Next js Boilerplate Features</h3>
-      <p>Developer experience first:</p>
-      <ul>
-        <li>
-          <span role="img" aria-label="fire">
-            🔥
-          </span>{' '}
-          <a href="https://nextjs.org" rel="nofollow">
-            Next.js
-          </a>{' '}
-          for Static Site Generator
-        </li>
-        <li>
-          <span role="img" aria-label="art">
-            🎨
-          </span>{' '}
-          Integrate with{' '}
-          <a href="https://tailwindcss.com" rel="nofollow">
-            Tailwind CSS
-          </a>
-        </li>
-        <li>
-          <span role="img" aria-label="nail_care">
-            💅
-          </span>{' '}
-          PostCSS for processing Tailwind CSS
-        </li>
-        <li>
-          <span role="img" aria-label="tada">
-            🎉
-          </span>{' '}
-          Type checking Typescript
-        </li>
-        <li>
-          <span role="img" aria-label="pencil2">
-            ✏️
-          </span>{' '}
-          Linter with{' '}
-          <a href="https://eslint.org" rel="nofollow">
-            ESLint
-          </a>
-        </li>
-        <li>
-          <span role="img" aria-label="hammer_and_wrench">
-            🛠
-          </span>{' '}
-          Code Formatter with{' '}
-          <a href="https://prettier.io" rel="nofollow">
-            Prettier
-          </a>
-        </li>
-        <li>
-          <span role="img" aria-label="fox_face">
-            🦊
-          </span>{' '}
-          Husky for Git Hooks
-        </li>
-        <li>
-          <span role="img" aria-label="no_entry_sign">
-            🚫
-          </span>{' '}
-          Lint-staged for running linters on Git staged files
-        </li>
-        <li>
-          <span role="img" aria-label="no_entry_sign">
-            🗂
-          </span>{' '}
-          VSCode configuration: Debug, Settings, Tasks and extension for
-          PostCSS, ESLint, Prettier, TypeScript
-        </li>
-        <li>
-          <span role="img" aria-label="robot">
-            🤖
-          </span>{' '}
-          SEO metadata, JSON-LD and Open Graph tags with Next SEO
-        </li>
-        <li>
-          <span role="img" aria-label="robot">
-            ⚙️
-          </span>{' '}
-          <a
-            href="https://www.npmjs.com/package/@next/bundle-analyzer"
-            rel="nofollow"
-          >
-            Bundler Analyzer
-          </a>
-        </li>
-        <li>
-          <span role="img" aria-label="rainbow">
-            🌈
-          </span>{' '}
-          Include a FREE minimalist theme
-        </li>
-        <li>
-          <span role="img" aria-label="hundred">
-            💯
-          </span>{' '}
-          Maximize lighthouse score
-        </li>
-      </ul>
-      <p>Built-in feature from Next.js:</p>
-      <ul>
-        <li>
-          <span role="img" aria-label="coffee">
-            ☕
-          </span>{' '}
-          Minify HTML &amp; CSS
-        </li>
-        <li>
-          <span role="img" aria-label="dash">
-            💨
-          </span>{' '}
-          Live reload
-        </li>
-        <li>
-          <span role="img" aria-label="white_check_mark">
-            ✅
-          </span>{' '}
-          Cache busting
-        </li>
-      </ul>
-      <h3 className="text-lg font-semibold">Our Stater code Philosophy</h3>
-      <ul>
-        <li>Minimal code</li>
-        <li>SEO-friendly</li>
-        <li>
-          <span role="img" aria-label="rocket">
-            🚀
-          </span>{' '}
-          Production-ready
-        </li>
-      </ul>
-      <p>
-        Check our GitHub project for more information about{' '}
-        <a href="https://github.com/ixartz/Next-js-Boilerplate">
-          Nextjs Boilerplate
-        </a>
-        . You can also browse our{' '}
-        <a href="https://creativedesignsguru.com/category/nextjs/">
-          Premium NextJS Templates
-        </a>{' '}
-        on our website to support this project.
-      </p>
-    </Main>
+    <>
+      <Meta
+        title="GroupShare"
+        description="Application for sharing group expenses"
+      />
+      <HomeLayout>
+        <div className="flexbox-col space-y-4">
+          <header className="text-center">
+            <h1 className="text-3xl">Welcome to GroupShare!</h1>
+            <h2 className="text-2xl">
+              Effortless Group Expense Management Made Easy
+            </h2>
+          </header>
+          <section className="p-3">
+            <h3 className="text-alice-accent">Simplify Your Group Expenses</h3>
+            <p>
+              {`Tired of endless back-and-forth conversations about who paid for
+            what? Our powerful expense splitting tool takes the stress out of
+            sharing costs. Whether you're organizing a trip, throwing a party,
+            or simply splitting the rent, GroupShare has got you
+            covered.`}
+            </p>
+          </section>
+          <div className="w-full p-2">
+            <Link href="/new-group" passHref>
+              <button
+                className="w-full rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                type="button"
+              >
+                Get Started
+              </button>
+            </Link>
+          </div>
+
+          {displayRecentGroups()}
+
+          <section className="p-3">
+            <h3 className="text-2xl text-alice-accent">How It Works</h3>
+            <ol>
+              <li>
+                Create an Event: Start by setting up an event and inviting
+                participants. You can customize the event name, date, and
+                description to suit your needs.
+              </li>
+              <li>
+                {`Add Expenses: As expenses accumulate, easily log them in our
+              user-friendly interface. Specify the amount, category, and
+              participants involved. We'll take care of the rest!`}
+              </li>
+              <li>
+                Split & Settle: With just a few clicks, our intelligent
+                algorithm calculates the fairest way to split the expenses. You
+                can choose from various splitting methods, including equal,
+                percentage-based, or custom splits.
+              </li>
+              <li>
+                Track Debts: Our interactive dashboard allows you to monitor who
+                owes what, keeping everyone accountable. You can also send
+                friendly reminders and notifications to ensure timely
+                settlements.
+              </li>
+            </ol>
+          </section>
+
+          <section className="p-3">
+            <h3 className="text-2xl text-alice-accent">
+              Features That Simplify Your Life
+            </h3>
+            <ul>
+              <li>
+                Real-Time Updates: Stay up-to-date with live updates on expense
+                additions, modifications, and settlements.
+              </li>
+              <li>
+                Multi-Currency Support: No matter where your group adventure
+                takes you, our platform supports multiple currencies for
+                seamless global transactions.
+              </li>
+              <li>
+                Receipt Uploads: Easily attach receipts to expenses for a clear
+                record of your financial transactions.
+              </li>
+              <li>
+                Secure and Private: We prioritize your data privacy and use
+                industry-standard security measures to safeguard your
+                information.
+              </li>
+            </ul>
+          </section>
+
+          <section className="p-3">
+            <h3 className="text-2xl text-alice-accent">
+              Join Our Growing Community
+            </h3>
+            <p>
+              {`Become a part of our ever-expanding community of users who have
+            embraced a stress-free way to split expenses. Whether you're
+            traveling, hosting events, or managing shared living expenses, [Your
+            Website Name] is here to simplify your financial journey.`}
+            </p>
+          </section>
+
+          <section className="p-3">
+            <h3 className="text-2xl text-alice-accent">Get Started Today!</h3>
+            <p>
+              Start organizing your expenses, splitting bills, and maintaining
+              financial harmony. Create a group and experience the convenience
+              of effortless group expense management.
+            </p>
+          </section>
+
+          <div className="w-full p-2">
+            <Link href="/new-group" passHref>
+              <button
+                className="w-full rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                type="button"
+              >
+                Get Started
+              </button>
+            </Link>
+          </div>
+        </div>
+      </HomeLayout>
+    </>
   );
 };
 

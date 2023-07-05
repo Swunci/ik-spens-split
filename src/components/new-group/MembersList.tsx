@@ -9,14 +9,14 @@ export default function MembersList({
     onDelete(memberName);
   };
   return (
-    <ul className="max-w-screen-md space-y-1">
+    <ul className="max-w-screen-md space-y-2">
       {[...currentMembers]
         .sort((a, b) => a.localeCompare(b))
         .map((member: string) => {
           return (
             <li
               key={member}
-              className="flex flex-row place-content-between items-center rounded border border-gray-200 p-2 px-3 align-middle text-sm"
+              className="flexbox-col flex w-full flex-row place-content-between items-center rounded border bg-alice-base p-2 px-3 align-middle text-sm shadow-md"
             >
               <span className="w-11/12 break-words pr-2">{member}</span>
               <svg

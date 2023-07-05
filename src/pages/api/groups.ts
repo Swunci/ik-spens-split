@@ -25,6 +25,7 @@ router.post(
           groupName: body.groupName,
           currency: body.currency,
           memberNames: body.members,
+          createdDate: new Date(),
         },
       })
       .catch(() => {
