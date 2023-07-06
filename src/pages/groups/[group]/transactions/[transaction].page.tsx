@@ -1,6 +1,6 @@
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { MenuItem, Select, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
 import Snackbar from '@mui/material/Snackbar';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -123,9 +123,12 @@ export default function EditTransactionPage() {
           href={currentPath.substring(0, currentPath.lastIndexOf('/'))}
           passHref
         >
-          <Button variant="outlined" startIcon={<ArrowBackIosIcon />}>
+          <button
+            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+            type="button"
+          >
             Back
-          </Button>
+          </button>
         </Link>
       </div>
       <form
@@ -149,71 +152,110 @@ export default function EditTransactionPage() {
         }}
       >
         <div className="flexbox-row w-full place-content-start gap-2 p-2">
-          <select
-            className="w-full bg-white p-2"
-            onChange={(e) => setPayer(e.target.value)}
-            defaultValue={transactionData!.payer}
+          <FormControl
+            size="small"
+            fullWidth={false}
+            className="h-fit border-alice-main"
           >
-            {groupData!.memberNames.map((member: string) => {
-              return <option key={member}>{member}</option>;
-            })}
-          </select>
-          <div className="bg-blue-400 p-2">
+            <Select
+              className="static bg-alice-base py-0"
+              defaultValue={transactionData!.payer}
+              onChange={(e) => setPayer(e.target.value)}
+            >
+              {groupData?.memberNames.map((name: string) => {
+                return (
+                  <MenuItem key={name} value={name}>
+                    <Typography
+                      className="whitespace-normal break-words"
+                      noWrap
+                    >
+                      {name}
+                    </Typography>
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+          <Typography className="flexbox-col max-w-fit justify-center">
             {getActionByTransactionType(transactionType)}
-          </div>
-          <select
-            className="bg-white p-2"
-            onChange={(e) => setTransactionType(e.currentTarget.value)}
-            defaultValue={transactionData!.type}
+          </Typography>
+          <FormControl
+            size="small"
+            fullWidth={false}
+            className="h-fit border-alice-main"
           >
-            <option>expense</option>
-            <option>loan</option>
-            <option>income</option>
-          </select>
+            <Select
+              className="static bg-alice-base py-0"
+              defaultValue={transactionData!.type}
+              onChange={(e) => setTransactionType(e.target.value)}
+            >
+              <MenuItem value="expense">
+                <Typography className="whitespace-normal break-words" noWrap>
+                  expense
+                </Typography>
+              </MenuItem>
+              <MenuItem value="loan">
+                <Typography className="whitespace-normal break-words" noWrap>
+                  loan
+                </Typography>
+              </MenuItem>
+              <MenuItem value="income">
+                <Typography className="whitespace-normal break-words" noWrap>
+                  income
+                </Typography>
+              </MenuItem>
+            </Select>
+          </FormControl>
         </div>
-        <div className="w-full p-2">
-          <label className="flex w-full flex-col" htmlFor="howMuch">
-            How much?
-            <input
-              className={`mt-2 rounded p-1 ${amountError ? 'bg-red-300' : ''}`}
-              id="howMuch"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Amount"
-              required
-              value={totalCost === 0 ? '' : totalCost}
-              defaultValue={transactionData!.amount}
-              onChange={(e) => handleHowMuch(e, setTotalCost, setAmountError)}
-            />
-          </label>
-        </div>
-        <div className="w-full p-2">
-          <label className="flex w-full flex-col" htmlFor="whatFor">
-            What for?
-            <input
-              className="mt-2 rounded p-1"
-              id="whatFor"
-              type="text"
-              placeholder="Food"
-              required
-              ref={descriptionRef}
-              defaultValue={transactionData!.description}
-            />
-          </label>
-        </div>
-        <div className="w-full p-2">
-          <label className="flex w-full flex-col" htmlFor="when">
-            When?
-            <input
-              className="mt-2 rounded bg-white p-1"
-              id="when"
-              type="date"
-              required
-              ref={dateRef}
-              defaultValue={getLocaleDateString(transactionData!.date)}
-            />
-          </label>
+        <div className="flexbox-col w-full space-y-4">
+          <div className="w-full rounded bg-alice-main p-2">
+            <label className="flex w-full flex-col" htmlFor="howMuch">
+              How much?
+              <input
+                className={`mt-2 rounded bg-alice-base p-1 ${
+                  amountError ? 'bg-red-300' : ''
+                }`}
+                id="howMuch"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Amount"
+                required
+                value={totalCost === 0 ? '' : totalCost}
+                defaultValue={transactionData!.amount}
+                onChange={(e) => handleHowMuch(e, setTotalCost, setAmountError)}
+              />
+            </label>
+          </div>
+
+          <div className="w-full rounded bg-alice-main p-2">
+            <label className="flex w-full flex-col" htmlFor="whatFor">
+              What for?
+              <input
+                className="mt-2 rounded bg-alice-base p-1"
+                id="whatFor"
+                type="text"
+                placeholder="Food"
+                required
+                ref={descriptionRef}
+                defaultValue={transactionData!.description}
+              />
+            </label>
+          </div>
+
+          <div className="w-full rounded bg-alice-main p-2">
+            <label className="flex w-full flex-col" htmlFor="when">
+              When?
+              <input
+                className="mt-2 rounded bg-alice-base p-1"
+                id="when"
+                type="date"
+                ref={dateRef}
+                defaultValue={getLocaleDateString(transactionData!.date)}
+                required
+              />
+            </label>
+          </div>
         </div>
         <div className="w-full p-2">
           <div className="py-2">How to split?</div>
@@ -222,11 +264,14 @@ export default function EditTransactionPage() {
           </TransactionContext.Provider>
         </div>
         <div className="flexbox-row w-full p-2">
-          <button className="rounded bg-red-700 p-2" type="submit">
+          <button
+            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+            type="submit"
+          >
             Update
           </button>
           <button
-            className="rounded bg-red-700 p-2"
+            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
             type="button"
             onClick={async (e) => {
               const isDeleted = await handleTransactionDelete(

@@ -4,6 +4,12 @@ export interface GroupCreation {
   members: Array<string>;
 }
 
+export interface GroupUpdate {
+  groupId: string;
+  groupName: string;
+  currency: string;
+}
+
 export interface TransactionCreation {
   groupId: string;
   payer: string;

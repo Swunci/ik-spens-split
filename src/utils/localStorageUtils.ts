@@ -9,6 +9,16 @@ function containsGroup(groups: Array<Group>, groupId: string) {
   return false;
 }
 
+function updateGroups(groups: Array<Group>, updatedGroup: Group) {
+  const updatedGroups = groups.map((group) => {
+    if (group.groupId === updatedGroup.groupId) {
+      return updatedGroup;
+    }
+    return group;
+  });
+  return updatedGroups;
+}
+
 export function saveGroupToLocalStorage(group: Group) {
   if (!localStorage.getItem('groups')) {
     localStorage.setItem('groups', JSON.stringify(new Array<Group>()));
@@ -19,4 +29,17 @@ export function saveGroupToLocalStorage(group: Group) {
     groups.push(group);
     localStorage.setItem('groups', JSON.stringify(groups));
   }
+}
+
+export function updateLocalStorageGroup(group: Group) {
+  if (!localStorage.getItem('groups')) {
+    localStorage.setItem('groups', JSON.stringify(new Array<Group>()));
+  }
+  let groups: Array<Group> = JSON.parse(localStorage.getItem('groups')!);
+  if (containsGroup(groups, group.groupId)) {
+    groups = updateGroups(groups, group);
+  } else {
+    groups.push(group);
+  }
+  localStorage.setItem('groups', JSON.stringify(groups));
 }

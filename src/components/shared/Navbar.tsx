@@ -1,4 +1,4 @@
-import { Grow, MenuList } from '@mui/material';
+import { Grow, MenuList, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import MenuItem from '@mui/material/MenuItem';
@@ -39,6 +39,14 @@ export default function Navbar() {
     setOpen(false);
   }
 
+  function handleEditGroup(e: React.MouseEvent) {
+    e.preventDefault();
+    if (typeof groupId === 'string') {
+      router.push(`/groups/${groupId}/edit`);
+    }
+    setOpen(false);
+  }
+
   function handleHistoryClick(e: React.MouseEvent) {
     e.preventDefault();
     if (typeof groupId === 'string') {
@@ -75,7 +83,7 @@ export default function Navbar() {
         </Link>
         <div className="h-full">
           <Button
-            className="h-full text-base text-black"
+            className="h-full text-base"
             sx={{ textTransform: 'none' }}
             ref={anchorRef}
             id="composition-button"
@@ -84,7 +92,7 @@ export default function Navbar() {
             aria-haspopup="true"
             onClick={handleToggle}
           >
-            More
+            <Typography className="text-black">More</Typography>
           </Button>
           <Popper
             open={open}
@@ -113,7 +121,9 @@ export default function Navbar() {
                       <MenuItem onClick={(e) => handleNewGroup(e)}>
                         New Group
                       </MenuItem>
-                      <MenuItem onClick={handleClose}>Edit Group</MenuItem>
+                      <MenuItem onClick={(e) => handleEditGroup(e)}>
+                        Edit Group
+                      </MenuItem>
                       <MenuItem onClick={(e) => handleHistoryClick(e)}>
                         History
                       </MenuItem>

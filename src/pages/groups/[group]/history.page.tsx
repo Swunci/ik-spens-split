@@ -1,5 +1,3 @@
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import type { Group } from '@prisma/client';
 import Link from 'next/link';
@@ -96,7 +94,9 @@ export default function HistoryPage() {
                   key={record.historyId}
                 >
                   <div className="flexbox-row">
-                    <div className="text-base">Created group</div>
+                    <div className="text-base">
+                      {getAction(record.action)} group
+                    </div>
                     <div className="min-w-fit text-xs">
                       {getHowLongAgo(record.createdDate)}
                     </div>
@@ -216,12 +216,15 @@ export default function HistoryPage() {
           }
           passHref
         >
-          <Button variant="outlined" startIcon={<ArrowBackIosIcon />}>
+          <button
+            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+            type="button"
+          >
             Back
-          </Button>
+          </button>
         </Link>
       </div>
-      <Typography>History</Typography>
+      <Typography className="pb-2 text-3xl">History</Typography>
       <div className="w-full rounded bg-alice-main p-2">{showHistory()}</div>
     </RootLayout>
   );
