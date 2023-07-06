@@ -63,6 +63,9 @@ export function getOverviewStats(
     const details = memberDetails;
     details.debt =
       memberDetails.paid - memberDetails.cost - memberDetails.received;
+    if (Math.abs(details.debt) < 0.01) {
+      details.debt = 0;
+    }
   });
   return [groupCost, membersMap];
 }

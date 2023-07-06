@@ -1,8 +1,13 @@
-import { ToggleButton, ToggleButtonGroup } from '@mui/material';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSwr from 'swr';
 
 import type CustomError from '@/errors/customError';
@@ -27,16 +32,16 @@ export default function Transactions() {
 
   const [dataOwner, setDataOwner] = useState('all');
   const [dataType, setDataType] = useState('transactions');
+  const [currentMember, setCurrentMember] = useState('');
 
-  const currentMember =
-    typeof window !== 'undefined'
-      ? localStorage.getItem('currentMember') ?? ''
-      : '';
-
-  const { error: groupError, isLoading: isLoadingGroup } = useSwr<
-    Group,
-    CustomError
-  >(() => (groupId ? `/api/groups/${groupId}` : null), fetcher);
+  const {
+    data: groupData,
+    error: groupError,
+    isLoading: isLoadingGroup,
+  } = useSwr<Group, CustomError>(
+    () => (groupId ? `/api/groups/${groupId}` : null),
+    fetcher
+  );
 
   const {
     data: transactionsData,
@@ -57,6 +62,12 @@ export default function Transactions() {
       : null,
     fetcher
   );
+
+  useEffect(() => {
+    if (groupData) {
+      setCurrentMember(groupData.memberNames.at(0)!);
+    }
+  }, [groupData]);
 
   if (
     isLoadingTransactions ||
@@ -219,8 +230,9 @@ export default function Transactions() {
   }
   return (
     <RootLayout>
-      <div className="w-full p-2">
+      <div className="flexbox-row w-full py-2">
         <Link
+          className="p-2"
           href={
             currentPath
               ? currentPath.substring(0, currentPath.lastIndexOf('/'))
@@ -235,7 +247,35 @@ export default function Transactions() {
             Back
           </button>
         </Link>
+        <div className="flexbox-row max-w-full items-center justify-end p-2">
+          <Typography className="min-w-fit p-1">View as</Typography>
+          <FormControl
+            size="small"
+            fullWidth={false}
+            className="border-alice-main"
+          >
+            <Select
+              className="static bg-alice-base"
+              defaultValue={groupData?.memberNames.at(0)}
+              onChange={(e) => setCurrentMember(e.target.value)}
+            >
+              {groupData?.memberNames.map((name: string) => {
+                return (
+                  <MenuItem key={name} value={name}>
+                    <Typography
+                      className="whitespace-normal break-words"
+                      noWrap
+                    >
+                      {name}
+                    </Typography>
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+        </div>
       </div>
+
       <div className="w-full p-2">
         <ToggleButtonGroup
           value={dataType}

@@ -19,10 +19,12 @@ export type Debt = {
 export default function DebtList({
   membersMap,
   currencyCode,
+  currentPath,
   dispatch,
 }: {
   membersMap: Map<string, MemberDetails>;
   currencyCode: string;
+  currentPath: string;
   dispatch: Dispatch<ActionType>;
 }) {
   const creditors = new Array<MemberAmount>();
@@ -82,6 +84,7 @@ export default function DebtList({
             key={`${debt.creditor}${debt.debtor}`}
             debt={debt}
             currencyCode={currencyCode}
+            currentPath={currentPath}
             dispatch={dispatch}
           />
         );

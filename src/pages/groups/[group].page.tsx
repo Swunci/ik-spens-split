@@ -90,10 +90,6 @@ export default function GroupPage() {
     }
   }, [groupData]);
 
-  useEffect(() => {
-    localStorage.setItem('currentMember', currentMember);
-  }, [currentMember]);
-
   if (
     isLoadingGroup ||
     isLoadingTransactions ||
@@ -246,6 +242,7 @@ export default function GroupPage() {
           <DebtList
             membersMap={membersMap}
             currencyCode={currencyCode}
+            currentPath={currentPath}
             dispatch={dispatch}
           />
         </div>

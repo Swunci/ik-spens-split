@@ -55,15 +55,13 @@ export function calculateSplit(members: IMember[]) {
 }
 
 function mathChecksOut(membersList: IMember[], totalCost: number) {
-  return (
-    totalCost ===
-    membersList.reduce((cost: number, member: IMember) => {
-      if (member.isSelected) {
-        return cost + member.amount;
-      }
-      return cost;
-    }, 0)
-  );
+  const sum = membersList.reduce((cost: number, member: IMember) => {
+    if (member.isSelected) {
+      return cost + member.amount;
+    }
+    return cost;
+  }, 0);
+  return totalCost === sum;
 }
 
 export async function handleCreation(

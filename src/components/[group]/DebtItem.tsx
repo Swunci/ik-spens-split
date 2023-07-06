@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import type { Dispatch } from 'react';
 import { useState } from 'react';
+import { mutate } from 'swr';
 
 import type { PaidDebtCreation } from '@/interfaces/request';
 import type { PaidDebt } from '@/interfaces/response';
@@ -13,10 +14,12 @@ import type { Debt } from './DebtList';
 export default function DebtItem({
   debt,
   currencyCode,
+  currentPath,
   dispatch,
 }: {
   debt: Debt;
   currencyCode: string;
+  currentPath: string;
   dispatch: Dispatch<ActionType>;
 }) {
   const router = useRouter();
@@ -48,6 +51,7 @@ export default function DebtItem({
     const data: PaidDebt = await response.json();
     setIsSettled(true);
     setDebtId(data.debtId);
+    mutate(`/api${currentPath}/debts`);
   }
 
   async function undoPaidDebt(e: React.MouseEvent) {
