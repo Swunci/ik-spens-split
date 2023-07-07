@@ -11,6 +11,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useReducer, useState } from 'react';
 import useSwr from 'swr';
 
+import CommentList from '@/components/[group]/CommentList';
 import DebtList from '@/components/[group]/DebtList';
 import {
   ACTION_TYPES,
@@ -19,7 +20,6 @@ import {
 } from '@/components/hooks/snackbarReducer';
 import type CustomError from '@/errors/customError';
 import type {
-  Comment,
   CommentResponse,
   Group,
   PaidDebtResponse,
@@ -30,7 +30,6 @@ import { displayBackdrop } from '@/utils/component/helpers';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
-import { getHowLongAgo } from '@/utils/timeUtils';
 
 import { createComment, getOverviewStats } from './[group]-helpers';
 
@@ -118,27 +117,6 @@ export default function GroupPage() {
   );
 
   const debtAmount = membersMap.get(currentMember)?.debt ?? 0;
-
-  function displayComments() {
-    return (
-      <ul className="space-y-2">
-        {commentsData!.comments.map((commentRecord: Comment) => {
-          return (
-            <li
-              className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
-              key={commentRecord.commentId}
-            >
-              <div className="flexbox-row">
-                <div>{commentRecord.commenter}</div>
-                <div>{getHowLongAgo(commentRecord.createdDate)}</div>
-              </div>
-              <div>{commentRecord.comment}</div>
-            </li>
-          );
-        })}
-      </ul>
-    );
-  }
 
   return (
     <RootLayout>
@@ -279,7 +257,11 @@ export default function GroupPage() {
               {isLoadingComments || commentsError ? (
                 <CircularProgress />
               ) : (
-                displayComments()
+                <CommentList
+                  comments={commentsData!.comments}
+                  memberNames={groupData!.memberNames}
+                  dispatch={dispatch}
+                />
               )}
             </div>
           ) : (
