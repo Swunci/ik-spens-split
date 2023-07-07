@@ -161,9 +161,11 @@ export default function HistoryPage() {
                   <div className="flexbox-col gap-1 pt-1">
                     <div className="text-xs">{`${
                       paidDebt.debtor
-                    } paid ${currencyCodeSymbolMap.get(paidDebt.currency)}${
-                      paidDebt.amount
-                    } to ${paidDebt.creditor}`}</div>
+                    } paid ${currencyCodeSymbolMap.get(
+                      paidDebt.currency
+                    )}${paidDebt.amount.toFixed(2)} to ${
+                      paidDebt.creditor
+                    }`}</div>
                   </div>
                 </li>
               );

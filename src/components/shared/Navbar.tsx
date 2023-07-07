@@ -7,6 +7,19 @@ import Popper from '@mui/material/Popper';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
+import useSwr from 'swr';
+import * as XLSX from 'xlsx';
+
+import type CustomError from '@/errors/customError';
+import type {
+  Group,
+  PaidDebt,
+  PaidDebtResponse,
+  Transaction,
+  TransactionResponse,
+} from '@/interfaces/response';
+import { fetcher } from '@/utils/fetcherWrapper';
+import { getLocaleDateString } from '@/utils/timeUtils';
 
 export default function Navbar() {
   const router = useRouter();
@@ -15,6 +28,21 @@ export default function Navbar() {
 
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLButtonElement>(null);
+
+  const { data: groupData } = useSwr<Group, CustomError>(
+    () => (groupId ? `/api/groups/${groupId}` : null),
+    fetcher
+  );
+
+  const { data: transactionsData } = useSwr<TransactionResponse, CustomError>(
+    () => (groupId ? `/api/groups/${groupId}/transactions` : null),
+    fetcher
+  );
+
+  const { data: paidDebtsData } = useSwr<PaidDebtResponse, CustomError>(
+    () => (groupId ? `/api/groups/${groupId}/debts` : null),
+    fetcher
+  );
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -51,6 +79,59 @@ export default function Navbar() {
     e.preventDefault();
     if (typeof groupId === 'string') {
       router.push(`/groups/${groupId}/history`);
+    }
+    setOpen(false);
+  }
+
+  function handleExportToExcel(e: React.MouseEvent) {
+    e.preventDefault();
+    if (groupData && transactionsData && paidDebtsData) {
+      const { memberNames } = groupData;
+      const jsonObjects: any[] = [];
+      transactionsData.transactions.forEach((transaction: Transaction) => {
+        const splitMap: Map<string, number> = new Map<string, number>(
+          Object.entries(JSON.parse(transaction.split))
+        );
+        memberNames.forEach((name: string) => {
+          if (splitMap.has(name)) {
+            splitMap.set(name, parseFloat(splitMap.get(name)!.toFixed(2)));
+          } else {
+            splitMap.set(name, 0.0);
+          }
+        });
+        jsonObjects.push({
+          date: getLocaleDateString(transaction.date),
+          payer: transaction.payer,
+          type: transaction.type,
+          amount: parseFloat(transaction.amount.toFixed(2)),
+          currency: transaction.currency,
+          description: transaction.description,
+          ...Object.fromEntries(splitMap.entries()),
+        });
+      });
+
+      paidDebtsData.paidDebts.forEach((paidDebt: PaidDebt) => {
+        const splitMap: Map<string, number> = new Map<string, number>();
+        splitMap.set(paidDebt.creditor, parseFloat(paidDebt.amount.toFixed(2)));
+        memberNames.forEach((name: string) => {
+          if (!splitMap.has(name)) {
+            splitMap.set(name, 0.0);
+          }
+        });
+        jsonObjects.push({
+          date: getLocaleDateString(paidDebt.date),
+          payer: paidDebt.debtor,
+          type: 'settlement',
+          amount: parseFloat(paidDebt.amount.toFixed(2)),
+          currency: paidDebt.currency,
+          description: 'paid money back',
+          ...Object.fromEntries(splitMap.entries()),
+        });
+      });
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(jsonObjects);
+      XLSX.utils.book_append_sheet(wb, ws, groupData.groupName);
+      XLSX.writeFile(wb, `${groupData.groupName}.xlsx`);
     }
     setOpen(false);
   }
@@ -127,7 +208,9 @@ export default function Navbar() {
                       <MenuItem onClick={(e) => handleHistoryClick(e)}>
                         History
                       </MenuItem>
-                      <MenuItem onClick={handleClose}>Export as Excel</MenuItem>
+                      <MenuItem onClick={(e) => handleExportToExcel(e)}>
+                        Export as Excel
+                      </MenuItem>
                     </MenuList>
                   </ClickAwayListener>
                 </Paper>

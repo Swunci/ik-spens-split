@@ -74,7 +74,7 @@ export default function DebtItem({
 
   return (
     <li
-      className="flexbox-row bg-alice-base p-2 shadow-md"
+      className="flexbox-row rounded bg-alice-base p-2 shadow-md"
       key={`${debt.creditor}${debt.debtor}`}
     >
       {isSettled ? (

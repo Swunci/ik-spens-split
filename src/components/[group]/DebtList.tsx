@@ -77,7 +77,7 @@ export default function DebtList({
       All settled up
     </div>
   ) : (
-    <ul>
+    <ul className="space-y-2">
       {debts.map((debt: Debt) => {
         return (
           <DebtItem
