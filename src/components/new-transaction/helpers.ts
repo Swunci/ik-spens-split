@@ -2,6 +2,8 @@ import type { ChangeEvent, Dispatch, SetStateAction } from 'react';
 
 import { getTodaysDate } from '@/utils/timeUtils';
 
+import { getDecimalPrecisionCurrency } from '../../utils/currencyUtil';
+
 export interface IMember {
   name: string;
   amount: number;
@@ -25,7 +27,9 @@ export function handleHowMuch(
   setTotalCost: Dispatch<SetStateAction<number>>,
   setAmountError: Dispatch<SetStateAction<boolean>>
 ) {
-  const newTotalCost = e.target.valueAsNumber ? e.target.valueAsNumber : 0;
+  const newTotalCost = e.target.valueAsNumber
+    ? getDecimalPrecisionCurrency(e.target.valueAsNumber, 2)
+    : 0;
   if (newTotalCost < 0) {
     setTotalCost(0);
     setAmountError(true);
@@ -49,6 +53,49 @@ export function handleDateChange(
   setDate(e.target.value);
 }
 
+function allSelectedMembersHaveWeight(membersList: Array<IMember>) {
+  let allHaveWeight = true;
+  membersList.forEach((member: IMember) => {
+    if (member.isSelected && member.weight === 0) {
+      allHaveWeight = false;
+    }
+  });
+  return allHaveWeight;
+}
+
+function assignRemainingToSomeone(
+  membersList: Array<IMember>,
+  totalCost: number
+) {
+  let updatedMemberList = membersList;
+  const calculatedTotal = membersList.reduce(
+    (count: number, member: IMember) => {
+      return getDecimalPrecisionCurrency(count + member.amount, 2);
+    },
+    0
+  );
+  if (totalCost !== calculatedTotal) {
+    const remaining = getDecimalPrecisionCurrency(
+      totalCost - calculatedTotal,
+      2
+    );
+    let assigned = false;
+    updatedMemberList = membersList.map((member: IMember) => {
+      const currentMember = member;
+      if (currentMember.isSelected && !assigned) {
+        currentMember.amount = getDecimalPrecisionCurrency(
+          currentMember.amount + remaining,
+          2
+        );
+        assigned = true;
+      }
+      return currentMember;
+    });
+  }
+
+  return updatedMemberList;
+}
+
 export function getInitialMemberList(
   memberNames: string[],
   transactionType: string,
@@ -63,7 +110,7 @@ export function getInitialMemberList(
     const member = {} as IMember;
     member.name = name;
     member.isSelected = true;
-    member.amount = totalCost / names.length;
+    member.amount = getDecimalPrecisionCurrency(totalCost / names.length, 2);
     member.weight = 0;
     return member;
   });
@@ -83,7 +130,9 @@ export function getEqualSplitMemberList(
 
   const list = membersList.map((currentMember: IMember) => {
     const member = currentMember;
-    member.amount = member.isSelected ? totalCost / selectedCount : 0;
+    member.amount = member.isSelected
+      ? getDecimalPrecisionCurrency(totalCost / selectedCount, 2)
+      : 0;
     return member;
   });
   return list;
@@ -114,7 +163,12 @@ export function getWeightSplitMemberList(
   const list = membersList.map((currentMember: IMember) => {
     const member = currentMember;
     member.amount =
-      totalWeight !== 0 ? totalCost * (member.weight / totalWeight) : 0;
+      totalWeight !== 0
+        ? getDecimalPrecisionCurrency(
+            totalCost * (member.weight / totalWeight),
+            2
+          )
+        : 0;
     return member;
   });
   return list;
@@ -140,9 +194,13 @@ export function getMembersListBySplitType(
   switch (splitType.toLowerCase()) {
     case 'equal':
       list = getEqualSplitMemberList(updatedMembers, totalCost);
+      list = assignRemainingToSomeone(list, totalCost);
       break;
     case 'weight':
       list = getWeightSplitMemberList(updatedMembers, totalCost);
+      if (allSelectedMembersHaveWeight(list)) {
+        list = assignRemainingToSomeone(list, totalCost);
+      }
       break;
     case 'custom':
       list = getCustomSplitMemberList(updatedMembers);

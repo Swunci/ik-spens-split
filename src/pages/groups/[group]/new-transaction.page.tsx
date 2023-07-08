@@ -52,6 +52,7 @@ export default function NewTransactionPage() {
   const [transactionType, setTransactionType] = useState('expense');
   const [membersList, setMembersList] = useState(new Array<IMember>());
   const [amountError, setAmountError] = useState(false);
+  const [currency, setCurrency] = useState('');
   const descriptionRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
 
@@ -65,6 +66,7 @@ export default function NewTransactionPage() {
       setTotalCost,
       transactionType,
       setTransactionType,
+      currency,
     }),
     [payer, membersList, totalCost, transactionType]
   );
@@ -72,6 +74,7 @@ export default function NewTransactionPage() {
   useEffect(() => {
     if (data) {
       setPayer(data.memberNames.at(0)!);
+      setCurrency(data.currency);
     }
   }, [data]);
 
@@ -190,6 +193,11 @@ export default function NewTransactionPage() {
                 placeholder="Amount"
                 required
                 value={totalCost === 0 ? '' : totalCost}
+                onKeyDown={(e) => {
+                  if (e.key.toLowerCase() === 'e') {
+                    e.preventDefault();
+                  }
+                }}
                 onChange={(e) => handleHowMuch(e, setTotalCost, setAmountError)}
               />
             </label>

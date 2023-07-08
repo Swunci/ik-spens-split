@@ -2,8 +2,9 @@ import { TextField } from '@mui/material';
 import { useContext } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
+import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 
-import { getWeightSplitMemberList, type IMember } from './helpers';
+import { getMembersListBySplitType, type IMember } from './helpers';
 
 export default function Weight({
   weightRef,
@@ -19,6 +20,7 @@ export default function Weight({
   return (
     <>
       <TextField
+        disabled={!member.isSelected}
         autoComplete="false"
         inputRef={weightRef}
         className="p-1"
@@ -63,11 +65,16 @@ export default function Weight({
             }
           );
 
-          const list = getWeightSplitMemberList(changedMembers, totalCost);
+          const list = getMembersListBySplitType(
+            'weight',
+            changedMembers,
+            totalCost,
+            transactionContext!.transactionType,
+            transactionContext!.payer
+          );
           transactionContext!.setMembersList(list);
         }}
       />
-      <span>$</span>
       <TextField
         disabled
         className="p-1"
@@ -80,7 +87,9 @@ export default function Weight({
             textAlign: 'right',
           },
         }}
-        value={member.amount.toFixed(2)}
+        value={`${currencyCodeSymbolMap.get(
+          transactionContext!.currency
+        )}${member.amount.toFixed(2)}`}
       />
     </>
   );

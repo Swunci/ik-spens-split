@@ -218,3 +218,7 @@ const codeSymbolMap = Object.entries(currencyDetails).reduce(
 export const currencyNameSymbolMap = nameSymbolMap;
 export const currencyNameCodeMap = new TwoWayReadonlyMap(nameCodeMap);
 export const currencyCodeSymbolMap = codeSymbolMap;
+
+export function getDecimalPrecisionCurrency(number: number, precision: number) {
+  return parseFloat(number.toFixed(precision));
+}

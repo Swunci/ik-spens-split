@@ -3,6 +3,10 @@ import Typography from '@mui/material/Typography';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
+import {
+  currencyCodeSymbolMap,
+  getDecimalPrecisionCurrency,
+} from '@/utils/currencyUtil';
 
 import Custom from './Custom';
 import { getMembersListBySplitType, type IMember } from './helpers';
@@ -23,7 +27,7 @@ export default function Member({
   useEffect(() => {
     const total = transactionContext!.membersList.reduce(
       (cost: number, mem: IMember) => {
-        return cost + mem.amount;
+        return getDecimalPrecisionCurrency(cost + mem.amount, 2);
       },
       0
     );
@@ -39,6 +43,7 @@ export default function Member({
       }
       if (!newMem.isSelected) {
         newMem.amount = 0;
+        newMem.weight = 0;
         setIsOver(false);
       }
       return newMem;
@@ -57,24 +62,23 @@ export default function Member({
     switch (splitType.toLowerCase()) {
       case 'equal':
         return (
-          <>
-            <span>$</span>
-            <TextField
-              inputRef={splitValueRef}
-              disabled
-              className="p-1"
-              size="small"
-              id="outlined-basic"
-              variant="outlined"
-              type="text"
-              inputProps={{
-                style: {
-                  textAlign: 'right',
-                },
-              }}
-              value={member.amount.toFixed(2)}
-            />
-          </>
+          <TextField
+            inputRef={splitValueRef}
+            disabled
+            className="p-1"
+            size="small"
+            id="outlined-basic"
+            variant="outlined"
+            type="text"
+            inputProps={{
+              style: {
+                textAlign: 'right',
+              },
+            }}
+            value={`${currencyCodeSymbolMap.get(
+              transactionContext!.currency
+            )}${member.amount.toFixed(2)}`}
+          />
         );
       case 'weight':
         return (

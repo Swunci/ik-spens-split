@@ -66,6 +66,7 @@ export default function EditTransactionPage() {
   const [amountError, setAmountError] = useState(false);
   const descriptionRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
+  const [currency, setCurrency] = useState('');
 
   const [isInitialMemberList, setIsInitialMemberList] = useState(true);
 
@@ -79,6 +80,7 @@ export default function EditTransactionPage() {
       setTotalCost,
       transactionType,
       setTransactionType,
+      currency,
     }),
     [payer, membersList, totalCost, transactionType]
   );
@@ -88,6 +90,7 @@ export default function EditTransactionPage() {
       setPayer(transactionData.payer);
       setTotalCost(transactionData.amount);
       setTransactionType(transactionData.type);
+      setCurrency(transactionData.currency);
     }
   }, [transactionData]);
 

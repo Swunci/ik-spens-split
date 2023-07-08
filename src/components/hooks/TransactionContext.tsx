@@ -16,4 +16,5 @@ type TransactionContextType = {
   setTotalCost: Dispatch<SetStateAction<number>>;
   transactionType: string;
   setTransactionType: Dispatch<SetStateAction<string>>;
+  currency: string;
 };
