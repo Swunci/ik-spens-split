@@ -14,10 +14,15 @@ import {
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
 import { TransactionContext } from '@/components/hooks/TransactionContext';
-import type { IMember } from '@/components/new-transaction/helpers';
+import type {
+  IMember,
+  UpdateTransactionForm,
+} from '@/components/new-transaction/helpers';
 import {
   getActionByTransactionType,
   handleHowMuch,
+  handleTransactionDelete,
+  handleTransactionUpdate,
 } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
 import type CustomError from '@/errors/customError';
@@ -26,12 +31,6 @@ import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { getLocaleDateString } from '@/utils/timeUtils';
-
-import type { UpdateTransactionForm } from '../new-transaction-helpers';
-import {
-  handleTransactionDelete,
-  handleTransactionUpdate,
-} from '../new-transaction-helpers';
 
 export default function EditTransactionPage() {
   const router = useRouter();
@@ -161,7 +160,7 @@ export default function EditTransactionPage() {
             className="h-fit border-alice-main"
           >
             <Select
-              className="static bg-alice-base py-0"
+              className="bg-alice-base py-0"
               defaultValue={transactionData!.payer}
               onChange={(e) => setPayer(e.target.value)}
             >
@@ -188,7 +187,7 @@ export default function EditTransactionPage() {
             className="h-fit border-alice-main"
           >
             <Select
-              className="static bg-alice-base py-0"
+              className="bg-alice-base py-0"
               defaultValue={transactionData!.type}
               onChange={(e) => setTransactionType(e.target.value)}
             >
@@ -226,6 +225,11 @@ export default function EditTransactionPage() {
                 required
                 value={totalCost === 0 ? '' : totalCost}
                 defaultValue={transactionData!.amount}
+                onKeyDown={(e) => {
+                  if (e.key.toLowerCase() === 'e') {
+                    e.preventDefault();
+                  }
+                }}
                 onChange={(e) => handleHowMuch(e, setTotalCost, setAmountError)}
               />
             </label>
@@ -260,10 +264,10 @@ export default function EditTransactionPage() {
             </label>
           </div>
         </div>
-        <div className="w-full p-2">
-          <div className="py-2">How to split?</div>
+        <div className="w-full py-2">
+          <div className="p-2">How to split?</div>
           <TransactionContext.Provider value={contextValue}>
-            <MembersList memberNames={groupData!.memberNames} />
+            <MembersList />
           </TransactionContext.Provider>
         </div>
         <div className="flexbox-row w-full p-2">

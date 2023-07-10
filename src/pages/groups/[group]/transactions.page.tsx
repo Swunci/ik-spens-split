@@ -1,3 +1,4 @@
+import { Alert, Snackbar } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
@@ -7,22 +8,25 @@ import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import useSwr from 'swr';
 
+import {
+  ACTION_TYPES,
+  initialState,
+  snackbarReducer,
+} from '@/components/hooks/snackbarReducer';
+import PaidDebtsList from '@/components/transactions/PaidDebtsList';
+import TransactionsList from '@/components/transactions/TransactionsList';
 import type CustomError from '@/errors/customError';
 import type {
   Group,
-  PaidDebt,
   PaidDebtResponse,
-  Transaction,
   TransactionResponse,
 } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop } from '@/utils/component/helpers';
-import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
-import { getLocaleDateString } from '@/utils/timeUtils';
 
 export default function Transactions() {
   const router = useRouter();
@@ -33,6 +37,8 @@ export default function Transactions() {
   const [dataOwner, setDataOwner] = useState('all');
   const [dataType, setDataType] = useState('transactions');
   const [currentMember, setCurrentMember] = useState('');
+
+  const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);
 
   const {
     data: groupData,
@@ -85,145 +91,28 @@ export default function Transactions() {
     return router.push('/500');
   }
 
-  function getYourShare(split: string) {
-    const splitObj = JSON.parse(split);
-    return splitObj[currentMember]?.toFixed(2);
-  }
-
-  function getInvolvedMembers(split: string) {
-    const splitObj = JSON.parse(split);
-    const groupSize = parseInt(localStorage.getItem('groupSize') ?? '0', 10);
-    const memberNames = [...Object.keys(splitObj)];
-    return groupSize === memberNames.length
-      ? 'everyone'
-      : memberNames.join(', ');
-  }
-
-  function isMemberInvolved(split: string, memberName: string) {
-    const splitObj: Object = JSON.parse(split);
-    return memberName in splitObj;
-  }
-
-  function getTransactions() {
-    if (transactionsData?.transactions.length === 0) {
-      return <div>No transactions to show</div>;
-    }
-
-    return (
-      <ul className="space-y-2">
-        {transactionsData?.transactions
-          .filter((transaction: Transaction) => {
-            switch (dataOwner) {
-              case 'yours':
-                return isMemberInvolved(transaction.split, currentMember);
-              case 'others':
-                return !isMemberInvolved(transaction.split, currentMember);
-              default:
-                return true;
-            }
-          })
-          .map((transaction: Transaction) => {
-            return (
-              <li
-                className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
-                key={transaction.transactionId}
-              >
-                <Link
-                  href={`${currentPath}/${transaction.transactionId}`}
-                  passHref
-                >
-                  <div className="text-base">
-                    <div>{`${
-                      transaction.payer
-                    } paid ${currencyCodeSymbolMap.get(transaction.currency)}${
-                      transaction.amount
-                    } for ${transaction.description}`}</div>
-                  </div>
-                  <div className="flexbox-row gap-2 pt-1">
-                    <div className="text-xs">
-                      People involved: {getInvolvedMembers(transaction.split)}.
-                    </div>
-                    <div className="text-xs">
-                      {isMemberInvolved(transaction.split, currentMember)
-                        ? `Your share: ${currencyCodeSymbolMap.get(
-                            transaction.currency
-                          )}${getYourShare(transaction.split)}`
-                        : null}
-                    </div>
-                    <div className="min-w-fit text-xs">
-                      {getLocaleDateString(transaction.date)}
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-      </ul>
-    );
-  }
-
-  function getPaidDebts() {
-    if (paidDebtsData?.paidDebts.length === 0) {
-      return <div>No paid debts to show</div>;
-    }
-
-    return (
-      <ul className="space-y-2">
-        {paidDebtsData?.paidDebts
-          .filter((paidDebt: PaidDebt) => {
-            switch (dataOwner) {
-              case 'yours':
-                return (
-                  paidDebt.creditor === currentMember ||
-                  paidDebt.debtor === currentMember
-                );
-              case 'others':
-                return (
-                  paidDebt.creditor !== currentMember &&
-                  paidDebt.debtor !== currentMember
-                );
-              default:
-                return true;
-            }
-          })
-          .map((paidDebt: PaidDebt) => {
-            return (
-              <li
-                className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
-                key={paidDebt.debtId}
-              >
-                <Link
-                  href={
-                    currentPath
-                      ? `${currentPath.slice(
-                          0,
-                          currentPath.lastIndexOf('/')
-                        )}/debts/${paidDebt.debtId}`
-                      : ''
-                  }
-                  passHref
-                >
-                  <div className="text-base">
-                    {`${paidDebt.debtor} paid ${
-                      paidDebt.creditor
-                    } ${currencyCodeSymbolMap.get(paidDebt.currency)}${
-                      paidDebt.amount
-                    } on ${getLocaleDateString(paidDebt.date)}`}
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-      </ul>
-    );
-  }
-
   function renderByDataType() {
     switch (dataType) {
       case 'transactions':
-        return getTransactions();
+        return (
+          <TransactionsList
+            transactions={transactionsData!.transactions}
+            dataOwner={dataOwner}
+            currentMember={currentMember}
+            group={groupData!}
+            dispatch={dispatch}
+          />
+        );
       case 'debts':
-        return getPaidDebts();
+        return (
+          <PaidDebtsList
+            paidDebts={paidDebtsData!.paidDebts}
+            dataOwner={dataOwner}
+            currentMember={currentMember}
+            groupData={groupData!}
+            dispatch={dispatch}
+          />
+        );
       default:
         return <div>Nothing to see here</div>;
     }
@@ -304,6 +193,21 @@ export default function Transactions() {
       <div className="flexbox-col h-full w-full space-y-2 rounded bg-alice-main p-2 py-4">
         {renderByDataType()}
       </div>
+      <Snackbar
+        autoHideDuration={5000}
+        open={snackbarState.isOpen}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        onClick={() => dispatch({ type: ACTION_TYPES.CLOSE })}
+        onClose={() => dispatch({ type: ACTION_TYPES.CLOSE })}
+      >
+        {snackbarState.isOpen ? (
+          <Alert severity={snackbarState.alertType}>
+            {snackbarState.message}
+          </Alert>
+        ) : (
+          <div />
+        )}
+      </Snackbar>
     </RootLayout>
   );
 }

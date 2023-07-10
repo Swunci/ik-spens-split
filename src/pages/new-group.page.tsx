@@ -8,9 +8,9 @@ import {
   initialState,
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
+import Currencies from '@/components/new-group/Currencies';
 import MembersList from '@/components/new-group/MembersList';
 import { RootLayout } from '@/layouts/RootLayout';
-import { currencyNameCodeMap } from '@/utils/currencyUtil';
 
 import { handleSubmit, onAddMember } from './new-group-helpers';
 
@@ -18,7 +18,6 @@ export default function NewGroupPage() {
   const router = useRouter();
 
   const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);
-
   const groupNameRef = useRef<HTMLInputElement>(null);
   const currencyRef = useRef<HTMLSelectElement>(null);
   const memberInputRef = useRef<HTMLInputElement>(null);
@@ -28,12 +27,6 @@ export default function NewGroupPage() {
     currentMembers.delete(member);
     setCurrentMembers(new Set([...currentMembers]));
   };
-
-  function populateCurrencies() {
-    return [...currencyNameCodeMap.map.keys()].map((currencyName) => {
-      return <option key={currencyName}>{currencyName}</option>;
-    });
-  }
 
   return (
     <RootLayout>
@@ -78,7 +71,7 @@ export default function NewGroupPage() {
             required
             ref={currencyRef}
           >
-            {populateCurrencies()}
+            <Currencies />
           </select>
         </label>
         <label

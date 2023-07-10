@@ -16,9 +16,14 @@ import {
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
 import { TransactionContext } from '@/components/hooks/TransactionContext';
-import type { IMember } from '@/components/new-transaction/helpers';
+import type {
+  CreateTransactionForm,
+  IMember,
+} from '@/components/new-transaction/helpers';
 import {
   getActionByTransactionType,
+  getInitialMemberList,
+  handleCreation,
   handleHowMuch,
 } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
@@ -28,9 +33,6 @@ import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { getTodaysDate } from '@/utils/timeUtils';
-
-import type { CreateTransactionForm } from './new-transaction-helpers';
-import { handleCreation } from './new-transaction-helpers';
 
 export default function NewTransactionPage() {
   const todaysDate = getTodaysDate();
@@ -75,6 +77,9 @@ export default function NewTransactionPage() {
     if (data) {
       setPayer(data.memberNames.at(0)!);
       setCurrency(data.currency);
+      setMembersList(
+        getInitialMemberList(data.memberNames, transactionType, payer)
+      );
     }
   }, [data]);
 
@@ -233,9 +238,9 @@ export default function NewTransactionPage() {
         </div>
 
         <div className="w-full py-2">
-          <div className="py-2">How to split?</div>
+          <div className="p-2">How to split?</div>
           <TransactionContext.Provider value={contextValue}>
-            <MembersList memberNames={data!.memberNames} />
+            <MembersList />
           </TransactionContext.Provider>
         </div>
 

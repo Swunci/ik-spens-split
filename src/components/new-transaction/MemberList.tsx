@@ -10,11 +10,7 @@ import type { IMember } from './helpers';
 import { getMembersListBySplitType, setSelectAllMembers } from './helpers';
 import Member from './Member';
 
-export default function MembersList({
-  memberNames,
-}: {
-  memberNames: string[];
-}) {
+export default function MembersList() {
   const transactionContext = React.useContext(TransactionContext);
   const [splitType, setSplitType] = useState('equal');
 
@@ -49,48 +45,37 @@ export default function MembersList({
     transactionContext!.transactionType,
   ]);
 
-  useEffect(() => {
-    transactionContext!.setMembersList(
-      memberNames.map((name: string) => {
-        const member = {} as IMember;
-        member.name = name;
-        member.isSelected = true;
-        member.amount = transactionContext!.totalCost / memberNames.length;
-        member.weight = 0;
-        return member;
-      })
-    );
-  }, [memberNames]);
-
   return (
     <>
-      <div className="flexbox-row gap-2 py-2">
+      <div className="flexbox-row justify-between gap-2 pb-2">
         <FormControl
           size="small"
           fullWidth={false}
           className="h-fit border-alice-main"
         >
-          <Select
-            className="static bg-alice-base py-0"
-            defaultValue="Equal"
-            onChange={(e) => setSplitType(e.target.value.toLowerCase())}
-          >
-            <MenuItem key="Equal" value="Equal">
-              <Typography className="whitespace-normal break-words" noWrap>
-                Equal
-              </Typography>
-            </MenuItem>
-            <MenuItem key="Weight" value="Weight">
-              <Typography className="whitespace-normal break-words" noWrap>
-                Weight
-              </Typography>
-            </MenuItem>
-            <MenuItem key="Custom" value="Custom">
-              <Typography className="whitespace-normal break-words" noWrap>
-                Custom
-              </Typography>
-            </MenuItem>
-          </Select>
+          <div className="p-2">
+            <Select
+              className="bg-alice-base"
+              defaultValue="Equal"
+              onChange={(e) => setSplitType(e.target.value.toLowerCase())}
+            >
+              <MenuItem key="Equal" value="Equal">
+                <Typography className="whitespace-normal break-words" noWrap>
+                  Equal
+                </Typography>
+              </MenuItem>
+              <MenuItem key="Weight" value="Weight">
+                <Typography className="whitespace-normal break-words" noWrap>
+                  Weight
+                </Typography>
+              </MenuItem>
+              <MenuItem key="Custom" value="Custom">
+                <Typography className="whitespace-normal break-words" noWrap>
+                  Custom
+                </Typography>
+              </MenuItem>
+            </Select>
+          </div>
         </FormControl>
         <div className="flexbox-row max-w-fit gap-1 p-2">
           <button

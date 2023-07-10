@@ -13,6 +13,7 @@ import useSwr from 'swr';
 
 import CommentList from '@/components/[group]/CommentList';
 import DebtList from '@/components/[group]/DebtList';
+import Overview from '@/components/[group]/Overview';
 import {
   ACTION_TYPES,
   initialState,
@@ -26,11 +27,12 @@ import type {
   TransactionResponse,
 } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
-import { displayBackdrop } from '@/utils/component/helpers';
+import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
 
+import type { MemberDetails } from './[group]-helpers';
 import { createComment, getOverviewStats } from './[group]-helpers';
 
 export default function GroupPage() {
@@ -89,34 +91,33 @@ export default function GroupPage() {
     }
   }, [groupData]);
 
-  if (
-    isLoadingGroup ||
-    isLoadingTransactions ||
-    isLoadingPaidDebts ||
-    !currentPath
-  ) {
+  if (isLoadingGroup || !currentPath) {
     return displayBackdrop();
   }
 
-  if (groupError || transactionsError || paidDebtsError) {
+  if (groupError) {
     if (groupError?.status === 404) {
       return router.push('/404');
     }
     return router.push('/500');
   }
 
+  if (transactionsError || paidDebtsError) {
+    return displaySnackbar('unavailable to load transactions at this time');
+  }
+
   const currencyCode = groupData?.currency ?? '';
 
-  const currencySymbol: string | undefined =
-    currencyCodeSymbolMap.get(currencyCode);
+  const currencySymbol: string = currencyCodeSymbolMap.get(currencyCode) ?? '';
 
-  const [groupCost, membersMap] = getOverviewStats(
-    transactionsData!.transactions,
-    groupData!.memberNames,
-    paidDebtsData!.paidDebts
-  );
-
-  const debtAmount = membersMap.get(currentMember)?.debt ?? 0;
+  const [groupCost, membersMap] =
+    isLoadingGroup || isLoadingTransactions || isLoadingPaidDebts
+      ? [0, new Map<string, MemberDetails>()]
+      : getOverviewStats(
+          transactionsData!.transactions,
+          groupData!.memberNames,
+          paidDebtsData!.paidDebts
+        );
 
   return (
     <RootLayout>
@@ -151,50 +152,12 @@ export default function GroupPage() {
             </Select>
           </FormControl>
         </div>
-        <div className="w-full rounded bg-alice-main shadow-md">
-          <div className="flexbox-row max-w-full p-2">
-            <div className="w-full rounded px-2 text-center text-2xl">
-              Overview
-            </div>
-          </div>
-          <div className="flexbox-col w-full space-y-2  p-2 pt-0 text-lg">
-            <div className="flexbox-row border-b-2 border-alice-accent p-2">
-              <div>Total group cost:</div>
-              <div>
-                {currencySymbol}
-                {groupCost.toFixed(2)}
-              </div>
-            </div>
-            <div className="flexbox-row border-b-2 border-alice-accent p-2">
-              <div>Your cost:</div>
-              <div>
-                {currencySymbol}
-                {membersMap.get(currentMember)?.cost.toFixed(2)}
-              </div>
-            </div>
-            <div className="flexbox-row border-b-2 border-alice-accent p-2">
-              <div>{`You've paid`}:</div>
-              <div>
-                {currencySymbol}
-                {membersMap.get(currentMember)?.paid.toFixed(2)}
-              </div>
-            </div>
-            <div className="flexbox-row border-b-2 border-alice-accent p-2">
-              <div>{`You've received`}:</div>
-              <div>
-                {currencySymbol}
-                {membersMap.get(currentMember)?.received.toFixed(2)}
-              </div>
-            </div>
-            <div className="flexbox-row border-b-2 border-alice-accent p-2">
-              <div>{debtAmount < 0 ? 'You owe' : 'You are owed'}:</div>
-              <div>
-                {currencySymbol}
-                {Math.abs(debtAmount).toFixed(2)}
-              </div>
-            </div>
-          </div>
-        </div>
+        <Overview
+          groupCost={groupCost}
+          membersMap={membersMap}
+          currentMember={currentMember}
+          currencySymbol={currencySymbol}
+        />
 
         <div className="flexbox-row w-full p-2">
           <Link href={`${currentPath}/transactions`} passHref>
@@ -217,12 +180,18 @@ export default function GroupPage() {
 
         <div className="flexbox-col w-full space-y-2 rounded bg-alice-main p-2 text-lg shadow-md">
           <div className="text-center text-2xl">Debts</div>
-          <DebtList
-            membersMap={membersMap}
-            currencyCode={currencyCode}
-            currentPath={currentPath}
-            dispatch={dispatch}
-          />
+          {isLoadingTransactions || isLoadingPaidDebts ? (
+            <div className="flex w-full place-content-evenly">
+              <CircularProgress className="text-alice-accent" />
+            </div>
+          ) : (
+            <DebtList
+              membersMap={membersMap}
+              currencyCode={currencyCode}
+              currentPath={currentPath}
+              dispatch={dispatch}
+            />
+          )}
         </div>
 
         <div className="w-full rounded bg-alice-main p-2">
@@ -255,7 +224,9 @@ export default function GroupPage() {
           {commentsData?.comments.length !== 0 ? (
             <div className="flexbox-col w-full space-y-2">
               {isLoadingComments || commentsError ? (
-                <CircularProgress />
+                <div className="flex w-full place-content-evenly">
+                  <CircularProgress className="text-alice-accent" />
+                </div>
               ) : (
                 <CommentList
                   comments={commentsData!.comments}

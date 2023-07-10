@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material';
 import type { Dispatch } from 'react';
 import { useState } from 'react';
 
@@ -24,11 +25,18 @@ export default function CommmentItem({
       key={commentRecord.commentId}
     >
       <button type="button" onClick={() => setOpen(true)}>
-        <div className="flexbox-row">
-          <div>{commentRecord.commenter}</div>
-          <div>{getHowLongAgo(commentRecord.createdDate)}</div>
+        <div className="flex">
+          <div className="w-full">
+            <div className="flexbox-row">
+              <div>{commentRecord.commenter}</div>
+              <div>{getHowLongAgo(commentRecord.createdDate)}</div>
+            </div>
+            <div className="text-left">{commentRecord.comment}</div>
+          </div>
+          <div className="flexbox-col w-fit justify-center py-2 pl-2">
+            <Typography>&gt;</Typography>
+          </div>
         </div>
-        <div className="text-left">{commentRecord.comment}</div>
       </button>
       <EditCommentModal
         open={open}

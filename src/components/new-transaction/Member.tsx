@@ -104,7 +104,7 @@ export default function Member({
   return (
     <li
       key={member.name}
-      className={`flex flex-row place-content-between items-center rounded border-2 bg-alice-base align-middle text-lg ${
+      className={`flex flex-row place-content-between items-center rounded-md border-4 bg-alice-base align-middle text-lg ${
         member.isSelected ? 'border-alice-accent' : ''
       } ${isOver && member.isSelected ? ' border-red-400' : ''}`}
     >

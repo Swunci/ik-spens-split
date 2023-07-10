@@ -6,10 +6,11 @@ import Snackbar from '@mui/material/Snackbar';
 export function displayBackdrop() {
   return (
     <Backdrop
-      sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       open
+      className="bg-alice-base"
     >
-      <CircularProgress color="inherit" />
+      <CircularProgress className="text-alice-accent" />
     </Backdrop>
   );
 }

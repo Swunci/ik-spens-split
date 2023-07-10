@@ -1,3 +1,4 @@
+import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import type { Group } from '@prisma/client';
 import Link from 'next/link';
@@ -5,19 +6,12 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import useSwr from 'swr';
 
+import HistoryRecords from '@/components/history/HistoryRecords';
 import type CustomError from '@/errors/customError';
-import type {
-  Comment,
-  History,
-  HistoryResponse,
-  PaidDebt,
-  Transaction,
-} from '@/interfaces/response';
+import type { HistoryResponse } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop } from '@/utils/component/helpers';
-import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
-import { getHowLongAgo, getLocaleDateString } from '@/utils/timeUtils';
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -44,7 +38,7 @@ export default function HistoryPage() {
     fetcher
   );
 
-  if (isLoadingGroup || isLoadingHistory || !currentPath) {
+  if (isLoadingGroup || !currentPath) {
     return displayBackdrop();
   }
 
@@ -53,158 +47,6 @@ export default function HistoryPage() {
       return router.push('/404');
     }
     return router.push('/500');
-  }
-
-  function getAction(action: string) {
-    switch (action) {
-      case 'put':
-        return 'Updated';
-      case 'post':
-        return 'Added';
-      case 'delete':
-        return 'Deleted';
-      default:
-        return '';
-    }
-  }
-
-  function displaySplit(split: string, currencyCode: string) {
-    const splitObj = JSON.parse(split);
-    const shares = new Array<string>();
-    for (const [name, share] of Object.entries(splitObj)) {
-      shares.push(
-        `${name}: ${currencyCodeSymbolMap.get(currencyCode)}${(
-          share as number
-        ).toFixed(2)}`
-      );
-    }
-    return shares.join(', ');
-  }
-
-  function showHistory() {
-    return (
-      <ul className="space-y-2">
-        {historyData?.history.map((record: History) => {
-          switch (record.table) {
-            case 'group': {
-              const group: Group = JSON.parse(record.details);
-              return (
-                <li
-                  className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
-                  key={record.historyId}
-                >
-                  <div className="flexbox-row">
-                    <div className="text-base">
-                      {getAction(record.action)} group
-                    </div>
-                    <div className="min-w-fit text-xs">
-                      {getHowLongAgo(record.createdDate)}
-                    </div>
-                  </div>
-                  <div className="flexbox-col gap-1 pt-1">
-                    <div className="text-xs">Name: {group.groupName}</div>
-                    <div className="text-xs">Currency: {group.currency}</div>
-                    <div className="text-xs">
-                      Members: {group.memberNames?.join(', ')}
-                    </div>
-                  </div>
-                </li>
-              );
-            }
-            case 'transaction': {
-              const transaction: Transaction = JSON.parse(record.details);
-              return (
-                <li
-                  className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
-                  key={record.historyId}
-                >
-                  <div className="flexbox-row">
-                    <div className="text-base">
-                      {getAction(record.action)} {transaction.type}
-                    </div>
-                    <div className="min-w-fit text-xs">
-                      {getHowLongAgo(record.createdDate)}
-                    </div>
-                  </div>
-                  <div className="flexbox-col gap-1 pt-1">
-                    <div className="text-xs">{`${
-                      transaction.payer
-                    } paid ${currencyCodeSymbolMap.get(transaction.currency)}${
-                      transaction.amount
-                    } for ${transaction.description}`}</div>
-                    <div className="text-xs">
-                      Date: {getLocaleDateString(transaction.date)}
-                    </div>
-                    <div className="text-xs">
-                      Split:{' '}
-                      {displaySplit(transaction.split, transaction.currency)}
-                    </div>
-                  </div>
-                </li>
-              );
-            }
-            case 'paidDebt': {
-              const paidDebt: PaidDebt = JSON.parse(record.details);
-              return (
-                <li
-                  className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
-                  key={record.historyId}
-                >
-                  <div className="flexbox-row">
-                    <div className="text-base">
-                      {`${getAction(record.action)} paid debt`}
-                    </div>
-                    <div className="min-w-fit text-xs">
-                      {getHowLongAgo(record.createdDate)}
-                    </div>
-                  </div>
-                  <div className="flexbox-col gap-1 pt-1">
-                    <div className="text-xs">{`${
-                      paidDebt.debtor
-                    } paid ${currencyCodeSymbolMap.get(
-                      paidDebt.currency
-                    )}${paidDebt.amount.toFixed(2)} to ${
-                      paidDebt.creditor
-                    }`}</div>
-                  </div>
-                </li>
-              );
-            }
-            case 'comment': {
-              const comment: Comment = JSON.parse(record.details);
-              return (
-                <li
-                  className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
-                  key={record.historyId}
-                >
-                  <div className="flexbox-row">
-                    <div className="text-base">
-                      {`${getAction(record.action)} comment`}
-                    </div>
-                    <div className="min-w-fit text-xs">
-                      {getHowLongAgo(record.createdDate)}
-                    </div>
-                  </div>
-                  <div className="flexbox-col gap-1 pt-1">
-                    <div className="text-xs">{comment.commenter}</div>
-                    <div className="text-xs">{comment.comment}</div>
-                  </div>
-                </li>
-              );
-            }
-            default:
-              return (
-                <div
-                  className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
-                  key={record.historyId}
-                >
-                  Missing switch case for {record.table}
-                </div>
-              );
-          }
-        })}
-      </ul>
-    );
   }
 
   return (
@@ -227,7 +69,13 @@ export default function HistoryPage() {
         </Link>
       </div>
       <Typography className="pb-2 text-3xl">History</Typography>
-      <div className="w-full rounded bg-alice-main p-2">{showHistory()}</div>
+      <div className="w-full rounded bg-alice-main p-2">
+        {isLoadingHistory ? (
+          <HistoryRecords historyRecords={historyData!.history} />
+        ) : (
+          <CircularProgress />
+        )}
+      </div>
     </RootLayout>
   );
 }
