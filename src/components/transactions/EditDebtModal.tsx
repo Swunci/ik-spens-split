@@ -1,17 +1,20 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { FormControl, MenuItem, Select, Typography } from '@mui/material';
+import Decimal from 'decimal.js';
 import type { Dispatch, SetStateAction } from 'react';
-import { Fragment, useState } from 'react';
+import { Fragment, useContext, useState } from 'react';
 import { mutate } from 'swr';
 
 import type { UpdatePaidDebtForm } from '@/components/new-transaction/helpers';
 import {
   handlePaidDebtDelete,
   handlePaidDebtUpdate,
+  handleTotalCostInput,
 } from '@/components/new-transaction/helpers';
-import type { Group, PaidDebt } from '@/interfaces/response';
-import { getDecimalPrecisionCurrency } from '@/utils/currencyUtil';
+import type { Group, Member, PaidDebt } from '@/interfaces/response';
+import { displayWithCommas } from '@/utils/currencyUtil';
 
+import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import type { ActionType } from '../hooks/snackbarReducer';
 
 export default function EditDebtModal({
@@ -29,7 +32,11 @@ export default function EditDebtModal({
 }) {
   const [creditor, setCreditor] = useState(debtData.creditor);
   const [debtor, setDebtor] = useState(debtData.debtor);
-  const [totalCost, setTotalCost] = useState(debtData.amount);
+  const [totalCost, setTotalCost] = useState(new Decimal(debtData.amount));
+
+  const memberIdNameContext = useContext(MemberIdNameContext);
+
+  const idNameMap = memberIdNameContext!.memberIdToNameMap;
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -58,13 +65,31 @@ export default function EditDebtModal({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="flexbox-col m-2 w-full max-w-screen-md overflow-hidden rounded border-2 border-alice-accent bg-alice-main p-2 text-left align-middle shadow-xl transition-all">
-                <div className="w-full p-2">
+                <div className="flexbox-row w-full p-2">
                   <button
                     className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
                     type="button"
                     onClick={() => setOpen(false)}
                   >
                     Close
+                  </button>
+                  <button
+                    className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                    type="button"
+                    onClick={async (e) => {
+                      const isDeleted = await handlePaidDebtDelete(
+                        e,
+                        groupData!.groupId,
+                        debtData!.debtId,
+                        dispatch
+                      );
+                      if (isDeleted) {
+                        mutate(`/api/groups/${groupData.groupId}/debts`);
+                        setOpen(false);
+                      }
+                    }}
+                  >
+                    Delete
                   </button>
                 </div>
                 <form
@@ -91,21 +116,26 @@ export default function EditDebtModal({
                     >
                       <Select
                         className="bg-alice-base py-0"
-                        onChange={(e) => setDebtor(e.target.value)}
+                        onChange={(e) =>
+                          setDebtor(idNameMap.revGet(e.target.value)!)
+                        }
                         value={debtor}
                       >
-                        {groupData!.memberNames
-                          .filter((name: string) => {
-                            return name !== creditor;
+                        {groupData!.members
+                          .filter((member: Member) => {
+                            return member.memberId !== creditor;
                           })
-                          .map((member: string) => {
+                          .map((member: Member) => {
                             return (
-                              <MenuItem key={member} value={member}>
+                              <MenuItem
+                                key={member.memberId}
+                                value={member.memberName}
+                              >
                                 <Typography
                                   className="whitespace-normal break-words"
                                   noWrap
                                 >
-                                  {member}
+                                  {member.memberName}
                                 </Typography>
                               </MenuItem>
                             );
@@ -123,22 +153,25 @@ export default function EditDebtModal({
                       <Select
                         className="bg-alice-base py-0"
                         onChange={(e) => {
-                          setCreditor(e.target.value);
+                          setCreditor(idNameMap.revGet(e.target.value)!);
                         }}
                         value={creditor}
                       >
-                        {groupData!.memberNames
-                          .filter((name: string) => {
-                            return name !== debtor;
+                        {groupData!.members
+                          .filter((member: Member) => {
+                            return member.memberId !== debtor;
                           })
-                          .map((member: string) => {
+                          .map((member: Member) => {
                             return (
-                              <MenuItem key={member} value={member}>
+                              <MenuItem
+                                key={member.memberId}
+                                value={member.memberName}
+                              >
                                 <Typography
                                   className="whitespace-normal break-words"
                                   noWrap
                                 >
-                                  {member}
+                                  {member.memberName}
                                 </Typography>
                               </MenuItem>
                             );
@@ -154,26 +187,12 @@ export default function EditDebtModal({
                         <input
                           className="mt-2 rounded bg-alice-base p-1"
                           id="howMuch"
-                          type="number"
-                          min="0"
-                          step="0.01"
+                          type="text"
                           placeholder="Amount"
                           required
-                          value={totalCost === 0 ? '' : totalCost}
-                          onKeyDown={(e) => {
-                            if (e.key.toLowerCase() === 'e') {
-                              e.preventDefault();
-                            }
-                          }}
+                          value={displayWithCommas(totalCost.toFixed(2))}
                           onChange={(e) =>
-                            setTotalCost(
-                              e.target.valueAsNumber
-                                ? getDecimalPrecisionCurrency(
-                                    e.target.valueAsNumber,
-                                    2
-                                  )
-                                : 0
-                            )
+                            handleTotalCostInput(e, setTotalCost)
                           }
                         />
                       </label>
@@ -185,24 +204,6 @@ export default function EditDebtModal({
                       type="submit"
                     >
                       Update
-                    </button>
-                    <button
-                      className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
-                      type="button"
-                      onClick={async (e) => {
-                        const isDeleted = await handlePaidDebtDelete(
-                          e,
-                          groupData!.groupId,
-                          debtData!.debtId,
-                          dispatch
-                        );
-                        if (isDeleted) {
-                          mutate(`/api/groups/${groupData.groupId}/debts`);
-                          setOpen(false);
-                        }
-                      }}
-                    >
-                      Delete
                     </button>
                   </div>
                 </form>

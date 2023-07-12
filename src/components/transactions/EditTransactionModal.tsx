@@ -1,20 +1,27 @@
 import { Dialog, Transition } from '@headlessui/react';
 import { FormControl, MenuItem, Select, Typography } from '@mui/material';
+import Decimal from 'decimal.js';
 import type { Dispatch, SetStateAction } from 'react';
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 
 import type {
-  IMember,
+  TransactionMember,
   UpdateTransactionForm,
 } from '@/components/new-transaction/helpers';
 import {
   getActionByTransactionType,
   getInitialMemberList,
-  handleHowMuch,
+  handleTotalCostInput,
   handleTransactionDelete,
   handleTransactionUpdate,
 } from '@/components/new-transaction/helpers';
-import type { Group, Transaction } from '@/interfaces/response';
+import type {
+  Group,
+  Member,
+  ShareCost,
+  Transaction,
+} from '@/interfaces/response';
+import { displayWithCommas } from '@/utils/currencyUtil';
 import { getLocaleDateString } from '@/utils/timeUtils';
 
 import type { ActionType } from '../hooks/snackbarReducer';
@@ -34,21 +41,20 @@ export default function EditDebtModal({
   group: Group;
   dispatch: Dispatch<ActionType>;
 }) {
-  const [totalCost, setTotalCost] = useState(transaction.amount);
-  const [payer, setPayer] = useState(transaction.payer);
+  const [totalCost, setTotalCost] = useState(new Decimal(transaction.amount));
+  const [payerId, setPayerId] = useState(transaction.payerId);
   const [transactionType, setTransactionType] = useState(transaction.type);
   const [membersList, setMembersList] = useState(
-    getInitialMemberList(group.memberNames, transaction.type, transaction.payer)
+    getInitialMemberList(group.members, transaction.type, transaction.payerId)
   );
-  const [amountError, setAmountError] = useState(false);
   const descriptionRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
   const [currency, setCurrency] = useState(transaction.currency);
 
-  const contextValue = React.useMemo(
+  const contextValue = useMemo(
     () => ({
-      payer,
-      setPayer,
+      payerId,
+      setPayerId,
       membersList,
       setMembersList,
       totalCost,
@@ -57,26 +63,31 @@ export default function EditDebtModal({
       setTransactionType,
       currency,
     }),
-    [payer, membersList, totalCost, transactionType]
+    [payerId, membersList, totalCost, transactionType]
   );
 
   useEffect(() => {
     if (open) {
-      setPayer(transaction.payer);
-      setTotalCost(transaction.amount);
+      setPayerId(transaction.payerId);
+      setTotalCost(new Decimal(transaction.amount));
       setTransactionType(transaction.type);
       setCurrency(transaction.currency);
-      const splitObj = JSON.parse(transaction.split);
-      const updatedMembersList = membersList.map((member: IMember) => {
-        const updatedMember = member;
-        if (member.name in splitObj) {
-          updatedMember.amount = splitObj[member.name];
-        } else {
-          updatedMember.isSelected = false;
-          updatedMember.amount = 0;
-        }
-        return updatedMember;
+      const splits = transaction.shareCosts;
+      const memberCostMap = new Map<string, Decimal>();
+      splits.forEach((split: ShareCost) => {
+        memberCostMap.set(split.memberId, new Decimal(split.shareCost));
       });
+      const updatedMembersList = membersList.map(
+        (member: TransactionMember) => {
+          const updatedMember = member;
+          if (!member.amount.greaterThan(0)) {
+            updatedMember.isSelected = false;
+          }
+          updatedMember.amount =
+            memberCostMap.get(member.memberId) ?? new Decimal(0);
+          return updatedMember;
+        }
+      );
       setMembersList(updatedMembersList);
     }
   }, [open]);
@@ -108,12 +119,30 @@ export default function EditDebtModal({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="flexbox-col m-2 w-full max-w-screen-md overflow-hidden rounded border-2 border-alice-accent bg-alice-main p-2 text-left align-middle shadow-xl transition-all">
-                <div className="w-full p-2">
+                <div className="flexbox-row w-full p-2">
                   <button
                     className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
                     type="button"
+                    onClick={() => setOpen(false)}
                   >
                     Back
+                  </button>
+                  <button
+                    className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                    type="button"
+                    onClick={async (e) => {
+                      const isDeleted = await handleTransactionDelete(
+                        e,
+                        group.groupId,
+                        transaction.transactionId,
+                        dispatch
+                      );
+                      if (isDeleted) {
+                        setOpen(false);
+                      }
+                    }}
+                  >
+                    Delete
                   </button>
                 </div>
                 <form
@@ -126,7 +155,7 @@ export default function EditDebtModal({
                         transactionId: transaction.transactionId,
                         date: dateRef.current!.value,
                         description: descriptionRef.current!.value,
-                        payer,
+                        payerId,
                         totalCost,
                         membersList,
                         transactionType,
@@ -144,17 +173,20 @@ export default function EditDebtModal({
                     >
                       <Select
                         className="bg-alice-base py-0"
-                        defaultValue={transaction.payer}
-                        onChange={(e) => setPayer(e.target.value)}
+                        defaultValue={transaction.payerId}
+                        onChange={(e) => setPayerId(e.target.value)}
                       >
-                        {group.memberNames.map((name: string) => {
+                        {group.members.map((member: Member) => {
                           return (
-                            <MenuItem key={name} value={name}>
+                            <MenuItem
+                              key={member.memberId}
+                              value={member.memberId}
+                            >
                               <Typography
                                 className="whitespace-normal break-words"
                                 noWrap
                               >
-                                {name}
+                                {member.memberName}
                               </Typography>
                             </MenuItem>
                           );
@@ -206,24 +238,15 @@ export default function EditDebtModal({
                       <label className="flex w-full flex-col" htmlFor="howMuch">
                         How much?
                         <input
-                          className={`mt-2 rounded bg-alice-base p-1 ${
-                            amountError ? 'bg-red-300' : ''
-                          }`}
+                          className="mt-2 rounded bg-alice-base p-1"
                           id="howMuch"
-                          type="number"
-                          min="0"
-                          step="0.01"
+                          type="text"
                           placeholder="Amount"
                           required
-                          value={totalCost === 0 ? '' : totalCost}
-                          defaultValue={transaction.amount}
-                          onKeyDown={(e) => {
-                            if (e.key.toLowerCase() === 'e') {
-                              e.preventDefault();
-                            }
-                          }}
+                          value={displayWithCommas(totalCost.toFixed(2))}
+                          onFocus={(e) => e.preventDefault()}
                           onChange={(e) =>
-                            handleHowMuch(e, setTotalCost, setAmountError)
+                            handleTotalCostInput(e, setTotalCost)
                           }
                         />
                       </label>
@@ -270,23 +293,6 @@ export default function EditDebtModal({
                       type="submit"
                     >
                       Update
-                    </button>
-                    <button
-                      className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
-                      type="button"
-                      onClick={async (e) => {
-                        const isDeleted = await handleTransactionDelete(
-                          e,
-                          group.groupId,
-                          transaction.transactionId,
-                          dispatch
-                        );
-                        if (isDeleted) {
-                          setOpen(false);
-                        }
-                      }}
-                    >
-                      Delete
                     </button>
                   </div>
                 </form>

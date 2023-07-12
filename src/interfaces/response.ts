@@ -2,17 +2,31 @@ export interface Group {
   groupId: string;
   groupName: string;
   currency: string;
-  memberNames: string[];
+  members: Member[];
   createdDate: Date;
+}
+
+export interface GroupList {
+  groups: Array<Group>;
+}
+
+export interface Member {
+  memberId: string;
+  memberName: string;
+}
+
+export interface ShareCost {
+  memberId: string;
+  shareCost: string;
 }
 
 export interface Transaction {
   groupId: string;
   transactionId: string;
-  payer: string;
+  payerId: string;
   description: string;
-  amount: number;
-  split: string;
+  amount: string;
+  shareCosts: Array<ShareCost>;
   date: Date;
   type: string;
   currency: string;
@@ -27,7 +41,7 @@ export interface PaidDebt {
   debtId: string;
   creditor: string;
   debtor: string;
-  amount: number;
+  amount: string;
   currency: string;
   date: Date;
 }

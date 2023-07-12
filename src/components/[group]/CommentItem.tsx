@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 import type { Dispatch } from 'react';
 import { useState } from 'react';
 
-import type { Comment } from '@/interfaces/response';
+import type { Comment, Member } from '@/interfaces/response';
 import { getHowLongAgo } from '@/utils/timeUtils';
 
 import type { ActionType } from '../hooks/snackbarReducer';
@@ -10,11 +10,11 @@ import EditCommentModal from './EditCommentModal';
 
 export default function CommmentItem({
   commentRecord,
-  memberNames,
+  members,
   dispatch,
 }: {
   commentRecord: Comment;
-  memberNames: Array<string>;
+  members: Array<Member>;
   dispatch: Dispatch<ActionType>;
 }) {
   const [open, setOpen] = useState(false);
@@ -41,7 +41,7 @@ export default function CommmentItem({
       <EditCommentModal
         open={open}
         setOpen={setOpen}
-        memberNames={memberNames}
+        members={members}
         commentRecord={commentRecord}
         dispatch={dispatch}
       />

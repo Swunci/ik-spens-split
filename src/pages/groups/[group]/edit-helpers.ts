@@ -1,11 +1,11 @@
-import type { Dispatch } from 'react';
+import type { Dispatch, FormEvent } from 'react';
 
 import type { ActionType } from '@/components/hooks/snackbarReducer';
 import { ACTION_TYPES } from '@/components/hooks/snackbarReducer';
 import type { GroupUpdate } from '@/interfaces/request';
 import NextApiClient from '@/utils/api/NextApiClient';
 import { currencyNameCodeMap } from '@/utils/currencyUtil';
-import { updateLocalStorageGroup } from '@/utils/localStorageUtils';
+import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
 
 export type GroupUpdateForm = {
   groupId: string;
@@ -14,7 +14,7 @@ export type GroupUpdateForm = {
 };
 
 export async function handleGroupUpdate(
-  e: React.FormEvent<HTMLFormElement>,
+  e: FormEvent<HTMLFormElement>,
   formDetails: GroupUpdateForm,
   dispatch: Dispatch<ActionType>
 ) {
@@ -42,7 +42,7 @@ export async function handleGroupUpdate(
     message: 'Updated group',
   });
   const group = await response.json();
-  updateLocalStorageGroup(group);
+  saveGroupToLocalStorage(group.groupId);
 }
 
 export async function handleGroupDelete(

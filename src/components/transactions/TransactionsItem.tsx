@@ -1,4 +1,5 @@
 import { type Dispatch, useState } from 'react';
+import { useContext } from 'react';
 
 import type { Group, Transaction } from '@/interfaces/response';
 import {
@@ -9,21 +10,26 @@ import {
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 import { getLocaleDateString } from '@/utils/timeUtils';
 
+import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import type { ActionType } from '../hooks/snackbarReducer';
 import EditTransactionModal from './EditTransactionModal';
 
 export default function TransactionsItem({
   transaction,
   group,
-  currentMember,
+  currentMemberId,
   dispatch,
 }: {
   transaction: Transaction;
   group: Group;
-  currentMember: string;
+  currentMemberId: string;
   dispatch: Dispatch<ActionType>;
 }) {
   const [open, setOpen] = useState(false);
+
+  const memberIdNameContext = useContext(MemberIdNameContext);
+
+  const idNameMap = memberIdNameContext!.memberIdToNameMap;
 
   return (
     <li
@@ -31,29 +37,36 @@ export default function TransactionsItem({
       key={transaction.transactionId}
     >
       <button type="button" onClick={() => setOpen(true)}>
-        <div className="w-full">
-          <div className="flexbox-row text-base">
-            <div>{`${transaction.payer} paid ${currencyCodeSymbolMap.get(
-              transaction.currency
-            )}${transaction.amount} for ${transaction.description}`}</div>
+        <div className="flexbox-row">
+          <div className="w-full">
+            <div className="flexbox-row text-base">
+              <div>{`${idNameMap.get(
+                transaction.payerId
+              )} paid ${currencyCodeSymbolMap.get(transaction.currency)}${
+                transaction.amount
+              } for ${transaction.description}`}</div>
+            </div>
+            <div className="flexbox-row gap-2 pt-1">
+              <div className="text-xs">
+                {`People involved: ${getInvolvedMembers(
+                  transaction.shareCosts,
+                  idNameMap
+                )}.`}
+              </div>
+              <div className="text-xs">
+                {isMemberInvolved(transaction.shareCosts, currentMemberId)
+                  ? `Your share: ${currencyCodeSymbolMap.get(
+                      transaction.currency
+                    )}${getYourShare(transaction.shareCosts, currentMemberId)}`
+                  : null}
+              </div>
+              <div className="min-w-fit text-xs">
+                {getLocaleDateString(transaction.date)}
+              </div>
+            </div>
           </div>
-          <div className="flexbox-row gap-2 pt-1">
-            <div className="text-xs">
-              People involved: {getInvolvedMembers(transaction.split)}.
-            </div>
-            <div className="text-xs">
-              {isMemberInvolved(transaction.split, currentMember)
-                ? `Your share: ${currencyCodeSymbolMap.get(
-                    transaction.currency
-                  )}${getYourShare(transaction.split, currentMember)}`
-                : null}
-            </div>
-            <div className="min-w-fit text-xs">
-              {getLocaleDateString(transaction.date)}
-            </div>
-          </div>
+          <div className="flexbox-col w-fit py-2 pl-2">&gt;</div>
         </div>
-        <div className="flexbox-col w-fit py-2 pl-2">&gt;</div>
       </button>
       <EditTransactionModal
         open={open}

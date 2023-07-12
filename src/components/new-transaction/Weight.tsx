@@ -1,19 +1,22 @@
 import { TextField } from '@mui/material';
+import type Decimal from 'decimal.js';
+import type { MutableRefObject } from 'react';
 import { useContext } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 
-import { getMembersListBySplitType, type IMember } from './helpers';
+import type { TransactionMember } from './helpers';
+import { getMembersListBySplitType } from './helpers';
 
 export default function Weight({
   weightRef,
   member,
   totalCost,
 }: {
-  weightRef: React.MutableRefObject<HTMLInputElement | undefined>;
-  member: IMember;
-  totalCost: number;
+  weightRef: MutableRefObject<HTMLInputElement | undefined>;
+  member: TransactionMember;
+  totalCost: Decimal;
 }) {
   const transactionContext = useContext(TransactionContext);
 
@@ -31,7 +34,7 @@ export default function Weight({
         inputProps={{
           style: {
             textAlign: 'right',
-            width: '50px',
+            width: '100px',
           },
         }}
         value={member.weight}
@@ -51,14 +54,13 @@ export default function Weight({
         onChange={(e) => {
           e.preventDefault();
           const nums = e.target.value.replace(/\D/g, '');
-          // eslint-disable-next-line no-param-reassign
           const weight = weightRef.current!;
           weight.value =
             nums.length === 0 ? '0' : parseInt(nums, 10).toFixed(0);
           const changedMembers = transactionContext!.membersList.map(
-            (mem: IMember) => {
+            (mem: TransactionMember) => {
               const newMem = mem;
-              if (mem.name === member.name) {
+              if (mem.memberId === member.memberId) {
                 newMem.weight = nums.length === 0 ? 0 : parseInt(nums, 10);
               }
               return newMem;
@@ -70,7 +72,7 @@ export default function Weight({
             changedMembers,
             totalCost,
             transactionContext!.transactionType,
-            transactionContext!.payer
+            transactionContext!.payerId
           );
           transactionContext!.setMembersList(list);
         }}

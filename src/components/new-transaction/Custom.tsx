@@ -1,21 +1,20 @@
 import { TextField } from '@mui/material';
-import { type Dispatch, type SetStateAction, useContext } from 'react';
+import Decimal from 'decimal.js';
+import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
+import { useContext } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
-import {
-  currencyCodeSymbolMap,
-  getDecimalPrecisionCurrency,
-} from '@/utils/currencyUtil';
+import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 
-import type { IMember } from './helpers';
+import type { TransactionMember } from './helpers';
 
 export default function Custom({
   splitValueRef,
   member,
   setIsOver,
 }: {
-  splitValueRef: React.MutableRefObject<HTMLInputElement | undefined>;
-  member: IMember;
+  splitValueRef: MutableRefObject<HTMLInputElement | undefined>;
+  member: TransactionMember;
   setIsOver: Dispatch<SetStateAction<boolean>>;
 }) {
   const transactionContext = useContext(TransactionContext);
@@ -54,27 +53,36 @@ export default function Custom({
         if (nums.length <= 1) {
           nums = `0${nums}`;
         }
-        const num = `${nums.slice(0, -2)}.${nums.slice(-2)}`;
+        const precision = 2;
+        const num = `${nums.slice(0, -1 * precision)}.${nums.slice(
+          -1 * precision
+        )}`;
+
+        const newCost = new Decimal(num).toDecimalPlaces(precision);
+
         const splitValue = splitValueRef.current!;
-        splitValue.value = parseFloat(num).toFixed(2);
+        splitValue.value = newCost.toFixed(precision);
+
         const total = transactionContext!.membersList.reduce(
-          (cost: number, mem: IMember) => {
-            if (member.name !== mem.name) {
-              return getDecimalPrecisionCurrency(cost + mem.amount, 2);
+          (cost: Decimal, mem: TransactionMember) => {
+            if (mem.memberId !== member.memberId) {
+              return cost.plus(mem.amount);
             }
             return cost;
           },
-          parseFloat(num)
+          new Decimal(num)
         );
-        setIsOver(total > transactionContext!.totalCost);
+
+        setIsOver(total.greaterThan(transactionContext!.totalCost));
+
         transactionContext!.setMembersList(
-          transactionContext!.membersList.map((mem: IMember) => {
+          transactionContext!.membersList.map((mem: TransactionMember) => {
             const newMem = mem;
-            if (mem.name === member.name) {
-              newMem.amount = parseFloat(num);
+            if (mem.memberId === member.memberId) {
+              newMem.amount = newCost;
             }
             return newMem;
-          }) || new Array<IMember>()
+          }) || new Array<TransactionMember>()
         );
       }}
     />

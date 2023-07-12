@@ -20,6 +20,8 @@ class NextApiClient extends HttpClient {
     return {
       create: (body: GroupCreation) => this.post('/api/groups', body),
       get: (groupId: string) => this.get(`/api/groups/${groupId}`),
+      getSome: (groupIds: Array<string>) =>
+        this.get(`/api/groups?groupIds=${JSON.stringify(groupIds)}`),
       update: (body: GroupUpdate) =>
         this.put(`/api/groups/${body.groupId}`, body),
       delete: (groupId: string) => this.delete(`/api/groups/${groupId}`),

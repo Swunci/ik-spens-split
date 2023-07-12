@@ -1,3 +1,4 @@
+import type Decimal from 'decimal.js';
 import type { Dispatch } from 'react';
 
 import type { MemberDetails } from '@/pages/groups/[group]-helpers';
@@ -7,13 +8,13 @@ import DebtItem from './DebtItem';
 
 type MemberAmount = {
   name: string;
-  amount: number;
+  amount: Decimal;
 };
 
 export type Debt = {
   debtor: string;
   creditor: string;
-  paidAmount: number;
+  paidAmount: Decimal;
 };
 
 export default function DebtList({
@@ -31,13 +32,13 @@ export default function DebtList({
   const debtors = new Array<MemberAmount>();
 
   membersMap.forEach((details, memberName) => {
-    if (details.debt > 0) {
+    if (details.debt.greaterThan(0)) {
       creditors.push({
         name: memberName,
         amount: details.debt,
       } as MemberAmount);
     }
-    if (details.debt < 0) {
+    if (details.debt.lessThan(0)) {
       debtors.push({
         name: memberName,
         amount: details.debt,
@@ -45,8 +46,8 @@ export default function DebtList({
     }
   });
 
-  creditors.sort((a, b) => b.amount - a.amount);
-  debtors.sort((a, b) => b.amount - a.amount);
+  creditors.sort((a, b) => b.amount.minus(a.amount).toNumber());
+  debtors.sort((a, b) => b.amount.minus(a.amount).toNumber());
 
   const debts = new Array<Debt>();
 
@@ -55,21 +56,23 @@ export default function DebtList({
     const debtor = debtors.at(0)!;
     const creditAmount = creditor.amount;
     const debtAmount = debtor.amount;
-    const remainingAmount = creditAmount + debtAmount;
+    const remainingAmount = creditAmount.plus(debtAmount);
     debts.push({
       debtor: debtor.name,
       creditor: creditor.name,
-      paidAmount: remainingAmount > 0 ? Math.abs(debtAmount) : creditAmount,
-    });
-    if (remainingAmount === 0) {
+      paidAmount: remainingAmount.greaterThan(0)
+        ? debtAmount.absoluteValue()
+        : creditAmount,
+    } as Debt);
+    if (remainingAmount.equals(0)) {
       creditors.shift();
       debtors.shift();
-    } else if (remainingAmount > 0) {
-      creditor.amount -= Math.abs(debtAmount);
+    } else if (remainingAmount.greaterThan(0)) {
+      creditor.amount = creditor.amount.minus(debtAmount.absoluteValue());
       debtors.shift();
     } else {
       creditors.shift();
-      debtor.amount += creditor.amount;
+      debtor.amount = debtor.amount.plus(creditor.amount);
     }
   }
   return debts.length === 0 ? (

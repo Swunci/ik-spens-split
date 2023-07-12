@@ -1,16 +1,16 @@
 import type { Dispatch } from 'react';
 
-import type { Comment } from '../../interfaces/response';
+import type { Comment, Member } from '../../interfaces/response';
 import type { ActionType } from '../hooks/snackbarReducer';
 import CommentItem from './CommentItem';
 
 export default function CommentList({
   comments,
-  memberNames,
+  members,
   dispatch,
 }: {
   comments: Array<Comment>;
-  memberNames: Array<string>;
+  members: Array<Member>;
   dispatch: Dispatch<ActionType>;
 }) {
   return (
@@ -20,7 +20,7 @@ export default function CommentList({
           <CommentItem
             key={commentRecord.commentId}
             commentRecord={commentRecord}
-            memberNames={memberNames}
+            members={members}
             dispatch={dispatch}
           />
         );

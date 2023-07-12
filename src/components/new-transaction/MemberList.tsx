@@ -2,16 +2,16 @@ import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
-import React, { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
 
-import type { IMember } from './helpers';
+import type { TransactionMember } from './helpers';
 import { getMembersListBySplitType, setSelectAllMembers } from './helpers';
 import Member from './Member';
 
 export default function MembersList() {
-  const transactionContext = React.useContext(TransactionContext);
+  const transactionContext = useContext(TransactionContext);
   const [splitType, setSplitType] = useState('equal');
 
   const handleSelectAll = (isAllSelected: boolean) => {
@@ -22,7 +22,7 @@ export default function MembersList() {
       splitType,
       transactionContext!.totalCost,
       transactionContext!.transactionType,
-      transactionContext!.payer
+      transactionContext!.payerId
     );
   };
 
@@ -34,12 +34,12 @@ export default function MembersList() {
           transactionContext.membersList,
           transactionContext.totalCost,
           transactionContext.transactionType,
-          transactionContext.payer
+          transactionContext.payerId
         )
       );
     }
   }, [
-    transactionContext!.payer,
+    transactionContext!.payerId,
     transactionContext!.totalCost,
     splitType,
     transactionContext!.transactionType,
@@ -96,15 +96,15 @@ export default function MembersList() {
       </div>
       <ul className="max-w-screen-md space-y-4 rounded bg-alice-main p-2">
         {transactionContext!.membersList
-          .filter((member: IMember) => {
+          .filter((member: TransactionMember) => {
             if (transactionContext!.transactionType === 'loan') {
-              return transactionContext!.payer !== member.name;
+              return transactionContext!.payerId !== member.memberId;
             }
             return true;
           })
-          .map((member: IMember) => {
+          .map((member: TransactionMember) => {
             return (
-              <div key={member.name}>
+              <div key={member.memberName}>
                 <Member member={member} splitType={splitType.toLowerCase()} />
               </div>
             );

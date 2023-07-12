@@ -9,13 +9,13 @@ import TransactionsItem from './TransactionsItem';
 export default function TransactionsList({
   transactions,
   dataOwner,
-  currentMember,
+  currentMemberId,
   group,
   dispatch,
 }: {
   transactions: Array<Transaction>;
   dataOwner: string;
-  currentMember: string;
+  currentMemberId: string;
   group: Group;
   dispatch: Dispatch<ActionType>;
 }) {
@@ -29,9 +29,9 @@ export default function TransactionsList({
         .filter((transaction: Transaction) => {
           switch (dataOwner) {
             case 'yours':
-              return isMemberInvolved(transaction.split, currentMember);
+              return isMemberInvolved(transaction.shareCosts, currentMemberId);
             case 'others':
-              return !isMemberInvolved(transaction.split, currentMember);
+              return !isMemberInvolved(transaction.shareCosts, currentMemberId);
             default:
               return true;
           }
@@ -42,7 +42,7 @@ export default function TransactionsList({
               key={transaction.transactionId}
               transaction={transaction}
               group={group}
-              currentMember={currentMember}
+              currentMemberId={currentMemberId}
               dispatch={dispatch}
             />
           );

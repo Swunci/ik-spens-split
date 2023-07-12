@@ -6,18 +6,22 @@ import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
+import type { SyntheticEvent } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import useSwr from 'swr';
 import * as XLSX from 'xlsx';
 
 import type CustomError from '@/errors/customError';
+import type { ShareCost } from '@/interfaces/request';
 import type {
   Group,
+  Member,
   PaidDebt,
   PaidDebtResponse,
   Transaction,
   TransactionResponse,
 } from '@/interfaces/response';
+import { TwoWayReadonlyMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { getLocaleDateString } from '@/utils/timeUtils';
 
@@ -26,8 +30,12 @@ export default function Navbar() {
 
   const { group: groupId } = router.query;
 
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef<HTMLButtonElement>(null);
+
+  const [memberIdToNameMap, setMemberIdToNameMap] = useState(
+    new TwoWayReadonlyMap(new Map<string, string>())
+  );
 
   const { data: groupData } = useSwr<Group, CustomError>(
     () => (groupId ? `/api/groups/${groupId}` : null),
@@ -44,11 +52,25 @@ export default function Navbar() {
     fetcher
   );
 
+  useEffect(() => {
+    if (groupData) {
+      const idNameMap = groupData.members.reduce(
+        (map: Map<string, string>, member: Member) => {
+          map.set(member.memberId, member.memberName);
+          return map;
+        },
+        new Map<string, string>()
+      );
+      const readOnlyMap = new TwoWayReadonlyMap(idNameMap);
+      setMemberIdToNameMap(readOnlyMap);
+    }
+  }, [groupData]);
+
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
   };
 
-  const handleClose = (event: Event | React.SyntheticEvent) => {
+  const handleClose = (event: Event | SyntheticEvent) => {
     if (
       anchorRef.current &&
       anchorRef.current.contains(event.target as HTMLElement)
@@ -86,43 +108,43 @@ export default function Navbar() {
   function handleExportToExcel(e: React.MouseEvent) {
     e.preventDefault();
     if (groupData && transactionsData && paidDebtsData) {
-      const { memberNames } = groupData;
+      const { members } = groupData;
       const jsonObjects: any[] = [];
       transactionsData.transactions.forEach((transaction: Transaction) => {
-        const splitMap: Map<string, number> = new Map<string, number>(
-          Object.entries(JSON.parse(transaction.split))
-        );
-        memberNames.forEach((name: string) => {
-          if (splitMap.has(name)) {
-            splitMap.set(name, parseFloat(splitMap.get(name)!.toFixed(2)));
-          } else {
-            splitMap.set(name, 0.0);
-          }
+        const shareCostsWithName = new Map<string, string>();
+        transaction.shareCosts.forEach((shareCost: ShareCost) => {
+          shareCostsWithName.set(
+            memberIdToNameMap.get(shareCost.memberId)!,
+            shareCost.shareCost
+          );
         });
         jsonObjects.push({
           date: getLocaleDateString(transaction.date),
-          payer: transaction.payer,
+          payer: memberIdToNameMap.get(transaction.payerId),
           type: transaction.type,
-          amount: parseFloat(transaction.amount.toFixed(2)),
+          amount: transaction.amount,
           currency: transaction.currency,
           description: transaction.description,
-          ...Object.fromEntries(splitMap.entries()),
+          ...Object.fromEntries(shareCostsWithName.entries()),
         });
       });
 
       paidDebtsData.paidDebts.forEach((paidDebt: PaidDebt) => {
-        const splitMap: Map<string, number> = new Map<string, number>();
-        splitMap.set(paidDebt.creditor, parseFloat(paidDebt.amount.toFixed(2)));
-        memberNames.forEach((name: string) => {
-          if (!splitMap.has(name)) {
-            splitMap.set(name, 0.0);
+        const splitMap: Map<string, string> = new Map<string, string>();
+        splitMap.set(
+          memberIdToNameMap.get(paidDebt.creditor)!,
+          paidDebt.amount
+        );
+        members.forEach((member: Member) => {
+          if (!splitMap.has(member.memberName)) {
+            splitMap.set(member.memberName, '0');
           }
         });
         jsonObjects.push({
           date: getLocaleDateString(paidDebt.date),
           payer: paidDebt.debtor,
           type: 'settlement',
-          amount: parseFloat(paidDebt.amount.toFixed(2)),
+          amount: paidDebt.amount,
           currency: paidDebt.currency,
           description: 'paid money back',
           ...Object.fromEntries(splitMap.entries()),
@@ -146,8 +168,8 @@ export default function Navbar() {
   }
 
   // return focus to the button when we transitioned from !open -> open
-  const prevOpen = React.useRef(open);
-  React.useEffect(() => {
+  const prevOpen = useRef(open);
+  useEffect(() => {
     if (prevOpen.current === true && open === false) {
       anchorRef.current!.focus();
     }

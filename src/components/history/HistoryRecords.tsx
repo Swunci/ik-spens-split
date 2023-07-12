@@ -8,14 +8,18 @@ import type {
 import {
   displaySplit,
   getAction,
+  getGroupMemberNames,
 } from '@/pages/groups/[group]/history-helpers';
+import type { TwoWayReadonlyMap } from '@/utils/currencyUtil';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 import { getHowLongAgo, getLocaleDateString } from '@/utils/timeUtils';
 
 export default function HistoryRecords({
   historyRecords,
+  memberIdToNameMap,
 }: {
   historyRecords: Array<History>;
+  memberIdToNameMap: TwoWayReadonlyMap<string, string>;
 }) {
   return (
     <ul className="space-y-2">
@@ -40,7 +44,7 @@ export default function HistoryRecords({
                   <div className="text-xs">Name: {group.groupName}</div>
                   <div className="text-xs">Currency: {group.currency}</div>
                   <div className="text-xs">
-                    Members: {group.memberNames?.join(', ')}
+                    Members: {getGroupMemberNames(group)}
                   </div>
                 </div>
               </li>
@@ -62,17 +66,20 @@ export default function HistoryRecords({
                   </div>
                 </div>
                 <div className="flexbox-col gap-1 pt-1">
-                  <div className="text-xs">{`${
-                    transaction.payer
-                  } paid ${currencyCodeSymbolMap.get(transaction.currency)}${
+                  <div className="text-xs">{`${memberIdToNameMap.get(
+                    transaction.payerId
+                  )} paid ${currencyCodeSymbolMap.get(transaction.currency)}${
                     transaction.amount
                   } for ${transaction.description}`}</div>
                   <div className="text-xs">
                     Date: {getLocaleDateString(transaction.date)}
                   </div>
                   <div className="text-xs">
-                    Split:{' '}
-                    {displaySplit(transaction.split, transaction.currency)}
+                    {`Split: ${displaySplit(
+                      transaction.shareCosts,
+                      transaction.currency,
+                      memberIdToNameMap
+                    )}`}
                   </div>
                 </div>
               </li>
@@ -96,11 +103,9 @@ export default function HistoryRecords({
                 <div className="flexbox-col gap-1 pt-1">
                   <div className="text-xs">{`${
                     paidDebt.debtor
-                  } paid ${currencyCodeSymbolMap.get(
-                    paidDebt.currency
-                  )}${paidDebt.amount.toFixed(2)} to ${
-                    paidDebt.creditor
-                  }`}</div>
+                  } paid ${currencyCodeSymbolMap.get(paidDebt.currency)}${
+                    paidDebt.amount
+                  } to ${paidDebt.creditor}`}</div>
                 </div>
               </li>
             );

@@ -8,9 +8,10 @@ import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
-import { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useMemo, useReducer, useState } from 'react';
 import useSwr from 'swr';
 
+import { MemberIdNameContext } from '@/components/hooks/MemberIdNameContext';
 import {
   ACTION_TYPES,
   initialState,
@@ -21,12 +22,15 @@ import TransactionsList from '@/components/transactions/TransactionsList';
 import type CustomError from '@/errors/customError';
 import type {
   Group,
+  Member,
   PaidDebtResponse,
   TransactionResponse,
 } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop } from '@/utils/component/helpers';
+import { TwoWayReadonlyMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
+import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
 
 export default function Transactions() {
   const router = useRouter();
@@ -36,7 +40,17 @@ export default function Transactions() {
 
   const [dataOwner, setDataOwner] = useState('all');
   const [dataType, setDataType] = useState('transactions');
-  const [currentMember, setCurrentMember] = useState('');
+  const [currentMemberId, setCurrentMemberId] = useState('');
+  const [memberIdToNameMap, setMemberIdToNameMap] = useState(
+    new TwoWayReadonlyMap(new Map<string, string>())
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      memberIdToNameMap,
+    }),
+    [memberIdToNameMap]
+  );
 
   const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);
 
@@ -71,7 +85,19 @@ export default function Transactions() {
 
   useEffect(() => {
     if (groupData) {
-      setCurrentMember(groupData.memberNames.at(0)!);
+      const idNameMap = groupData.members.reduce(
+        (map: Map<string, string>, member: Member) => {
+          map.set(member.memberId, member.memberName);
+          return map;
+        },
+        new Map<string, string>()
+      );
+      const readOnlyMap = new TwoWayReadonlyMap(idNameMap);
+      setMemberIdToNameMap(readOnlyMap);
+
+      setCurrentMemberId(groupData.members.at(0)!.memberId);
+
+      saveGroupToLocalStorage(groupData.groupId);
     }
   }, [groupData]);
 
@@ -98,7 +124,7 @@ export default function Transactions() {
           <TransactionsList
             transactions={transactionsData!.transactions}
             dataOwner={dataOwner}
-            currentMember={currentMember}
+            currentMemberId={currentMemberId}
             group={groupData!}
             dispatch={dispatch}
           />
@@ -108,7 +134,7 @@ export default function Transactions() {
           <PaidDebtsList
             paidDebts={paidDebtsData!.paidDebts}
             dataOwner={dataOwner}
-            currentMember={currentMember}
+            currentMemberId={currentMemberId}
             groupData={groupData!}
             dispatch={dispatch}
           />
@@ -145,17 +171,19 @@ export default function Transactions() {
           >
             <Select
               className="static bg-alice-base"
-              defaultValue={groupData?.memberNames.at(0)}
-              onChange={(e) => setCurrentMember(e.target.value)}
+              defaultValue={groupData?.members.at(0)?.memberName}
+              onChange={(e) =>
+                setCurrentMemberId(memberIdToNameMap.revGet(e.target.value)!)
+              }
             >
-              {groupData?.memberNames.map((name: string) => {
+              {groupData?.members.map((member: Member) => {
                 return (
-                  <MenuItem key={name} value={name}>
+                  <MenuItem key={member.memberId} value={member.memberName}>
                     <Typography
                       className="whitespace-normal break-words"
                       noWrap
                     >
-                      {name}
+                      {member.memberName}
                     </Typography>
                   </MenuItem>
                 );
@@ -191,7 +219,9 @@ export default function Transactions() {
         </ToggleButtonGroup>
       </div>
       <div className="flexbox-col h-full w-full space-y-2 rounded bg-alice-main p-2 py-4">
-        {renderByDataType()}
+        <MemberIdNameContext.Provider value={contextValue}>
+          {renderByDataType()}
+        </MemberIdNameContext.Provider>
       </div>
       <Snackbar
         autoHideDuration={5000}

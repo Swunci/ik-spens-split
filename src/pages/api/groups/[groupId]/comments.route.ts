@@ -10,7 +10,7 @@ import validate from '../../../../middleware/validation';
 
 const schema = Joi.object({
   groupId: Joi.string().required(),
-  commenter: Joi.string().required(),
+  commenterId: Joi.string().required(),
   comment: Joi.string().required(),
 });
 

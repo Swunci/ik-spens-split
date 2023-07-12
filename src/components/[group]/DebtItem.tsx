@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import type { Dispatch } from 'react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { mutate } from 'swr';
 
 import type { PaidDebtCreation } from '@/interfaces/request';
@@ -8,6 +8,7 @@ import type { PaidDebt } from '@/interfaces/response';
 import NextApiClient from '@/utils/api/NextApiClient';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 
+import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import { ACTION_TYPES, type ActionType } from '../hooks/snackbarReducer';
 import type { Debt } from './DebtList';
 
@@ -29,12 +30,16 @@ export default function DebtItem({
   const [isSettled, setIsSettled] = useState(false);
   const [debtId, setDebtId] = useState('');
 
+  const memberIdNameContext = useContext(MemberIdNameContext);
+
+  const idNameMap = memberIdNameContext!.memberIdToNameMap;
+
   const currencySymbol = currencyCodeSymbolMap.get(currencyCode) || '';
 
   async function createPaidDebt(e: React.MouseEvent) {
     e.preventDefault();
     const body: PaidDebtCreation = {} as PaidDebtCreation;
-    body.amount = debt.paidAmount;
+    body.amount = debt.paidAmount.toString();
     body.creditor = debt.creditor;
     body.debtor = debt.debtor;
     body.groupId = groupId as string;
@@ -80,7 +85,9 @@ export default function DebtItem({
       {isSettled ? (
         <>
           <div className="p-1">
-            {debt.debtor} settled up with {debt.creditor}
+            {`${idNameMap.get(debt.debtor)} settled up with ${idNameMap.get(
+              debt.creditor
+            )}`}
           </div>
           <button
             className="rounded bg-alice-accent px-2 py-1 text-alice-base shadow-md"
@@ -93,8 +100,10 @@ export default function DebtItem({
       ) : (
         <>
           <div className="p-1">
-            {debt.debtor} owes {debt.creditor} {currencySymbol}
-            {Math.abs(debt.paidAmount).toFixed(2)}
+            {`${idNameMap.get(debt.debtor)} owes ${idNameMap.get(
+              debt.creditor
+            )} ${currencySymbol}
+            ${debt.paidAmount.absoluteValue().toFixed(2)}`}
           </div>
           <button
             className="rounded bg-alice-accent px-2 py-1 text-alice-base shadow-md"

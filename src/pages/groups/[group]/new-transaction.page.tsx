@@ -4,10 +4,11 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
+import Decimal from 'decimal.js';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
-import React, { useEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import useSwr from 'swr';
 
 import {
@@ -18,19 +19,20 @@ import {
 import { TransactionContext } from '@/components/hooks/TransactionContext';
 import type {
   CreateTransactionForm,
-  IMember,
+  TransactionMember,
 } from '@/components/new-transaction/helpers';
 import {
   getActionByTransactionType,
   getInitialMemberList,
-  handleCreation,
-  handleHowMuch,
+  handleTotalCostInput,
+  handleTransactionCreation,
 } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
 import type CustomError from '@/errors/customError';
-import type { Group } from '@/interfaces/response';
+import type { Group, Member } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
+import { displayWithCommas, TwoWayReadonlyMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { getTodaysDate } from '@/utils/timeUtils';
 
@@ -43,25 +45,33 @@ export default function NewTransactionPage() {
 
   const { group: groupId } = router.query;
 
-  const { data, error, isLoading } = useSwr<Group, CustomError>(
+  const {
+    data: groupData,
+    error,
+    isLoading,
+  } = useSwr<Group, CustomError>(
     () => (groupId ? `/api/groups/${groupId}` : null),
     fetcher
   );
 
   const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);
-  const [totalCost, setTotalCost] = useState(0);
-  const [payer, setPayer] = useState('');
+  const [totalCost, setTotalCost] = useState(new Decimal(0));
+  const [payerId, setPayerId] = useState('');
   const [transactionType, setTransactionType] = useState('expense');
-  const [membersList, setMembersList] = useState(new Array<IMember>());
-  const [amountError, setAmountError] = useState(false);
+  const [membersList, setMembersList] = useState(
+    new Array<TransactionMember>()
+  );
   const [currency, setCurrency] = useState('');
   const descriptionRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
+  const [memberIdToNameMap, setMemberIdToNameMap] = useState(
+    new TwoWayReadonlyMap(new Map<string, string>())
+  );
 
-  const contextValue = React.useMemo(
+  const contextValue = useMemo(
     () => ({
-      payer,
-      setPayer,
+      payerId,
+      setPayerId,
       membersList,
       setMembersList,
       totalCost,
@@ -70,18 +80,27 @@ export default function NewTransactionPage() {
       setTransactionType,
       currency,
     }),
-    [payer, membersList, totalCost, transactionType]
+    [payerId, membersList, totalCost, transactionType]
   );
 
   useEffect(() => {
-    if (data) {
-      setPayer(data.memberNames.at(0)!);
-      setCurrency(data.currency);
+    if (groupData) {
+      const idNameMap = groupData.members.reduce(
+        (map: Map<string, string>, member: Member) => {
+          map.set(member.memberId, member.memberName);
+          return map;
+        },
+        new Map<string, string>()
+      );
+      const readOnlyMap = new TwoWayReadonlyMap(idNameMap);
+      setMemberIdToNameMap(readOnlyMap);
+      setPayerId(groupData.members.at(0)!.memberId);
+      setCurrency(groupData.currency);
       setMembersList(
-        getInitialMemberList(data.memberNames, transactionType, payer)
+        getInitialMemberList(groupData.members, transactionType, payerId)
       );
     }
-  }, [data]);
+  }, [groupData]);
 
   if (isLoading || !groupId) {
     return displayBackdrop();
@@ -108,17 +127,17 @@ export default function NewTransactionPage() {
       <form
         className="flex w-full flex-col items-center"
         onSubmit={(e) => {
-          handleCreation(
+          handleTransactionCreation(
             e,
             {
-              groupId: data!.groupId,
+              groupId: groupData!.groupId,
               date: dateRef.current!.value,
               description: descriptionRef.current!.value,
-              payer,
+              payerId,
               totalCost,
               membersList,
               transactionType,
-              currency: data!.currency,
+              currency: groupData!.currency,
             } as CreateTransactionForm,
             dispatch,
             setTotalCost,
@@ -134,17 +153,19 @@ export default function NewTransactionPage() {
           >
             <Select
               className="static bg-alice-base py-0"
-              defaultValue={data?.memberNames.at(0)}
-              onChange={(e) => setPayer(e.target.value)}
+              defaultValue={groupData?.members.at(0)?.memberName}
+              onChange={(e) =>
+                setPayerId(memberIdToNameMap.revGet(e.target.value)!)
+              }
             >
-              {data?.memberNames.map((name: string) => {
+              {groupData?.members.map((member: Member) => {
                 return (
-                  <MenuItem key={name} value={name}>
+                  <MenuItem key={member.memberId} value={member.memberName}>
                     <Typography
                       className="whitespace-normal break-words"
                       noWrap
                     >
-                      {name}
+                      {member.memberName}
                     </Typography>
                   </MenuItem>
                 );
@@ -188,22 +209,13 @@ export default function NewTransactionPage() {
             <label className="flex w-full flex-col" htmlFor="howMuch">
               How much?
               <input
-                className={`mt-2 rounded bg-alice-base p-1 ${
-                  amountError ? 'bg-red-300' : ''
-                }`}
+                className="mt-2 rounded bg-alice-base p-1"
                 id="howMuch"
-                type="number"
-                min="0"
-                step="0.01"
+                type="text"
                 placeholder="Amount"
                 required
-                value={totalCost === 0 ? '' : totalCost}
-                onKeyDown={(e) => {
-                  if (e.key.toLowerCase() === 'e') {
-                    e.preventDefault();
-                  }
-                }}
-                onChange={(e) => handleHowMuch(e, setTotalCost, setAmountError)}
+                value={displayWithCommas(totalCost.toFixed(2))}
+                onChange={(e) => handleTotalCostInput(e, setTotalCost)}
               />
             </label>
           </div>

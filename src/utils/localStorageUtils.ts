@@ -1,45 +1,34 @@
-import type { Group } from '@/interfaces/response';
-
-function containsGroup(groups: Array<Group>, groupId: string) {
-  for (let i = 0; i < groups.length; i += 1) {
-    if (groups.at(i)?.groupId === groupId) {
-      return true;
-    }
-  }
-  return false;
+function containsGroup(groupIds: Array<string>, groupId: string) {
+  return groupIds.includes(groupId);
 }
 
-function updateGroups(groups: Array<Group>, updatedGroup: Group) {
-  const updatedGroups = groups.map((group) => {
-    if (group.groupId === updatedGroup.groupId) {
-      return updatedGroup;
-    }
-    return group;
-  });
-  return updatedGroups;
+function removeGroupId(groupIds: Array<string>, groupId: string) {
+  const index = groupIds.indexOf(groupId);
+  if (index > -1) {
+    groupIds.splice(index);
+  }
+  return groupIds;
 }
 
-export function saveGroupToLocalStorage(group: Group) {
-  if (!localStorage.getItem('groups')) {
-    localStorage.setItem('groups', JSON.stringify(new Array<Group>()));
+export function saveGroupToLocalStorage(groupId: string) {
+  if (!localStorage.getItem('groupIds')) {
+    localStorage.setItem('groupIds', JSON.stringify(new Array<string>()));
   }
-  const groups: Array<Group> = JSON.parse(localStorage.getItem('groups')!);
+  const groupIds: Array<string> = JSON.parse(localStorage.getItem('groupIds')!);
 
-  if (!containsGroup(groups, group.groupId)) {
-    groups.push(group);
-    localStorage.setItem('groups', JSON.stringify(groups));
+  if (!containsGroup(groupIds, groupId)) {
+    groupIds.push(groupId);
+    localStorage.setItem('groupIds', JSON.stringify(groupIds));
   }
 }
 
-export function updateLocalStorageGroup(group: Group) {
-  if (!localStorage.getItem('groups')) {
-    localStorage.setItem('groups', JSON.stringify(new Array<Group>()));
+export function removeGroupFromLocalStorage(groupId: string) {
+  if (!localStorage.getItem('groupIds')) {
+    localStorage.setItem('groupIds', JSON.stringify(new Array<string>()));
   }
-  let groups: Array<Group> = JSON.parse(localStorage.getItem('groups')!);
-  if (containsGroup(groups, group.groupId)) {
-    groups = updateGroups(groups, group);
-  } else {
-    groups.push(group);
-  }
-  localStorage.setItem('groups', JSON.stringify(groups));
+  const groupIds: Array<string> = JSON.parse(localStorage.getItem('groupIds')!);
+  localStorage.setItem(
+    'groupIds',
+    JSON.stringify(removeGroupId(groupIds, groupId))
+  );
 }

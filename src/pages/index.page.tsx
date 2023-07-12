@@ -1,23 +1,10 @@
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
 import RecentGroups from '@/components/index/RecentGroups';
-import type { Group } from '@/interfaces/response';
 import { HomeLayout } from '@/layouts/HomeLayout';
 import { Meta } from '@/layouts/Meta';
 
 const Index = () => {
-  const [groups, setGroups] = useState(new Array<Group>());
-
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      localStorage.getItem('groups') !== null
-    ) {
-      setGroups(JSON.parse(localStorage.getItem('groups')!));
-    }
-  }, []);
-
   return (
     <>
       <Meta
@@ -55,7 +42,7 @@ const Index = () => {
             </Link>
           </div>
 
-          <RecentGroups groups={groups} />
+          <RecentGroups />
 
           <section className="p-3">
             <h3 className="text-2xl text-alice-accent">How It Works</h3>

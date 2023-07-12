@@ -9,7 +9,7 @@ class HttpClient {
   }
 
   private async fetchResponse(endpoint: string, options: RequestInit = {}) {
-    const res = await fetch(this.baseURL + endpoint, {
+    const res: Response = await fetch(this.baseURL + endpoint, {
       ...options,
       headers: this.headers,
     }).catch((_err) => {

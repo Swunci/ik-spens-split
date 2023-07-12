@@ -1,20 +1,29 @@
-import type { ChangeEvent, Dispatch, RefObject, SetStateAction } from 'react';
+import Decimal from 'decimal.js';
+import type {
+  ChangeEvent,
+  Dispatch,
+  FormEvent,
+  RefObject,
+  SetStateAction,
+} from 'react';
 
 import type { ActionType } from '@/components/hooks/snackbarReducer';
 import { ACTION_TYPES } from '@/components/hooks/snackbarReducer';
 import type {
   PaidDebtUpdate,
+  ShareCost,
   TransactionCreation,
   TransactionUpdate,
 } from '@/interfaces/request';
+import type { Member } from '@/interfaces/response';
 import NextApiClient from '@/utils/api/NextApiClient';
-import { getTodaysDate } from '@/utils/timeUtils';
 
-import { getDecimalPrecisionCurrency } from '../../utils/currencyUtil';
+import { trimLeadingZeros } from '../../utils/currencyUtil';
 
-export interface IMember {
-  name: string;
-  amount: number;
+export interface TransactionMember {
+  memberId: string;
+  memberName: string;
+  amount: Decimal;
   isSelected: boolean;
   weight: number;
 }
@@ -30,71 +39,41 @@ export function getActionByTransactionType(transactionType: string) {
   return transactionMap.get(transactionType.toLowerCase()) ?? '';
 }
 
-export function handleHowMuch(
+export function handleTotalCostInput(
   e: ChangeEvent<HTMLInputElement>,
-  setTotalCost: Dispatch<SetStateAction<number>>,
-  setAmountError: Dispatch<SetStateAction<boolean>>
+  setTotalCost: Dispatch<SetStateAction<Decimal>>
 ) {
-  const newTotalCost = e.target.valueAsNumber
-    ? getDecimalPrecisionCurrency(e.target.valueAsNumber, 2)
-    : 0;
-  if (newTotalCost < 0) {
-    setTotalCost(0);
-    setAmountError(true);
-    return;
+  let nums = e.target.value.replace(/\D/g, '');
+  if (nums.length <= 1) {
+    nums = `0${nums}`;
   }
-  setAmountError(false);
-  setTotalCost(newTotalCost);
-}
-
-export function handleDateChange(
-  e: ChangeEvent<HTMLInputElement>,
-  setDate: Dispatch<SetStateAction<string>>
-) {
-  const inputDate = e.target.value;
-  const todaysDate = getTodaysDate();
-  if (inputDate > todaysDate) {
-    setDate(todaysDate);
-    e.target.value = todaysDate;
-    return;
-  }
-  setDate(e.target.value);
-}
-
-function allSelectedMembersHaveWeight(membersList: Array<IMember>) {
-  let allHaveWeight = true;
-  membersList.forEach((member: IMember) => {
-    if (member.isSelected && member.weight === 0) {
-      allHaveWeight = false;
-    }
-  });
-  return allHaveWeight;
+  const precision = -1 * 2;
+  const num = `${nums.slice(0, precision)}.${nums.slice(precision)}`;
+  setTotalCost(new Decimal(trimLeadingZeros(num)));
 }
 
 function assignRemainingToSomeone(
-  membersList: Array<IMember>,
-  totalCost: number
+  membersList: Array<TransactionMember>,
+  totalCost: Decimal,
+  isWeightSplit: boolean
 ) {
   let updatedMemberList = membersList;
   const calculatedTotal = membersList.reduce(
-    (count: number, member: IMember) => {
-      return getDecimalPrecisionCurrency(count + member.amount, 2);
+    (count: Decimal, member: TransactionMember) => {
+      return count.plus(member.amount);
     },
-    0
+    new Decimal(0)
   );
-  if (totalCost !== calculatedTotal) {
-    const remaining = getDecimalPrecisionCurrency(
-      totalCost - calculatedTotal,
-      2
-    );
+  if (!totalCost.equals(calculatedTotal)) {
+    const remaining = totalCost.minus(calculatedTotal);
     let assigned = false;
-    updatedMemberList = membersList.map((member: IMember) => {
+    updatedMemberList = membersList.map((member: TransactionMember) => {
       const currentMember = member;
-      if (currentMember.isSelected && !assigned) {
-        currentMember.amount = getDecimalPrecisionCurrency(
-          currentMember.amount + remaining,
-          2
-        );
+      if (isWeightSplit && currentMember.weight === 0) {
+        return currentMember;
+      }
+      if (!assigned && currentMember.isSelected) {
+        currentMember.amount = currentMember.amount.plus(remaining);
         assigned = true;
       }
       return currentMember;
@@ -105,31 +84,36 @@ function assignRemainingToSomeone(
 }
 
 export function getEqualSplitMemberList(
-  membersList: Array<IMember>,
-  totalCost: number
+  membersList: Array<TransactionMember>,
+  totalCost: Decimal
 ) {
-  const selectedCount = membersList.reduce((count: number, member: IMember) => {
-    if (member.isSelected) {
-      return count + 1;
-    }
-    return count;
-  }, 0);
+  const selectedCount = membersList.reduce(
+    (count: number, member: TransactionMember) => {
+      if (member.isSelected) {
+        return count + 1;
+      }
+      return count;
+    },
+    0
+  );
 
-  const list = membersList.map((currentMember: IMember) => {
+  const list = membersList.map((currentMember: TransactionMember) => {
     const member = currentMember;
     member.amount = member.isSelected
-      ? getDecimalPrecisionCurrency(totalCost / selectedCount, 2)
-      : 0;
+      ? totalCost.dividedBy(selectedCount).toDecimalPlaces(2)
+      : new Decimal(0);
     return member;
   });
   return list;
 }
 
-export function getCustomSplitMemberList(membersList: Array<IMember>) {
-  const list = membersList.map((currentMember: IMember) => {
+export function getCustomSplitMemberList(
+  membersList: Array<TransactionMember>
+) {
+  const list = membersList.map((currentMember: TransactionMember) => {
     const member = currentMember;
     if (!member.isSelected) {
-      member.amount = 0;
+      member.amount = new Decimal(0);
     }
     return member;
   });
@@ -137,25 +121,27 @@ export function getCustomSplitMemberList(membersList: Array<IMember>) {
 }
 
 export function getWeightSplitMemberList(
-  membersList: Array<IMember>,
-  totalCost: number
+  membersList: Array<TransactionMember>,
+  totalCost: Decimal
 ) {
-  const totalWeight = membersList.reduce((weight: number, member: IMember) => {
-    if (member.isSelected) {
-      return weight + member.weight;
-    }
-    return weight;
-  }, 0);
+  const totalWeight = membersList.reduce(
+    (weight: number, member: TransactionMember) => {
+      if (member.isSelected) {
+        return weight + member.weight;
+      }
+      return weight;
+    },
+    0
+  );
 
-  const list = membersList.map((currentMember: IMember) => {
+  const list = membersList.map((currentMember: TransactionMember) => {
     const member = currentMember;
     member.amount =
       totalWeight !== 0
-        ? getDecimalPrecisionCurrency(
-            totalCost * (member.weight / totalWeight),
-            2
-          )
-        : 0;
+        ? totalCost
+            .mul(new Decimal(member.weight).dividedBy(new Decimal(totalWeight)))
+            .toDecimalPlaces(2)
+        : new Decimal(0);
     return member;
   });
   return list;
@@ -163,16 +149,16 @@ export function getWeightSplitMemberList(
 
 export function getMembersListBySplitType(
   splitType: string,
-  members: IMember[],
-  totalCost: number,
+  members: TransactionMember[],
+  totalCost: Decimal,
   transactionType: string,
-  payer: string
+  payerId: string
 ) {
-  let list = new Array<IMember>();
-  const updatedMembers = members.map((member: IMember) => {
+  let list = new Array<TransactionMember>();
+  const updatedMembers = members.map((member: TransactionMember) => {
     const updatedMember = member;
-    if (transactionType === 'loan' && member.name === payer) {
-      updatedMember.amount = 0;
+    if (transactionType === 'loan' && member.memberId === payerId) {
+      updatedMember.amount = new Decimal(0);
       updatedMember.isSelected = false;
       updatedMember.weight = 0;
     }
@@ -181,13 +167,11 @@ export function getMembersListBySplitType(
   switch (splitType.toLowerCase()) {
     case 'equal':
       list = getEqualSplitMemberList(updatedMembers, totalCost);
-      list = assignRemainingToSomeone(list, totalCost);
+      list = assignRemainingToSomeone(list, totalCost, false);
       break;
     case 'weight':
       list = getWeightSplitMemberList(updatedMembers, totalCost);
-      if (allSelectedMembersHaveWeight(list)) {
-        list = assignRemainingToSomeone(list, totalCost);
-      }
+      list = assignRemainingToSomeone(list, totalCost, true);
       break;
     case 'custom':
       list = getCustomSplitMemberList(updatedMembers);
@@ -198,15 +182,15 @@ export function getMembersListBySplitType(
 }
 
 export function setSelectAllMembers(
-  membersList: IMember[],
-  setMembersList: Dispatch<SetStateAction<IMember[]>>,
+  membersList: TransactionMember[],
+  setMembersList: Dispatch<SetStateAction<TransactionMember[]>>,
   isAllSelected: boolean,
   splitType: string,
-  totalCost: number,
+  totalCost: Decimal,
   transactionType: string,
-  payer: string
+  payerId: string
 ): void {
-  const members = membersList.map((mem: IMember) => {
+  const members = membersList.map((mem: TransactionMember) => {
     const newMem = mem;
     newMem.isSelected = isAllSelected;
     newMem.weight = 0;
@@ -217,7 +201,7 @@ export function setSelectAllMembers(
     members,
     totalCost,
     transactionType,
-    payer
+    payerId
   );
   setMembersList(newList);
 }
@@ -226,9 +210,9 @@ export type CreateTransactionForm = {
   groupId: string;
   date: string;
   description: string;
-  payer: string;
-  totalCost: number;
-  membersList: IMember[];
+  payerId: string;
+  totalCost: Decimal;
+  membersList: TransactionMember[];
   currency: string;
   transactionType: string;
 };
@@ -238,9 +222,9 @@ export type UpdateTransactionForm = {
   transactionId: string;
   date: string;
   description: string;
-  payer: string;
-  totalCost: number;
-  membersList: IMember[];
+  payerId: string;
+  totalCost: Decimal;
+  membersList: TransactionMember[];
   currency: string;
   transactionType: string;
 };
@@ -250,69 +234,70 @@ export type UpdatePaidDebtForm = {
   debtId: string;
   creditor: string;
   debtor: string;
-  amount: number;
+  amount: Decimal;
 };
 
 export function getInitialMemberList(
-  memberNames: string[],
+  members: Array<Member>,
   transactionType: string,
-  payer: string
+  payerId: string
 ) {
-  const names = memberNames.filter((name: string) => {
-    if (transactionType === 'loan') return payer !== name;
+  const currentMembers = members.filter((member: Member) => {
+    if (transactionType === 'loan') return payerId !== member.memberId;
     return true;
   });
-  const list = names.map((name: string) => {
-    const member = {} as IMember;
-    member.name = name;
-    member.isSelected = true;
-    member.amount = 0;
-    member.weight = 0;
-    return member;
+  const list = currentMembers.map((member: Member) => {
+    const transactionMember = {} as TransactionMember;
+    transactionMember.memberId = member.memberId;
+    transactionMember.memberName = member.memberName;
+    transactionMember.isSelected = true;
+    transactionMember.amount = new Decimal(0);
+    transactionMember.weight = 0;
+    return transactionMember;
   });
   return list;
 }
 
-export function calculateSplit(members: IMember[]) {
-  const split: Map<string, number> = members.reduce(
-    (splitMap: Map<string, number>, member: IMember) => {
-      if (member.isSelected) {
-        splitMap.set(member.name, member.amount);
-      }
-      return splitMap;
-    },
-    new Map<string, number>()
-  );
-  return split;
-}
-
-function mathChecksOut(membersList: IMember[], totalCost: number) {
-  const sum = membersList.reduce((cost: number, member: IMember) => {
+function mathChecksOut(membersList: TransactionMember[], totalCost: Decimal) {
+  const sum = membersList.reduce((cost: Decimal, member: TransactionMember) => {
     if (member.isSelected) {
-      return cost + member.amount;
+      return cost.plus(member.amount);
     }
     return cost;
-  }, 0);
-  return totalCost === sum;
+  }, new Decimal(0));
+  return totalCost.equals(sum);
 }
 
-export async function handleCreation(
-  e: React.FormEvent<HTMLFormElement>,
+export async function handleTransactionCreation(
+  e: FormEvent<HTMLFormElement>,
   formDetails: CreateTransactionForm,
   dispatch: Dispatch<ActionType>,
-  setTotalCost: Dispatch<SetStateAction<number>>,
+  setTotalCost: Dispatch<SetStateAction<Decimal>>,
   descriptionRef: RefObject<HTMLInputElement>
 ) {
   e.preventDefault();
+
+  if (formDetails.totalCost.greaterThan(10 ** 9)) {
+    dispatch({
+      type: ACTION_TYPES.OPEN_WARNING,
+      message: 'Maximum value is 1,000,000,000',
+    });
+    return;
+  }
   const requestBody: TransactionCreation = {} as TransactionCreation;
   requestBody.groupId = formDetails.groupId;
-  requestBody.payer = formDetails.payer;
+  requestBody.payerId = formDetails.payerId;
   requestBody.type = formDetails.transactionType.toLowerCase();
-  requestBody.amount = formDetails.totalCost;
+  requestBody.amount = formDetails.totalCost.toString();
   requestBody.date = formDetails.date;
   requestBody.description = formDetails.description;
-  requestBody.split = JSON.stringify(
-    Object.fromEntries(calculateSplit(formDetails.membersList))
+  requestBody.splits = formDetails.membersList.map(
+    (member: TransactionMember) => {
+      return {
+        memberId: member.memberId,
+        shareCost: member.amount.toString(),
+      } as ShareCost;
+    }
   );
   requestBody.currency = formDetails.currency;
 
@@ -343,13 +328,13 @@ export async function handleCreation(
       formDetails.description
     }`,
   });
-  setTotalCost(0);
+  setTotalCost(new Decimal(0));
   const description = descriptionRef.current!;
   description.value = '';
 }
 
 export async function handleTransactionUpdate(
-  e: React.FormEvent<HTMLFormElement>,
+  e: FormEvent<HTMLFormElement>,
   formDetails: UpdateTransactionForm,
   dispatch: Dispatch<ActionType>
 ) {
@@ -357,13 +342,18 @@ export async function handleTransactionUpdate(
   const requestBody: TransactionUpdate = {} as TransactionUpdate;
   requestBody.groupId = formDetails.groupId;
   requestBody.transactionId = formDetails.transactionId;
-  requestBody.payer = formDetails.payer;
+  requestBody.payerId = formDetails.payerId;
   requestBody.type = formDetails.transactionType.toLowerCase();
-  requestBody.amount = formDetails.totalCost;
+  requestBody.amount = formDetails.totalCost.toString();
   requestBody.date = formDetails.date;
   requestBody.description = formDetails.description;
-  requestBody.split = JSON.stringify(
-    Object.fromEntries(calculateSplit(formDetails.membersList))
+  requestBody.splits = formDetails.membersList.map(
+    (member: TransactionMember) => {
+      return {
+        memberId: member.memberId,
+        shareCost: member.amount.toString(),
+      } as ShareCost;
+    }
   );
   requestBody.currency = formDetails.currency;
 
@@ -448,7 +438,7 @@ export async function handlePaidDebtDelete(
 }
 
 export async function handlePaidDebtUpdate(
-  e: React.FormEvent<HTMLFormElement>,
+  e: FormEvent<HTMLFormElement>,
   formDetails: UpdatePaidDebtForm,
   dispatch: Dispatch<ActionType>
 ) {
@@ -458,7 +448,7 @@ export async function handlePaidDebtUpdate(
   requestBody.debtId = formDetails.debtId;
   requestBody.creditor = formDetails.creditor;
   requestBody.debtor = formDetails.debtor;
-  requestBody.amount = formDetails.amount;
+  requestBody.amount = formDetails.amount.toString();
 
   const nextApiClient = new NextApiClient().jsonBody();
   const response = await nextApiClient.paidDebts.update(requestBody);

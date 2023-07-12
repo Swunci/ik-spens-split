@@ -1,19 +1,21 @@
 import { CircularProgress } from '@mui/material';
+import Decimal from 'decimal.js';
 
 import type { MemberDetails } from '@/pages/groups/[group]-helpers';
 
 export default function Overview({
   groupCost,
   membersMap,
-  currentMember,
+  currentMemberId,
   currencySymbol,
 }: {
-  groupCost: number;
+  groupCost: Decimal;
   membersMap: Map<string, MemberDetails>;
-  currentMember: string;
+  currentMemberId: string;
   currencySymbol: string;
 }) {
-  const debtAmount = membersMap.get(currentMember)?.debt ?? 0;
+  const debtAmount: Decimal =
+    membersMap.get(currentMemberId)?.debt ?? new Decimal(0);
   const isLoading = membersMap.size === 0;
   return (
     <div className="w-full rounded bg-alice-main shadow-md">
@@ -39,7 +41,7 @@ export default function Overview({
               <CircularProgress size="1.25rem" className="text-alice-accent" />
             ) : (
               `${currencySymbol}
-            ${membersMap.get(currentMember)?.cost.toFixed(2)}`
+            ${membersMap.get(currentMemberId)?.cost.toFixed(2)}`
             )}
           </div>
         </div>
@@ -50,7 +52,7 @@ export default function Overview({
               <CircularProgress size="1.25rem" className="text-alice-accent" />
             ) : (
               `${currencySymbol}
-            ${membersMap.get(currentMember)?.paid.toFixed(2)}`
+            ${membersMap.get(currentMemberId)?.paid.toFixed(2)}`
             )}
           </div>
         </div>
@@ -61,18 +63,18 @@ export default function Overview({
               <CircularProgress size="1.25rem" className="text-alice-accent" />
             ) : (
               `${currencySymbol}
-            ${membersMap.get(currentMember)?.received.toFixed(2)}`
+            ${membersMap.get(currentMemberId)?.received.toFixed(2)}`
             )}
           </div>
         </div>
         <div className="flexbox-row border-b-2 border-alice-accent p-2">
-          <div>{debtAmount < 0 ? 'You owe' : 'You are owed'}:</div>
+          <div>{debtAmount.lessThan(0) ? 'You owe' : 'You are owed'}:</div>
           <div>
             {isLoading ? (
               <CircularProgress size="1.25rem" className="text-alice-accent" />
             ) : (
               `${currencySymbol}
-            ${Math.abs(debtAmount).toFixed(2)}`
+            ${debtAmount.absoluteValue().toFixed(2)}`
             )}
           </div>
         </div>

@@ -45,7 +45,7 @@ export async function handleCommentUpdate(
   const requestBody: CommentUpdate = {} as CommentUpdate;
   requestBody.groupId = formDetails.groupId;
   requestBody.commentId = formDetails.commentId;
-  requestBody.commenter = formDetails.commenter;
+  requestBody.commenterId = formDetails.commenter;
   requestBody.comment = formDetails.commentText;
 
   const nextApiClient = new NextApiClient().jsonBody();

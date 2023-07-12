@@ -1,71 +1,82 @@
+import Decimal from 'decimal.js';
 import type { Dispatch } from 'react';
 import { mutate } from 'swr';
 
 import type { ActionType } from '@/components/hooks/snackbarReducer';
 import { ACTION_TYPES } from '@/components/hooks/snackbarReducer';
 import type { CommentCreation } from '@/interfaces/request';
-import type { PaidDebt, Transaction } from '@/interfaces/response';
+import type {
+  Member,
+  PaidDebt,
+  ShareCost,
+  Transaction,
+} from '@/interfaces/response';
 import NextApiClient from '@/utils/api/NextApiClient';
 
 export interface MemberDetails {
-  cost: number;
-  paid: number;
-  received: number;
-  debt: number;
+  cost: Decimal;
+  paid: Decimal;
+  received: Decimal;
+  debt: Decimal;
 }
 
 export function getOverviewStats(
   transactions: Array<Transaction>,
-  memberNames: Array<string>,
+  members: Array<Member>,
   paidDebts: Array<PaidDebt>
-): [number, Map<string, MemberDetails>] {
-  let groupCost = 0;
-  const membersMap = memberNames.reduce(
-    (members: Map<string, MemberDetails>, name: string) => {
-      members.set(name, {
-        cost: 0,
-        paid: 0,
-        received: 0,
-        debt: 0,
+): [Decimal, Map<string, MemberDetails>] {
+  let groupCost = new Decimal(0);
+  const membersMap = members.reduce(
+    (map: Map<string, MemberDetails>, member: Member) => {
+      map.set(member.memberId, {
+        cost: new Decimal(0),
+        paid: new Decimal(0),
+        received: new Decimal(0),
+        debt: new Decimal(0),
       } as MemberDetails);
-      return members;
+      return map;
     },
     new Map<string, MemberDetails>()
   );
   paidDebts.forEach((paidDebt: PaidDebt) => {
     const { creditor, debtor, amount } = paidDebt;
-    membersMap.get(creditor)!.received += amount;
-    membersMap.get(debtor)!.paid += amount;
+    membersMap.get(creditor)!.received = membersMap
+      .get(creditor)!
+      .received.plus(amount);
+    membersMap.get(debtor)!.paid = membersMap.get(debtor)!.paid.plus(amount);
   });
   transactions.forEach((transaction: Transaction) => {
     const type = transaction.type.toLowerCase();
-    const { payer, amount } = transaction;
-    const split: Map<string, number> = new Map(
-      Object.entries(JSON.parse(transaction.split))
-    );
+    const { payerId, amount } = transaction;
 
     if (type === 'expense' || type === 'loan') {
-      groupCost += amount;
-      membersMap.get(payer)!.paid += amount;
-      split.forEach((share: number, name: string) => {
-        membersMap.get(name)!.cost += share;
+      groupCost = groupCost.plus(amount);
+      membersMap.get(payerId)!.paid = membersMap
+        .get(payerId)!
+        .paid.plus(amount);
+      transaction.shareCosts.forEach((split: ShareCost) => {
+        membersMap.get(split.memberId)!.cost = membersMap
+          .get(split.memberId)!
+          .cost.plus(split.shareCost);
       });
     }
     if (type === 'income') {
-      groupCost -= amount;
-      membersMap.get(payer)!.received += amount;
-      split.forEach((share: number, name: string) => {
-        membersMap.get(name)!.cost -= share;
+      groupCost = groupCost.minus(amount);
+      membersMap.get(payerId)!.received = membersMap
+        .get(payerId)!
+        .received.plus(amount);
+      transaction.shareCosts.forEach((split: ShareCost) => {
+        membersMap.get(split.memberId)!.cost = membersMap
+          .get(split.memberId)!
+          .cost.minus(split.shareCost);
       });
     }
   });
   membersMap.forEach((memberDetails, _memberName) => {
     const details = memberDetails;
-    details.debt =
-      memberDetails.paid - memberDetails.cost - memberDetails.received;
-    if (Math.abs(details.debt) < 0.01) {
-      details.debt = 0;
-    }
+    details.debt = memberDetails.paid
+      .minus(memberDetails.cost)
+      .minus(memberDetails.received);
   });
   return [groupCost, membersMap];
 }
@@ -73,7 +84,7 @@ export function getOverviewStats(
 export async function createComment(
   e: React.MouseEvent,
   groupId: string,
-  commenter: string,
+  commenterId: string,
   comment: string,
   currentPath: string,
   dispatch: Dispatch<ActionType>
@@ -81,7 +92,7 @@ export async function createComment(
   e.preventDefault();
   const requestBody = {} as CommentCreation;
   requestBody.groupId = groupId;
-  requestBody.commenter = commenter;
+  requestBody.commenterId = commenterId;
   requestBody.comment = comment.trim();
 
   if (requestBody.comment === '') {

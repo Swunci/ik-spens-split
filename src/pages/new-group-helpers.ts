@@ -1,5 +1,5 @@
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
-import type { Dispatch, RefObject } from 'react';
+import type { Dispatch, FormEvent, RefObject } from 'react';
 
 import {
   ACTION_TYPES,
@@ -37,7 +37,7 @@ export function onAddMember(
 }
 
 export async function handleSubmit(
-  e: React.FormEvent<HTMLFormElement>,
+  e: FormEvent<HTMLFormElement>,
   groupNameRef: RefObject<HTMLInputElement>,
   currencyRef: RefObject<HTMLSelectElement>,
   currentMembers: Set<string>,
@@ -65,7 +65,7 @@ export async function handleSubmit(
   }
   const group: Group = await response.json();
 
-  saveGroupToLocalStorage(group);
+  saveGroupToLocalStorage(group.groupId);
 
   router.push(`/groups/${group.groupId}`);
 }

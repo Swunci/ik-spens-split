@@ -8,13 +8,13 @@ import PaidDebtsItem from './PaidDebtsItem';
 export default function PaidDebtsList({
   paidDebts,
   dataOwner,
-  currentMember,
+  currentMemberId,
   groupData,
   dispatch,
 }: {
   paidDebts: Array<PaidDebt>;
   dataOwner: string;
-  currentMember: string;
+  currentMemberId: string;
   groupData: Group;
   dispatch: Dispatch<ActionType>;
 }) {
@@ -28,13 +28,13 @@ export default function PaidDebtsList({
           switch (dataOwner) {
             case 'yours':
               return (
-                paidDebt.creditor === currentMember ||
-                paidDebt.debtor === currentMember
+                paidDebt.creditor === currentMemberId ||
+                paidDebt.debtor === currentMemberId
               );
             case 'others':
               return (
-                paidDebt.creditor !== currentMember &&
-                paidDebt.debtor !== currentMember
+                paidDebt.creditor !== currentMemberId &&
+                paidDebt.debtor !== currentMemberId
               );
             default:
               return true;

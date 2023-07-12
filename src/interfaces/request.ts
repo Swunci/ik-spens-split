@@ -10,12 +10,17 @@ export interface GroupUpdate {
   currency: string;
 }
 
+export interface ShareCost {
+  memberId: string;
+  shareCost: string;
+}
+
 export interface TransactionCreation {
   groupId: string;
-  payer: string;
+  payerId: string;
   description: string;
-  amount: number;
-  split: string;
+  amount: string;
+  splits: Array<ShareCost>;
   type: string;
   date: string;
   currency: string;
@@ -29,7 +34,7 @@ export interface PaidDebtCreation {
   groupId: string;
   creditor: string;
   debtor: string;
-  amount: number;
+  amount: string;
   currency: string;
 }
 
@@ -43,7 +48,7 @@ export interface PaidDebtDeletion {
 
 export interface CommentCreation {
   groupId: string;
-  commenter: string;
+  commenterId: string;
   comment: string;
 }
 

@@ -6,14 +6,16 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
+import Decimal from 'decimal.js';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 import useSwr from 'swr';
 
 import CommentList from '@/components/[group]/CommentList';
 import DebtList from '@/components/[group]/DebtList';
 import Overview from '@/components/[group]/Overview';
+import { MemberIdNameContext } from '@/components/hooks/MemberIdNameContext';
 import {
   ACTION_TYPES,
   initialState,
@@ -23,12 +25,13 @@ import type CustomError from '@/errors/customError';
 import type {
   CommentResponse,
   Group,
+  Member,
   PaidDebtResponse,
   TransactionResponse,
 } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
-import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
+import { currencyCodeSymbolMap, TwoWayReadonlyMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
 
@@ -39,8 +42,18 @@ export default function GroupPage() {
   const router = useRouter();
   const currentPath = usePathname();
 
-  const [currentMember, setCurrentMember] = useState('');
+  const [currentMemberId, setCurrentMemberId] = useState('');
   const [commentText, setCommentText] = useState('');
+  const [memberIdToNameMap, setMemberIdToNameMap] = useState(
+    new TwoWayReadonlyMap(new Map<string, string>())
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      memberIdToNameMap,
+    }),
+    [memberIdToNameMap]
+  );
 
   const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);
 
@@ -82,16 +95,28 @@ export default function GroupPage() {
 
   useEffect(() => {
     if (groupData) {
-      setCurrentMember(groupData.memberNames.at(0)!);
-      localStorage.setItem(
-        'groupSize',
-        JSON.stringify(groupData.memberNames.length ?? 0)
+      const idNameMap = groupData.members.reduce(
+        (map: Map<string, string>, member: Member) => {
+          map.set(member.memberId, member.memberName);
+          return map;
+        },
+        new Map<string, string>()
       );
-      saveGroupToLocalStorage(groupData);
+      const readOnlyMap = new TwoWayReadonlyMap(idNameMap);
+      setMemberIdToNameMap(readOnlyMap);
+
+      setCurrentMemberId(groupData.members.at(0)!.memberId);
+
+      saveGroupToLocalStorage(groupData.groupId);
     }
   }, [groupData]);
 
-  if (isLoadingGroup || !currentPath) {
+  if (
+    isLoadingGroup ||
+    !currentPath ||
+    isLoadingTransactions ||
+    isLoadingPaidDebts
+  ) {
     return displayBackdrop();
   }
 
@@ -112,10 +137,10 @@ export default function GroupPage() {
 
   const [groupCost, membersMap] =
     isLoadingGroup || isLoadingTransactions || isLoadingPaidDebts
-      ? [0, new Map<string, MemberDetails>()]
+      ? [new Decimal(0), new Map<string, MemberDetails>()]
       : getOverviewStats(
           transactionsData!.transactions,
-          groupData!.memberNames,
+          groupData!.members,
           paidDebtsData!.paidDebts
         );
 
@@ -134,17 +159,19 @@ export default function GroupPage() {
           >
             <Select
               className="static bg-alice-base"
-              defaultValue={groupData?.memberNames.at(0)}
-              onChange={(e) => setCurrentMember(e.target.value)}
+              defaultValue={groupData?.members.at(0)?.memberName}
+              onChange={(e) =>
+                setCurrentMemberId(memberIdToNameMap.revGet(e.target.value)!)
+              }
             >
-              {groupData?.memberNames.map((name: string) => {
+              {groupData?.members.map((member: Member) => {
                 return (
-                  <MenuItem key={name} value={name}>
+                  <MenuItem key={member.memberId} value={member.memberName}>
                     <Typography
                       className="whitespace-normal break-words"
                       noWrap
                     >
-                      {name}
+                      {member.memberName}
                     </Typography>
                   </MenuItem>
                 );
@@ -155,7 +182,7 @@ export default function GroupPage() {
         <Overview
           groupCost={groupCost}
           membersMap={membersMap}
-          currentMember={currentMember}
+          currentMemberId={currentMemberId}
           currencySymbol={currencySymbol}
         />
 
@@ -185,12 +212,14 @@ export default function GroupPage() {
               <CircularProgress className="text-alice-accent" />
             </div>
           ) : (
-            <DebtList
-              membersMap={membersMap}
-              currencyCode={currencyCode}
-              currentPath={currentPath}
-              dispatch={dispatch}
-            />
+            <MemberIdNameContext.Provider value={contextValue}>
+              <DebtList
+                membersMap={membersMap}
+                currencyCode={currencyCode}
+                currentPath={currentPath}
+                dispatch={dispatch}
+              />
+            </MemberIdNameContext.Provider>
           )}
         </div>
 
@@ -210,7 +239,7 @@ export default function GroupPage() {
                   createComment(
                     e,
                     groupData!.groupId,
-                    currentMember,
+                    currentMemberId,
                     commentText,
                     currentPath,
                     dispatch
@@ -230,7 +259,7 @@ export default function GroupPage() {
               ) : (
                 <CommentList
                   comments={commentsData!.comments}
-                  memberNames={groupData!.memberNames}
+                  members={groupData!.members}
                   dispatch={dispatch}
                 />
               )}

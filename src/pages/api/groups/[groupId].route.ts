@@ -24,6 +24,14 @@ router
       where: {
         groupId,
       },
+      include: {
+        members: {
+          select: {
+            memberId: true,
+            memberName: true,
+          },
+        },
+      },
     });
     if (!group) {
       return res.status(404).json({ message: 'Not found' });

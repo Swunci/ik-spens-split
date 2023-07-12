@@ -1,8 +1,8 @@
 model Group {
 	groupId String @id @default(uuid())
-	groupName String
-	currency String
-	memberNames String[]
+	groupName String @db.VarChar(100)
+	currency String @db.Char(3)
+	members Member[]
 	transactions Transaction[]
 	history History[]
 	paidDebts PaidDebt[]
@@ -10,18 +10,51 @@ model Group {
 	createdDate DateTime
 }
 
-model Transaction {
-	groupId String
+model Member {
+  groupId String
 	group Group @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
 
+  memberId String @id @default(uuid())
+  memberName String @db.VarChar(50)
+
+  paidTransactions Transaction[]
+  shareCosts ShareCost[]
+
+  paidDebtsAsCreditor PaidDebt[] @relation("creditor")
+  paidDebtsAsDebtior PaidDebt[] @relation("debtor")
+
+  comments Comment[]
+
+  @@unique([groupId, memberName])
+}
+
+model ShareCost {
+  memberId String
+  member Member @relation(fields: [memberId], references: [memberId])
+
+  transactionId String
+  transaction Transaction @relation(fields: [transactionId], references: [transactionId], onDelete: Cascade)
+
+  shareCost Decimal @db.Decimal(36, 18)
+
+  @@id([memberId, transactionId])
+}
+
+model Transaction {
+	groupId String
+  group Group @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
+
+  payerId String
+  member Member @relation(fields: [payerId], references: [memberId])
+
 	transactionId String @id @default(uuid())
-	payer String
-	description String
-	amount Float
-	split Json
+	description String @db.VarChar(1000)
+	amount Decimal @db.Decimal(36, 18)
 	date DateTime
-	type String
-	currency String
+	type String @db.VarChar(10)
+	currency String @db.Char(3)
+
+  shareCosts ShareCost[]
 
 	@@unique([groupId, transactionId])
 }
@@ -29,7 +62,7 @@ model Transaction {
 model History {
 	groupId String
 	group Group @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
-	
+
 	historyId String @id @default(uuid())
 	table String
 	action String
@@ -43,12 +76,15 @@ model PaidDebt {
 	groupId String
 	group Group @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
 
-	debtId String @id @default(uuid())
 	creditor String
 	debtor String
-	amount Float
+  creditorMember Member @relation("creditor", fields: [creditor], references: [memberId])
+  debtorMember Member @relation("debtor", fields: [debtor], references: [memberId])
+
+	debtId String @id @default(uuid())
+	amount Decimal @db.Decimal(36, 18)
 	date DateTime @default(now())
-	currency String
+	currency String @db.Char(3)
 
 	@@unique([groupId, debtId])
 }
@@ -57,9 +93,11 @@ model Comment {
 	groupId String
 	group Group @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
 
+  commenterId String
+  member Member @relation(fields: [commenterId], references: [memberId], onDelete: Cascade)
+
 	commentId String @id @default(uuid())
-	commenter String
-	comment String
+	comment String @db.VarChar(10000)
 	createdDate DateTime
 
 	@@unique([groupId, commentId])

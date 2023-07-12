@@ -1,10 +1,11 @@
 import type { Dispatch } from 'react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 import { getLocaleDateString } from '@/utils/timeUtils';
 
 import type { Group, PaidDebt } from '../../interfaces/response';
+import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import type { ActionType } from '../hooks/snackbarReducer';
 import EditDebtModal from './EditDebtModal';
 
@@ -19,15 +20,19 @@ export default function PaidDebtsItem({
 }) {
   const [open, setOpen] = useState(false);
 
+  const memberIdNameContext = useContext(MemberIdNameContext);
+
+  const idNameMap = memberIdNameContext!.memberIdToNameMap;
+
   return (
     <li className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md">
       <button type="button" onClick={() => setOpen(true)}>
         <div className="flexbox-row">
           <div className="flex w-full justify-start p-2">
             <div className="text-base">
-              {`${paidDebt.debtor} paid ${
+              {`${idNameMap.get(paidDebt.debtor)} paid ${idNameMap.get(
                 paidDebt.creditor
-              } ${currencyCodeSymbolMap.get(paidDebt.currency)}${
+              )} ${currencyCodeSymbolMap.get(paidDebt.currency)}${
                 paidDebt.amount
               } on ${getLocaleDateString(paidDebt.date)}`}
             </div>

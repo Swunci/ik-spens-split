@@ -1,48 +1,42 @@
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import React, { useEffect, useRef, useState } from 'react';
+import Decimal from 'decimal.js';
+import { useContext, useEffect, useState } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
-import {
-  currencyCodeSymbolMap,
-  getDecimalPrecisionCurrency,
-} from '@/utils/currencyUtil';
 
-import Custom from './Custom';
-import { getMembersListBySplitType, type IMember } from './helpers';
-import Weight from './Weight';
+import type { TransactionMember } from './helpers';
+import { getMembersListBySplitType } from './helpers';
+import MemberField from './MemberField';
 
 export default function Member({
   member,
   splitType,
 }: {
-  member: IMember;
+  member: TransactionMember;
   splitType: string;
 }) {
-  const transactionContext = React.useContext(TransactionContext);
-  const splitValueRef = useRef<HTMLInputElement>();
-  const weightRef = useRef<HTMLInputElement>();
+  const transactionContext = useContext(TransactionContext);
   const [isOver, setIsOver] = useState(false);
 
   useEffect(() => {
     const total = transactionContext!.membersList.reduce(
-      (cost: number, mem: IMember) => {
-        return getDecimalPrecisionCurrency(cost + mem.amount, 2);
+      (cost: Decimal, mem: TransactionMember) => {
+        return cost.plus(mem.amount);
       },
-      0
+      new Decimal(0)
     );
-    setIsOver(total > transactionContext!.totalCost);
+    setIsOver(total.greaterThan(transactionContext!.totalCost));
   }, [transactionContext!.membersList]);
 
   const handleSelect = (e: React.MouseEvent) => {
     e.preventDefault();
-    let list = transactionContext!.membersList.map((mem: IMember) => {
+    let list = transactionContext!.membersList.map((mem: TransactionMember) => {
       const newMem = mem;
-      if (mem.name === member.name) {
+      if (mem.memberId === member.memberId) {
         newMem.isSelected = !mem.isSelected;
       }
       if (!newMem.isSelected) {
-        newMem.amount = 0;
+        newMem.amount = new Decimal(0);
         newMem.weight = 0;
         setIsOver(false);
       }
@@ -53,69 +47,30 @@ export default function Member({
       list,
       transactionContext!.totalCost,
       transactionContext!.transactionType,
-      transactionContext!.payer
+      transactionContext!.payerId
     );
     transactionContext!.setMembersList(list);
   };
 
-  const renderMember = () => {
-    switch (splitType.toLowerCase()) {
-      case 'equal':
-        return (
-          <TextField
-            inputRef={splitValueRef}
-            disabled
-            className="p-1"
-            size="small"
-            id="outlined-basic"
-            variant="outlined"
-            type="text"
-            inputProps={{
-              style: {
-                textAlign: 'right',
-              },
-            }}
-            value={`${currencyCodeSymbolMap.get(
-              transactionContext!.currency
-            )}${member.amount.toFixed(2)}`}
-          />
-        );
-      case 'weight':
-        return (
-          <Weight
-            weightRef={weightRef}
-            member={member}
-            totalCost={transactionContext!.totalCost}
-          />
-        );
-      case 'custom':
-        return (
-          <Custom
-            splitValueRef={splitValueRef}
-            member={member}
-            setIsOver={setIsOver}
-          />
-        );
-      default:
-        return <div />;
-    }
-  };
-
   return (
     <li
-      key={member.name}
+      key={member.memberId}
       className={`flex flex-row place-content-between items-center rounded-md border-4 bg-alice-base align-middle text-lg ${
         member.isSelected ? 'border-alice-accent' : ''
       } ${isOver && member.isSelected ? ' border-red-400' : ''}`}
     >
       <button
-        className="flexbox-row w-full max-w-6/12 break-words p-2 py-3 mobile-disable-highlight"
+        className="flexbox-row w-full break-words p-2 py-3 mobile-disable-highlight"
         type="button"
         onClick={handleSelect}
       >
-        <Typography noWrap>{member.name}</Typography>
+        <Typography noWrap>{member.memberName}</Typography>
       </button>
-      {renderMember()}
+      <MemberField
+        splitType={splitType}
+        member={member}
+        setIsOver={setIsOver}
+      />
     </li>
   );
 }

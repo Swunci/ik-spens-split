@@ -1,3 +1,5 @@
+import type { Group, Member, ShareCost } from '@/interfaces/response';
+import type { TwoWayReadonlyMap } from '@/utils/currencyUtil';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 
 export function getAction(action: string) {
@@ -13,15 +15,25 @@ export function getAction(action: string) {
   }
 }
 
-export function displaySplit(split: string, currencyCode: string) {
-  const splitObj = JSON.parse(split);
+export function getGroupMemberNames(group: Group) {
+  const memberNames = group.members.map((member: Member) => {
+    return member.memberName;
+  });
+  return memberNames.join(', ');
+}
+
+export function displaySplit(
+  splits: Array<ShareCost>,
+  currencyCode: string,
+  memberIdToNameMap: TwoWayReadonlyMap<string, string>
+) {
   const shares = new Array<string>();
-  for (const [name, share] of Object.entries(splitObj)) {
+  splits.forEach((split: ShareCost) => {
     shares.push(
-      `${name}: ${currencyCodeSymbolMap.get(currencyCode)}${(
-        share as number
-      ).toFixed(2)}`
+      `${memberIdToNameMap.get(split.memberId)}: ${currencyCodeSymbolMap.get(
+        currencyCode
+      )}${split.shareCost}`
     );
-  }
+  });
   return shares.join(', ');
 }

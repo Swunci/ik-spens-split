@@ -1,19 +1,20 @@
+import type Decimal from 'decimal.js';
 import type { Dispatch, SetStateAction } from 'react';
-import React from 'react';
+import { createContext } from 'react';
 
-import type { IMember } from '@/components/new-transaction/helpers';
+import type { TransactionMember } from '@/components/new-transaction/helpers';
 
-export const TransactionContext = React.createContext<
+export const TransactionContext = createContext<
   TransactionContextType | undefined
 >(undefined);
 
 type TransactionContextType = {
-  payer: string;
-  setPayer: Dispatch<SetStateAction<string>>;
-  membersList: IMember[];
-  setMembersList: Dispatch<SetStateAction<IMember[]>>;
-  totalCost: number;
-  setTotalCost: Dispatch<SetStateAction<number>>;
+  payerId: string;
+  setPayerId: Dispatch<SetStateAction<string>>;
+  membersList: TransactionMember[];
+  setMembersList: Dispatch<SetStateAction<TransactionMember[]>>;
+  totalCost: Decimal;
+  setTotalCost: Dispatch<SetStateAction<Decimal>>;
   transactionType: string;
   setTransactionType: Dispatch<SetStateAction<string>>;
   currency: string;

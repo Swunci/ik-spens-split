@@ -169,7 +169,7 @@ const currencyDetails = {
   ZWL: { name: 'Zimbabwean dollar', symbol: '$' },
 };
 
-class TwoWayReadonlyMap<T, K> {
+export class TwoWayReadonlyMap<T, K> {
   map: Map<T, K>;
 
   reverseMap: Map<K, T>;
@@ -221,4 +221,32 @@ export const currencyCodeSymbolMap = codeSymbolMap;
 
 export function getDecimalPrecisionCurrency(number: number, precision: number) {
   return parseFloat(number.toFixed(precision));
+}
+
+function addCommasToNumber(num: string) {
+  return num.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+export function displayWithCommas(num: string) {
+  const index = num.lastIndexOf('.');
+  if (index !== -1) {
+    const numWithCommas = addCommasToNumber(num.slice(0, index));
+    return `${numWithCommas}${num.slice(index)}`;
+  }
+  return addCommasToNumber(num);
+}
+
+export function trimLeadingZeros(num: string) {
+  let indexAfterLastLeadingZero = 0;
+  for (let i = 0; i < num.length; i += 1) {
+    if (num.charAt(i) !== '0') {
+      break;
+    }
+    indexAfterLastLeadingZero += 1;
+  }
+  const value = num.slice(indexAfterLastLeadingZero);
+  if (value === '' || value.charAt(0) === '.') {
+    return `0${value}`;
+  }
+  return value;
 }

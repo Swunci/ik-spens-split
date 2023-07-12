@@ -4,7 +4,7 @@ import { FormControl, MenuItem, Select, Typography } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 import { Fragment, useState } from 'react';
 
-import type { Comment } from '@/interfaces/response';
+import type { Comment, Member } from '@/interfaces/response';
 
 import type { ActionType } from '../hooks/snackbarReducer';
 import type { UpdateCommentForm } from './helpers';
@@ -13,13 +13,13 @@ import { handleCommentDelete, handleCommentUpdate } from './helpers';
 export default function EditCommentModal({
   open,
   setOpen,
-  memberNames,
+  members,
   commentRecord,
   dispatch,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  memberNames: Array<string>;
+  members: Array<Member>;
   commentRecord: Comment;
   dispatch: Dispatch<ActionType>;
 }) {
@@ -53,7 +53,36 @@ export default function EditCommentModal({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="flexbox-col m-2 w-full max-w-screen-md overflow-hidden rounded border-2 border-alice-accent bg-alice-main p-2 text-left align-middle shadow-xl transition-all">
-                <Typography className="text-center">Edit</Typography>
+                <div className="flexbox-row p-2">
+                  <button
+                    className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                    type="button"
+                    onClick={() => setOpen(false)}
+                  >
+                    Close
+                  </button>
+                  <Typography className="flexbox-col justify-center text-center">
+                    Edit
+                  </Typography>
+                  <button
+                    className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                    type="button"
+                    onClick={async (e) => {
+                      const isDeleted = await handleCommentDelete(
+                        e,
+                        commentRecord.groupId,
+                        commentRecord.commentId,
+                        dispatch
+                      );
+
+                      if (isDeleted) {
+                        setOpen(false);
+                      }
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
                 <Typography className="min-w-fit p-1">Commenter</Typography>
                 <FormControl
                   size="small"
@@ -65,14 +94,17 @@ export default function EditCommentModal({
                     defaultValue={commentRecord.commenter}
                     onChange={(e) => setCommenter(e.target.value)}
                   >
-                    {memberNames.map((name: string) => {
+                    {members.map((member: Member) => {
                       return (
-                        <MenuItem key={name} value={name}>
+                        <MenuItem
+                          key={member.memberId}
+                          value={member.memberName}
+                        >
                           <Typography
                             className="whitespace-normal break-words"
                             noWrap
                           >
-                            {name}
+                            {member.memberName}
                           </Typography>
                         </MenuItem>
                       );
@@ -103,24 +135,6 @@ export default function EditCommentModal({
                     }}
                   >
                     Update
-                  </button>
-                  <button
-                    className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
-                    type="button"
-                    onClick={async (e) => {
-                      const isDeleted = await handleCommentDelete(
-                        e,
-                        commentRecord.groupId,
-                        commentRecord.commentId,
-                        dispatch
-                      );
-
-                      if (isDeleted) {
-                        setOpen(false);
-                      }
-                    }}
-                  >
-                    Delete
                   </button>
                 </div>
               </Dialog.Panel>
