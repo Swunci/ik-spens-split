@@ -10,7 +10,7 @@ import { ACTION_TYPES } from '../hooks/snackbarReducer';
 export type UpdateCommentForm = {
   groupId: string;
   commentId: string;
-  commenter: string;
+  commenterId: string;
   commentText: string;
 };
 
@@ -45,8 +45,7 @@ export async function handleCommentUpdate(
   const requestBody: CommentUpdate = {} as CommentUpdate;
   requestBody.groupId = formDetails.groupId;
   requestBody.commentId = formDetails.commentId;
-  requestBody.commenterId = formDetails.commenter;
-  requestBody.comment = formDetails.commentText;
+  requestBody.commenterId = formDetails.commenterId;
 
   const nextApiClient = new NextApiClient().jsonBody();
   const response = await nextApiClient.comments.update(requestBody);

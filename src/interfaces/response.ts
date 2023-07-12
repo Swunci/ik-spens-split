@@ -66,7 +66,7 @@ export interface HistoryResponse {
 export interface Comment {
   groupId: string;
   commentId: string;
-  commenter: string;
+  commenterId: string;
   comment: string;
   createdDate: Date;
 }

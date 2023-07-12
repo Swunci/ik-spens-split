@@ -1,10 +1,11 @@
 import { Typography } from '@mui/material';
 import type { Dispatch } from 'react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import type { Comment, Member } from '@/interfaces/response';
 import { getHowLongAgo } from '@/utils/timeUtils';
 
+import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import type { ActionType } from '../hooks/snackbarReducer';
 import EditCommentModal from './EditCommentModal';
 
@@ -19,6 +20,10 @@ export default function CommmentItem({
 }) {
   const [open, setOpen] = useState(false);
 
+  const memberIdNameContext = useContext(MemberIdNameContext);
+
+  const idNameMap = memberIdNameContext!.memberIdToNameMap;
+
   return (
     <li
       className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
@@ -28,7 +33,7 @@ export default function CommmentItem({
         <div className="flex">
           <div className="w-full">
             <div className="flexbox-row">
-              <div>{commentRecord.commenter}</div>
+              <div>{idNameMap.get(commentRecord.commenterId)}</div>
               <div>{getHowLongAgo(commentRecord.createdDate)}</div>
             </div>
             <div className="text-left">{commentRecord.comment}</div>

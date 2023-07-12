@@ -2,10 +2,11 @@ import { Dialog, Transition } from '@headlessui/react';
 import TextareaAutosize from '@mui/base/TextareaAutosize';
 import { FormControl, MenuItem, Select, Typography } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
-import { Fragment, useState } from 'react';
+import { Fragment, useContext, useState } from 'react';
 
 import type { Comment, Member } from '@/interfaces/response';
 
+import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import type { ActionType } from '../hooks/snackbarReducer';
 import type { UpdateCommentForm } from './helpers';
 import { handleCommentDelete, handleCommentUpdate } from './helpers';
@@ -24,7 +25,11 @@ export default function EditCommentModal({
   dispatch: Dispatch<ActionType>;
 }) {
   const [commentText, setCommentText] = useState(commentRecord.comment);
-  const [commenter, setCommenter] = useState(commentRecord.commenter);
+  const [commenterId, setCommenterId] = useState(commentRecord.commenterId);
+
+  const memberIdNameContext = useContext(MemberIdNameContext);
+
+  const idNameMap = memberIdNameContext!.memberIdToNameMap;
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -91,8 +96,10 @@ export default function EditCommentModal({
                 >
                   <Select
                     className="static bg-alice-base"
-                    defaultValue={commentRecord.commenter}
-                    onChange={(e) => setCommenter(e.target.value)}
+                    defaultValue={idNameMap.get(commentRecord.commenterId)}
+                    onChange={(e) =>
+                      setCommenterId(idNameMap.revGet(e.target.value)!)
+                    }
                   >
                     {members.map((member: Member) => {
                       return (
@@ -127,7 +134,7 @@ export default function EditCommentModal({
                         {
                           groupId: commentRecord.groupId,
                           commentId: commentRecord.commentId,
-                          commenter,
+                          commenterId,
                           commentText,
                         } as UpdateCommentForm,
                         dispatch

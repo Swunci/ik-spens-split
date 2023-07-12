@@ -257,11 +257,13 @@ export default function GroupPage() {
                   <CircularProgress className="text-alice-accent" />
                 </div>
               ) : (
-                <CommentList
-                  comments={commentsData!.comments}
-                  members={groupData!.members}
-                  dispatch={dispatch}
-                />
+                <MemberIdNameContext.Provider value={contextValue}>
+                  <CommentList
+                    comments={commentsData!.comments}
+                    members={groupData!.members}
+                    dispatch={dispatch}
+                  />
+                </MemberIdNameContext.Provider>
               )}
             </div>
           ) : (
