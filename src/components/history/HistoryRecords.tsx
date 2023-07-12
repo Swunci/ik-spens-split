@@ -101,11 +101,11 @@ export default function HistoryRecords({
                   </div>
                 </div>
                 <div className="flexbox-col gap-1 pt-1">
-                  <div className="text-xs">{`${
+                  <div className="text-xs">{`${memberIdToNameMap.get(
                     paidDebt.debtor
-                  } paid ${currencyCodeSymbolMap.get(paidDebt.currency)}${
+                  )} paid ${currencyCodeSymbolMap.get(paidDebt.currency)}${
                     paidDebt.amount
-                  } to ${paidDebt.creditor}`}</div>
+                  } to ${memberIdToNameMap.get(paidDebt.creditor)}`}</div>
                 </div>
               </li>
             );
@@ -126,7 +126,9 @@ export default function HistoryRecords({
                   </div>
                 </div>
                 <div className="flexbox-col gap-1 pt-1">
-                  <div className="text-xs">{comment.commenter}</div>
+                  <div className="text-xs">
+                    {memberIdToNameMap.get(comment.commenterId)}
+                  </div>
                   <div className="text-xs">{comment.comment}</div>
                 </div>
               </li>

@@ -9,10 +9,10 @@ import { prisma } from '@/prisma/db';
 import validate from '../../../../../middleware/validation';
 
 const schema = Joi.object({
-  groupId: Joi.string().required(),
-  commentId: Joi.string().required(),
-  commenter: Joi.string().required(),
-  comment: Joi.string().required(),
+  groupId: Joi.string().min(36).max(36).required(),
+  commenterId: Joi.string().min(36).max(36).required(),
+  commentId: Joi.string().min(36).max(36).required(),
+  comment: Joi.string().max(1000).required(),
 });
 
 const router = createRouter<NextApiRequest, NextApiResponse>();

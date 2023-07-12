@@ -94,12 +94,12 @@ export default function HistoryPage() {
       <Typography className="pb-2 text-3xl">History</Typography>
       <div className="w-full rounded bg-alice-main p-2">
         {isLoadingHistory ? (
+          <CircularProgress />
+        ) : (
           <HistoryRecords
             historyRecords={historyData!.history}
             memberIdToNameMap={memberIdToNameMap}
           />
-        ) : (
-          <CircularProgress />
         )}
       </div>
     </RootLayout>
