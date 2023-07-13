@@ -58,6 +58,7 @@ export default function NewTransactionPage() {
   const [totalCost, setTotalCost] = useState(new Decimal(0));
   const [payerId, setPayerId] = useState('');
   const [transactionType, setTransactionType] = useState('expense');
+  const [splitType, setSplitType] = useState('Equal');
   const [membersList, setMembersList] = useState(
     new Array<TransactionMember>()
   );
@@ -79,8 +80,10 @@ export default function NewTransactionPage() {
       transactionType,
       setTransactionType,
       currency,
+      splitType,
+      setSplitType,
     }),
-    [payerId, membersList, totalCost, transactionType]
+    [payerId, membersList, totalCost, transactionType, splitType]
   );
 
   useEffect(() => {
@@ -137,6 +140,7 @@ export default function NewTransactionPage() {
               totalCost,
               membersList,
               transactionType,
+              splitType,
               currency: groupData!.currency,
             } as CreateTransactionForm,
             dispatch,

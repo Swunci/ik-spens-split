@@ -8,14 +8,27 @@ import { prisma } from '@/prisma/db';
 
 import validate from '../../../../../middleware/validation';
 
+const splitsSchema = Joi.object({
+  memberId: Joi.string().min(36).max(36).required(),
+  shareCost: Joi.number()
+    .precision(18)
+    .max(10 ** 9)
+    .required(),
+  weight: Joi.number().precision(0).required(),
+});
+
 const schema = Joi.object({
-  groupId: Joi.string().required(),
-  transactionId: Joi.string().required(),
-  payer: Joi.string().required(),
-  description: Joi.string().required(),
-  amount: Joi.number().precision(2).required(),
-  split: Joi.string().required(),
-  type: Joi.string().required(),
+  groupId: Joi.string().min(36).max(36).required(),
+  transactionId: Joi.string().min(36).max(36).required(),
+  payerId: Joi.string().min(36).max(36).required(),
+  description: Joi.string().max(1000).required(),
+  amount: Joi.number()
+    .precision(18)
+    .max(10 ** 9)
+    .required(),
+  splits: Joi.array().min(1).items(splitsSchema).required(),
+  type: Joi.string().max(10).required(),
+  splitType: Joi.string().max(10).required(),
   date: Joi.string().required(),
   currency: Joi.string().min(3).max(3).required(),
 });
@@ -44,19 +57,40 @@ router
     validate({ body: schema }),
     async (req: NextApiRequest, res: NextApiResponse) => {
       const body = req.body as TransactionUpdate;
-      const transaction: Transaction = await prisma.transaction
-        .update({
-          where: {
-            groupId_transactionId: {
-              groupId: body.groupId,
+      const [, transaction] = await prisma
+        .$transaction([
+          prisma.shareCost.deleteMany({
+            where: {
               transactionId: body.transactionId,
             },
-          },
-          data: {
-            ...body,
-            date: new Date(body.date),
-          },
-        })
+          }),
+          prisma.transaction.update({
+            where: {
+              groupId_transactionId: {
+                groupId: body.groupId,
+                transactionId: body.transactionId,
+              },
+            },
+            data: {
+              groupId: body.groupId,
+              payerId: body.payerId,
+              description: body.description,
+              amount: body.amount,
+              date: new Date(body.date),
+              type: body.type,
+              splitType: body.splitType,
+              currency: body.currency,
+              shareCosts: {
+                createMany: {
+                  data: [...body.splits],
+                },
+              },
+            },
+            include: {
+              shareCosts: true,
+            },
+          }),
+        ])
         .catch((_err) => {
           throw Error('Database problem');
         });

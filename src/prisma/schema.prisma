@@ -36,6 +36,7 @@ model ShareCost {
   transaction Transaction @relation(fields: [transactionId], references: [transactionId], onDelete: Cascade)
 
   shareCost Decimal @db.Decimal(36, 18)
+  weight Int @default(0)
 
   @@id([memberId, transactionId])
 }
@@ -53,6 +54,7 @@ model Transaction {
 	date DateTime
 	type String @db.VarChar(10)
 	currency String @db.Char(3)
+  splitType String @db.VarChar(10)
 
   shareCosts ShareCost[]
 

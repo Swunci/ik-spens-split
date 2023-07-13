@@ -22,6 +22,7 @@ CREATE TABLE "ShareCost" (
     "memberId" TEXT NOT NULL,
     "transactionId" TEXT NOT NULL,
     "shareCost" DECIMAL(36,18) NOT NULL,
+    "weight" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "ShareCost_pkey" PRIMARY KEY ("memberId","transactionId")
 );
@@ -36,6 +37,7 @@ CREATE TABLE "Transaction" (
     "date" TIMESTAMP(3) NOT NULL,
     "type" VARCHAR(10) NOT NULL,
     "currency" CHAR(3) NOT NULL,
+    "splitType" VARCHAR(10) NOT NULL,
 
     CONSTRAINT "Transaction_pkey" PRIMARY KEY ("transactionId")
 );
@@ -68,7 +70,7 @@ CREATE TABLE "PaidDebt" (
 -- CreateTable
 CREATE TABLE "Comment" (
     "groupId" TEXT NOT NULL,
-    "commenter" TEXT NOT NULL,
+    "commenterId" TEXT NOT NULL,
     "commentId" TEXT NOT NULL,
     "comment" VARCHAR(10000) NOT NULL,
     "createdDate" TIMESTAMP(3) NOT NULL,
@@ -122,4 +124,4 @@ ALTER TABLE "PaidDebt" ADD CONSTRAINT "PaidDebt_debtor_fkey" FOREIGN KEY ("debto
 ALTER TABLE "Comment" ADD CONSTRAINT "Comment_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("groupId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Comment" ADD CONSTRAINT "Comment_commenter_fkey" FOREIGN KEY ("commenter") REFERENCES "Member"("memberId") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Comment" ADD CONSTRAINT "Comment_commenterId_fkey" FOREIGN KEY ("commenterId") REFERENCES "Member"("memberId") ON DELETE CASCADE ON UPDATE CASCADE;

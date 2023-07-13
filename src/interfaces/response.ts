@@ -18,6 +18,7 @@ export interface Member {
 export interface ShareCost {
   memberId: string;
   shareCost: string;
+  weight: number;
 }
 
 export interface Transaction {
@@ -29,6 +30,7 @@ export interface Transaction {
   shareCosts: Array<ShareCost>;
   date: Date;
   type: string;
+  splitType: string;
   currency: string;
 }
 

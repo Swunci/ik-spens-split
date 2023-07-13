@@ -119,7 +119,7 @@ export default function EditDebtModal({
                         onChange={(e) =>
                           setDebtor(idNameMap.revGet(e.target.value)!)
                         }
-                        value={debtor}
+                        value={idNameMap.get(debtor)}
                       >
                         {groupData!.members
                           .filter((member: Member) => {
@@ -155,7 +155,7 @@ export default function EditDebtModal({
                         onChange={(e) => {
                           setCreditor(idNameMap.revGet(e.target.value)!);
                         }}
-                        value={creditor}
+                        value={idNameMap.get(creditor)}
                       >
                         {groupData!.members
                           .filter((member: Member) => {

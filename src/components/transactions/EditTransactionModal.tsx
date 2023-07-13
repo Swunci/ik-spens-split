@@ -44,6 +44,7 @@ export default function EditDebtModal({
   const [totalCost, setTotalCost] = useState(new Decimal(transaction.amount));
   const [payerId, setPayerId] = useState(transaction.payerId);
   const [transactionType, setTransactionType] = useState(transaction.type);
+  const [splitType, setSplitType] = useState('Equal');
   const [membersList, setMembersList] = useState(
     getInitialMemberList(group.members, transaction.type, transaction.payerId)
   );
@@ -62,8 +63,10 @@ export default function EditDebtModal({
       transactionType,
       setTransactionType,
       currency,
+      splitType,
+      setSplitType,
     }),
-    [payerId, membersList, totalCost, transactionType]
+    [payerId, membersList, totalCost, transactionType, splitType]
   );
 
   useEffect(() => {
@@ -73,21 +76,26 @@ export default function EditDebtModal({
       setTransactionType(transaction.type);
       setCurrency(transaction.currency);
       const splits = transaction.shareCosts;
-      const memberCostMap = new Map<string, Decimal>();
+      const memberMap = new Map<string, ShareCost>();
       splits.forEach((split: ShareCost) => {
-        memberCostMap.set(split.memberId, new Decimal(split.shareCost));
+        memberMap.set(split.memberId, split);
       });
       const updatedMembersList = membersList.map(
         (member: TransactionMember) => {
           const updatedMember = member;
-          if (!member.amount.greaterThan(0)) {
+          updatedMember.amount = new Decimal(
+            memberMap.get(member.memberId)!.shareCost
+          );
+          updatedMember.weight = memberMap.get(member.memberId)!.weight;
+          if (!updatedMember.amount.greaterThan(0)) {
             updatedMember.isSelected = false;
+          } else {
+            updatedMember.isSelected = true;
           }
-          updatedMember.amount =
-            memberCostMap.get(member.memberId) ?? new Decimal(0);
           return updatedMember;
         }
       );
+      setSplitType(transaction.splitType);
       setMembersList(updatedMembersList);
     }
   }, [open]);
@@ -159,6 +167,7 @@ export default function EditDebtModal({
                         totalCost,
                         membersList,
                         transactionType,
+                        splitType,
                         currency: group.currency,
                       } as UpdateTransactionForm,
                       dispatch

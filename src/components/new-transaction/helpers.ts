@@ -6,6 +6,7 @@ import type {
   RefObject,
   SetStateAction,
 } from 'react';
+import { mutate } from 'swr';
 
 import type { ActionType } from '@/components/hooks/snackbarReducer';
 import { ACTION_TYPES } from '@/components/hooks/snackbarReducer';
@@ -215,6 +216,7 @@ export type CreateTransactionForm = {
   membersList: TransactionMember[];
   currency: string;
   transactionType: string;
+  splitType: string;
 };
 
 export type UpdateTransactionForm = {
@@ -227,6 +229,7 @@ export type UpdateTransactionForm = {
   membersList: TransactionMember[];
   currency: string;
   transactionType: string;
+  splitType: string;
 };
 
 export type UpdatePaidDebtForm = {
@@ -288,6 +291,7 @@ export async function handleTransactionCreation(
   requestBody.groupId = formDetails.groupId;
   requestBody.payerId = formDetails.payerId;
   requestBody.type = formDetails.transactionType.toLowerCase();
+  requestBody.splitType = formDetails.splitType;
   requestBody.amount = formDetails.totalCost.toString();
   requestBody.date = formDetails.date;
   requestBody.description = formDetails.description;
@@ -296,6 +300,7 @@ export async function handleTransactionCreation(
       return {
         memberId: member.memberId,
         shareCost: member.amount.toString(),
+        weight: member.weight,
       } as ShareCost;
     }
   );
@@ -344,6 +349,7 @@ export async function handleTransactionUpdate(
   requestBody.transactionId = formDetails.transactionId;
   requestBody.payerId = formDetails.payerId;
   requestBody.type = formDetails.transactionType.toLowerCase();
+  requestBody.splitType = formDetails.splitType;
   requestBody.amount = formDetails.totalCost.toString();
   requestBody.date = formDetails.date;
   requestBody.description = formDetails.description;
@@ -352,6 +358,7 @@ export async function handleTransactionUpdate(
       return {
         memberId: member.memberId,
         shareCost: member.amount.toString(),
+        weight: member.weight,
       } as ShareCost;
     }
   );
@@ -384,6 +391,7 @@ export async function handleTransactionUpdate(
       formDetails.description
     }`,
   });
+  mutate(`/api/groups/${requestBody.groupId}/transactions`);
 }
 
 export async function handleTransactionDelete(
@@ -410,6 +418,7 @@ export async function handleTransactionDelete(
     });
     return false;
   }
+  mutate(`/api/groups/${groupId}/transactions`);
   return true;
 }
 
@@ -434,6 +443,7 @@ export async function handlePaidDebtDelete(
     });
     return false;
   }
+  mutate(`/api/groups/${groupId}/debts`);
   return true;
 }
 
@@ -467,4 +477,5 @@ export async function handlePaidDebtUpdate(
     type: ACTION_TYPES.OPEN_SUCCESS,
     message: 'Updated paid debt',
   });
+  mutate(`/api/groups/${requestBody.groupId}/debts`);
 }

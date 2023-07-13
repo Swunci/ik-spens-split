@@ -22,6 +22,7 @@ export interface TransactionCreation {
   amount: string;
   splits: Array<ShareCost>;
   type: string;
+  splitType: string;
   date: string;
   currency: string;
 }

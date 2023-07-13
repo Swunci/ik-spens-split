@@ -2,7 +2,7 @@ import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
 
@@ -12,14 +12,13 @@ import Member from './Member';
 
 export default function MembersList() {
   const transactionContext = useContext(TransactionContext);
-  const [splitType, setSplitType] = useState('equal');
 
   const handleSelectAll = (isAllSelected: boolean) => {
     setSelectAllMembers(
       transactionContext!.membersList,
       transactionContext!.setMembersList,
       isAllSelected,
-      splitType,
+      transactionContext!.splitType,
       transactionContext!.totalCost,
       transactionContext!.transactionType,
       transactionContext!.payerId
@@ -30,7 +29,7 @@ export default function MembersList() {
     if (transactionContext) {
       transactionContext.setMembersList(
         getMembersListBySplitType(
-          splitType,
+          transactionContext.splitType,
           transactionContext.membersList,
           transactionContext.totalCost,
           transactionContext.transactionType,
@@ -41,7 +40,7 @@ export default function MembersList() {
   }, [
     transactionContext!.payerId,
     transactionContext!.totalCost,
-    splitType,
+    transactionContext!.splitType,
     transactionContext!.transactionType,
   ]);
 
@@ -56,8 +55,8 @@ export default function MembersList() {
           <div className="p-2">
             <Select
               className="bg-alice-base"
-              defaultValue="Equal"
-              onChange={(e) => setSplitType(e.target.value.toLowerCase())}
+              defaultValue={transactionContext!.splitType}
+              onChange={(e) => transactionContext!.setSplitType(e.target.value)}
             >
               <MenuItem key="Equal" value="Equal">
                 <Typography className="whitespace-normal break-words" noWrap>
@@ -105,7 +104,10 @@ export default function MembersList() {
           .map((member: TransactionMember) => {
             return (
               <div key={member.memberName}>
-                <Member member={member} splitType={splitType.toLowerCase()} />
+                <Member
+                  member={member}
+                  splitType={transactionContext!.splitType.toLowerCase()}
+                />
               </div>
             );
           })}

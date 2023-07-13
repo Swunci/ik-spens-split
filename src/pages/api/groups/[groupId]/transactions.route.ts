@@ -15,6 +15,7 @@ const splitsSchema = Joi.object({
     .precision(18)
     .max(10 ** 9)
     .required(),
+  weight: Joi.number().precision(0).required(),
 });
 
 const schema = Joi.object({
@@ -27,6 +28,7 @@ const schema = Joi.object({
     .required(),
   splits: Joi.array().min(1).items(splitsSchema).required(),
   type: Joi.string().max(10).required(),
+  splitType: Joi.string().max(10).required(),
   date: Joi.string().required(),
   currency: Joi.string().min(3).max(3).required(),
 });
@@ -54,6 +56,7 @@ router
           select: {
             memberId: true,
             shareCost: true,
+            weight: true,
           },
         },
       },
@@ -76,6 +79,7 @@ router
             amount: body.amount,
             date: new Date(body.date),
             type: body.type,
+            splitType: body.splitType,
             currency: body.currency,
             shareCosts: {
               createMany: {

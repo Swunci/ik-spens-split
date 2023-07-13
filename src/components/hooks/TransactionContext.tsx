@@ -18,4 +18,6 @@ type TransactionContextType = {
   transactionType: string;
   setTransactionType: Dispatch<SetStateAction<string>>;
   currency: string;
+  splitType: string;
+  setSplitType: Dispatch<SetStateAction<string>>;
 };
