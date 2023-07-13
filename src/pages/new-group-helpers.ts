@@ -39,7 +39,7 @@ export function onAddMember(
 export async function handleSubmit(
   e: FormEvent<HTMLFormElement>,
   groupNameRef: RefObject<HTMLInputElement>,
-  currencyRef: RefObject<HTMLSelectElement>,
+  currency: string,
   currentMembers: Set<string>,
   router: AppRouterInstance,
   dispatch: Dispatch<ActionType>
@@ -47,7 +47,7 @@ export async function handleSubmit(
   e.preventDefault();
   const data: GroupCreation = <GroupCreation>{};
   data.groupName = groupNameRef.current!.value;
-  data.currency = currencyNameCodeMap.get(currencyRef.current!.value) ?? '';
+  data.currency = currencyNameCodeMap.get(currency) ?? '';
   data.members = [...currentMembers];
 
   const nextApiClient = new NextApiClient().jsonBody();

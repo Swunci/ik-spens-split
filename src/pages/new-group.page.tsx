@@ -8,7 +8,7 @@ import {
   initialState,
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
-import Currencies from '@/components/new-group/Currencies';
+import CurrencySelection from '@/components/new-group/CurrencySelection';
 import MembersList from '@/components/new-group/MembersList';
 import { RootLayout } from '@/layouts/RootLayout';
 
@@ -19,9 +19,9 @@ export default function NewGroupPage() {
 
   const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);
   const groupNameRef = useRef<HTMLInputElement>(null);
-  const currencyRef = useRef<HTMLSelectElement>(null);
   const memberInputRef = useRef<HTMLInputElement>(null);
   const [currentMembers, setCurrentMembers] = useState(new Set<string>());
+  const [currency, setCurrency] = useState('');
 
   const onDeleteMember = (member: string) => {
     currentMembers.delete(member);
@@ -39,7 +39,7 @@ export default function NewGroupPage() {
           handleSubmit(
             e,
             groupNameRef,
-            currencyRef,
+            currency,
             currentMembers,
             router,
             dispatch
@@ -55,25 +55,15 @@ export default function NewGroupPage() {
             className="mt-2 rounded p-1"
             id="groupName"
             type="text"
-            placeholder="Trip to ?"
+            placeholder=""
             required
             ref={groupNameRef}
           />
         </label>
-        <label
-          className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
-          htmlFor="mainCurrency"
-        >
-          Main currency
-          <select
-            className="mt-2 rounded bg-white p-1"
-            id="mainCurrency"
-            required
-            ref={currencyRef}
-          >
-            <Currencies />
-          </select>
-        </label>
+        <CurrencySelection
+          selectedCurrency={currency}
+          setSelectedCurrency={setCurrency}
+        />
         <label
           className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
           htmlFor="addMembers"
@@ -81,7 +71,7 @@ export default function NewGroupPage() {
           Add member(s)
           <div className="flex flex-row place-content-between">
             <input
-              className="mt-2 w-full rounded p-1"
+              className="mt-2 w-full rounded p-2"
               id="addMembers"
               type="text"
               placeholder="Alice, Bob, Charlie"
