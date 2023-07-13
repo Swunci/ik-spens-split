@@ -26,7 +26,7 @@ router
       where: {
         groupId,
       },
-      orderBy: [{ date: 'desc' }, { amount: 'desc' }],
+      orderBy: [{ date: 'desc' }],
     });
     res.status(200).json({ paidDebts });
   })

@@ -46,6 +46,15 @@ router
         where: {
           transactionId,
         },
+        include: {
+          shareCosts: {
+            select: {
+              memberId: true,
+              shareCost: true,
+              weight: true,
+            },
+          },
+        },
       }
     );
     if (!transaction) {
@@ -116,6 +125,9 @@ router
       .delete({
         where: {
           transactionId,
+        },
+        include: {
+          shareCosts: true,
         },
       })
       .catch((_err) => {

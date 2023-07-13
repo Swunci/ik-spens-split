@@ -32,6 +32,7 @@ router
         include: {
           members: {
             select: {
+              memberId: true,
               memberName: true,
             },
           },
@@ -62,7 +63,12 @@ router
             },
           },
           include: {
-            members: true,
+            members: {
+              select: {
+                memberId: true,
+                memberName: true,
+              },
+            },
           },
         })
         .catch(() => {

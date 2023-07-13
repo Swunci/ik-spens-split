@@ -50,6 +50,14 @@ router
           data: {
             ...body,
           },
+          include: {
+            members: {
+              select: {
+                memberId: true,
+                memberName: true,
+              },
+            },
+          },
         })
         .catch((_err) => {
           throw Error('Database problem');
