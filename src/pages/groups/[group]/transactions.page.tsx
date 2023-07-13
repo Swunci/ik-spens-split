@@ -2,8 +2,6 @@ import { Alert, Snackbar } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -17,8 +15,10 @@ import {
   initialState,
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
+import FilterToggle from '@/components/transactions/FilterToggle';
 import PaidDebtsList from '@/components/transactions/PaidDebtsList';
 import TransactionsList from '@/components/transactions/TransactionsList';
+import TypeToggle from '@/components/transactions/TypeToggle';
 import type CustomError from '@/errors/customError';
 import type {
   Group,
@@ -192,32 +192,14 @@ export default function Transactions() {
           </FormControl>
         </div>
       </div>
+      <div className="w-full p-2">
+        <TypeToggle dataType={dataType} setDataType={setDataType} />
+      </div>
 
       <div className="w-full p-2">
-        <ToggleButtonGroup
-          value={dataType}
-          exclusive
-          onChange={(_e, value) => {
-            setDataType(value);
-          }}
-        >
-          <ToggleButton value="transactions">Transactions</ToggleButton>
-          <ToggleButton value="debts">Paid Debts</ToggleButton>
-        </ToggleButtonGroup>
+        <FilterToggle dataOwner={dataOwner} setDataOwner={setDataOwner} />
       </div>
-      <div className="w-full p-2">
-        <ToggleButtonGroup
-          value={dataOwner}
-          exclusive
-          onChange={(_e, value) => {
-            setDataOwner(value);
-          }}
-        >
-          <ToggleButton value="all">All</ToggleButton>
-          <ToggleButton value="yours">Yours</ToggleButton>
-          <ToggleButton value="others">Others</ToggleButton>
-        </ToggleButtonGroup>
-      </div>
+
       <div className="flexbox-col h-full w-full space-y-2 rounded bg-alice-main p-2 py-4">
         <MemberIdNameContext.Provider value={contextValue}>
           {renderByDataType()}
