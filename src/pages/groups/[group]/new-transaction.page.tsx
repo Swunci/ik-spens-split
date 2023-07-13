@@ -26,6 +26,7 @@ import {
   getInitialMemberList,
   handleTotalCostInput,
   handleTransactionCreation,
+  resetSplitCosts,
 } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
 import type CustomError from '@/errors/customError';
@@ -129,8 +130,8 @@ export default function NewTransactionPage() {
       </div>
       <form
         className="flex w-full flex-col items-center"
-        onSubmit={(e) => {
-          handleTransactionCreation(
+        onSubmit={async (e) => {
+          const isCreated = await handleTransactionCreation(
             e,
             {
               groupId: groupData!.groupId,
@@ -143,10 +144,13 @@ export default function NewTransactionPage() {
               splitType,
               currency: groupData!.currency,
             } as CreateTransactionForm,
-            dispatch,
-            setTotalCost,
-            descriptionRef
+            dispatch
           );
+          if (isCreated) {
+            setTotalCost(new Decimal(0));
+            descriptionRef.current!.value = '';
+            setMembersList(resetSplitCosts(membersList));
+          }
         }}
       >
         <div className="flexbox-row w-full place-content-start gap-2 p-2">

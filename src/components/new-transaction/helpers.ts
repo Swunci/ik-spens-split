@@ -1,11 +1,5 @@
 import Decimal from 'decimal.js';
-import type {
-  ChangeEvent,
-  Dispatch,
-  FormEvent,
-  RefObject,
-  SetStateAction,
-} from 'react';
+import type { ChangeEvent, Dispatch, FormEvent, SetStateAction } from 'react';
 import { mutate } from 'swr';
 
 import type { ActionType } from '@/components/hooks/snackbarReducer';
@@ -274,9 +268,7 @@ function mathChecksOut(membersList: TransactionMember[], totalCost: Decimal) {
 export async function handleTransactionCreation(
   e: FormEvent<HTMLFormElement>,
   formDetails: CreateTransactionForm,
-  dispatch: Dispatch<ActionType>,
-  setTotalCost: Dispatch<SetStateAction<Decimal>>,
-  descriptionRef: RefObject<HTMLInputElement>
+  dispatch: Dispatch<ActionType>
 ) {
   e.preventDefault();
 
@@ -285,7 +277,7 @@ export async function handleTransactionCreation(
       type: ACTION_TYPES.OPEN_WARNING,
       message: 'Maximum value is 1,000,000,000',
     });
-    return;
+    return false;
   }
   const requestBody: TransactionCreation = {} as TransactionCreation;
   requestBody.groupId = formDetails.groupId;
@@ -311,7 +303,7 @@ export async function handleTransactionCreation(
       type: ACTION_TYPES.OPEN_WARNING,
       message: 'Please check if sum adds up to total cost',
     });
-    return;
+    return false;
   }
 
   const nextApiClient = new NextApiClient().jsonBody();
@@ -325,7 +317,7 @@ export async function handleTransactionCreation(
           ? 'Field validation failed'
           : 'Services currently unavailable',
     });
-    return;
+    return false;
   }
   dispatch({
     type: ACTION_TYPES.OPEN_SUCCESS,
@@ -333,9 +325,7 @@ export async function handleTransactionCreation(
       formDetails.description
     }`,
   });
-  setTotalCost(new Decimal(0));
-  const description = descriptionRef.current!;
-  description.value = '';
+  return true;
 }
 
 export async function handleTransactionUpdate(
@@ -478,4 +468,12 @@ export async function handlePaidDebtUpdate(
     message: 'Updated paid debt',
   });
   mutate(`/api/groups/${requestBody.groupId}/debts`);
+}
+
+export function resetSplitCosts(membersList: Array<TransactionMember>) {
+  return membersList.map((member: TransactionMember) => {
+    const updatedMember = member;
+    updatedMember.amount = new Decimal(0);
+    return updatedMember;
+  });
 }
