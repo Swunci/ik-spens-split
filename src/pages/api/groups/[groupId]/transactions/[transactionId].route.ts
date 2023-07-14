@@ -25,6 +25,7 @@ const schema = Joi.object({
   amount: Joi.number()
     .precision(18)
     .max(10 ** 9)
+    .greater(0)
     .required(),
   splits: Joi.array().min(1).items(splitsSchema).required(),
   type: Joi.string().max(10).required(),

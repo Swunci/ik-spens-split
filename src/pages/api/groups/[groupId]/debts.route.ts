@@ -12,7 +12,11 @@ const schema = Joi.object({
   groupId: Joi.string().required(),
   creditor: Joi.string().required(),
   debtor: Joi.string().required(),
-  amount: Joi.number().precision(2).required(),
+  amount: Joi.number()
+    .precision(2)
+    .max(10 ** 9)
+    .greater(0)
+    .required(),
   currency: Joi.string().min(3).max(3).required(),
 });
 

@@ -1,5 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { FormControl, MenuItem, Select, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import Decimal from 'decimal.js';
 import type { Dispatch, SetStateAction } from 'react';
 import { Fragment, useContext, useState } from 'react';
@@ -11,11 +11,12 @@ import {
   handlePaidDebtUpdate,
   handleTotalCostInput,
 } from '@/components/new-transaction/helpers';
-import type { Group, Member, PaidDebt } from '@/interfaces/response';
+import type { Group, PaidDebt } from '@/interfaces/response';
 import { displayWithCommas } from '@/utils/currencyUtil';
 
 import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import type { ActionType } from '../hooks/snackbarReducer';
+import MemberSelection from '../shared/MemberSelection';
 
 export default function EditDebtModal({
   open,
@@ -109,75 +110,21 @@ export default function EditDebtModal({
                   }}
                 >
                   <div className="flexbox-row w-full place-content-start gap-2 p-2">
-                    <FormControl
-                      size="small"
-                      fullWidth={false}
-                      className="h-fit border-alice-main"
-                    >
-                      <Select
-                        className="bg-alice-base py-0"
-                        onChange={(e) =>
-                          setDebtor(idNameMap.revGet(e.target.value)!)
-                        }
-                        value={idNameMap.get(debtor)}
-                      >
-                        {groupData!.members
-                          .filter((member: Member) => {
-                            return member.memberId !== creditor;
-                          })
-                          .map((member: Member) => {
-                            return (
-                              <MenuItem
-                                key={member.memberId}
-                                value={member.memberName}
-                              >
-                                <Typography
-                                  className="whitespace-normal break-words"
-                                  noWrap
-                                >
-                                  {member.memberName}
-                                </Typography>
-                              </MenuItem>
-                            );
-                          })}
-                      </Select>
-                    </FormControl>
+                    <MemberSelection
+                      currentMemberId={creditor}
+                      members={groupData.members}
+                      idNameMap={idNameMap}
+                      setCurrentMemberId={setCreditor}
+                    />
                     <Typography className="flexbox-col max-w-fit justify-center">
                       paid
                     </Typography>
-                    <FormControl
-                      size="small"
-                      fullWidth={false}
-                      className="h-fit border-alice-main"
-                    >
-                      <Select
-                        className="bg-alice-base py-0"
-                        onChange={(e) => {
-                          setCreditor(idNameMap.revGet(e.target.value)!);
-                        }}
-                        value={idNameMap.get(creditor)}
-                      >
-                        {groupData!.members
-                          .filter((member: Member) => {
-                            return member.memberId !== debtor;
-                          })
-                          .map((member: Member) => {
-                            return (
-                              <MenuItem
-                                key={member.memberId}
-                                value={member.memberName}
-                              >
-                                <Typography
-                                  className="whitespace-normal break-words"
-                                  noWrap
-                                >
-                                  {member.memberName}
-                                </Typography>
-                              </MenuItem>
-                            );
-                          })}
-                      </Select>
-                    </FormControl>
+                    <MemberSelection
+                      currentMemberId={debtor}
+                      members={groupData.members}
+                      idNameMap={idNameMap}
+                      setCurrentMemberId={setDebtor}
+                    />
                   </div>
 
                   <div className="flexbox-col w-full space-y-4">

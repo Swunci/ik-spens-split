@@ -298,10 +298,15 @@ export async function handleTransactionCreation(
   );
   requestBody.currency = formDetails.currency;
 
-  if (!mathChecksOut(formDetails.membersList, formDetails.totalCost)) {
+  if (
+    !mathChecksOut(formDetails.membersList, formDetails.totalCost) ||
+    formDetails.totalCost.lessThanOrEqualTo(0)
+  ) {
     dispatch({
       type: ACTION_TYPES.OPEN_WARNING,
-      message: 'Please check if sum adds up to total cost',
+      message: formDetails.totalCost.lessThanOrEqualTo(0)
+        ? 'Please enter amount greater than 0'
+        : 'Please check if sum adds up to total cost',
     });
     return false;
   }
@@ -449,6 +454,14 @@ export async function handlePaidDebtUpdate(
   requestBody.creditor = formDetails.creditor;
   requestBody.debtor = formDetails.debtor;
   requestBody.amount = formDetails.amount.toString();
+
+  if (formDetails.creditor === formDetails.debtor) {
+    dispatch({
+      type: ACTION_TYPES.OPEN_WARNING,
+      message: `Can't pay yourself`,
+    });
+    return;
+  }
 
   const nextApiClient = new NextApiClient().jsonBody();
   const response = await nextApiClient.paidDebts.update(requestBody);

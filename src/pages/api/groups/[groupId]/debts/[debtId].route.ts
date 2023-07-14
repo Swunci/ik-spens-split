@@ -13,7 +13,11 @@ const schema = Joi.object({
   debtId: Joi.string().required(),
   creditor: Joi.string().required(),
   debtor: Joi.string().required(),
-  amount: Joi.number().precision(2).required(),
+  amount: Joi.number()
+    .precision(2)
+    .max(10 ** 9)
+    .greater(0)
+    .required(),
 });
 
 const router = createRouter<NextApiRequest, NextApiResponse>();

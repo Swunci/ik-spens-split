@@ -56,7 +56,7 @@ export default function EditGroupPage() {
 
   return (
     <RootLayout>
-      <div className="w-full p-2">
+      <div className="flexbox-row w-full p-2">
         <Link
           href={
             currentPath
@@ -72,6 +72,22 @@ export default function EditGroupPage() {
             Back
           </button>
         </Link>
+        <button
+          className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+          type="button"
+          onClick={async (e) => {
+            const isDeleted = await handleGroupDelete(
+              e,
+              groupData!.groupId,
+              dispatch
+            );
+            if (isDeleted) {
+              router.push('/');
+            }
+          }}
+        >
+          Delete
+        </button>
       </div>
       <form
         className="flex w-full flex-col items-start space-y-4"
@@ -123,22 +139,6 @@ export default function EditGroupPage() {
             type="submit"
           >
             Update
-          </button>
-          <button
-            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
-            type="button"
-            onClick={async (e) => {
-              const isDeleted = await handleGroupDelete(
-                e,
-                groupData!.groupId,
-                dispatch
-              );
-              if (isDeleted) {
-                router.push('/');
-              }
-            }}
-          >
-            Delete
           </button>
         </div>
       </form>
