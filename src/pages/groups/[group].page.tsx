@@ -1,9 +1,6 @@
 import TextareaAutosize from '@mui/base/TextareaAutosize';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
-import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
 import Decimal from 'decimal.js';
@@ -21,6 +18,7 @@ import {
   initialState,
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
+import MemberSelection from '@/components/shared/MemberSelection';
 import type CustomError from '@/errors/customError';
 import type {
   CommentResponse,
@@ -149,35 +147,20 @@ export default function GroupPage() {
       <Typography className="w-full min-w-fit whitespace-normal break-words p-1 text-center text-3xl">
         {groupData?.groupName}
       </Typography>
-      <div className="w-full space-y-6 p-2">
-        <div className="flexbox-row max-w-full items-center justify-start p-2">
-          <Typography className="min-w-fit p-1">View as</Typography>
-          <FormControl
-            size="small"
-            fullWidth={false}
-            className="border-alice-main"
-          >
-            <Select
-              className="static bg-alice-base"
-              defaultValue={groupData?.members.at(0)?.memberName}
-              onChange={(e) =>
-                setCurrentMemberId(memberIdToNameMap.revGet(e.target.value)!)
-              }
-            >
-              {groupData?.members.map((member: Member) => {
-                return (
-                  <MenuItem key={member.memberId} value={member.memberName}>
-                    <Typography
-                      className="whitespace-normal break-words"
-                      noWrap
-                    >
-                      {member.memberName}
-                    </Typography>
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
+      <div className="w-full space-y-6 py-2">
+        <div className="w-full">
+          <div className="">
+            <div className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md">
+              <p className="p-2">View as</p>
+              <div />
+              <MemberSelection
+                currentMemberId={currentMemberId}
+                members={groupData!.members}
+                idNameMap={memberIdToNameMap}
+                setCurrentMemberId={setCurrentMemberId}
+              />
+            </div>
+          </div>
         </div>
         <Overview
           groupCost={groupCost}
@@ -186,7 +169,7 @@ export default function GroupPage() {
           currencySymbol={currencySymbol}
         />
 
-        <div className="flexbox-row w-full p-2">
+        <div className="flexbox-row w-full py-2">
           <Link href={`${currentPath}/transactions`} passHref>
             <button
               className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"

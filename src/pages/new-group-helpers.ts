@@ -15,9 +15,11 @@ export function onAddMember(
   e: React.MouseEvent,
   currentMembers: Set<string>,
   memberInputRef: RefObject<HTMLInputElement>,
-  setCurrentMembers: Function
+  setCurrentMembers: Function,
+  dispatch: Dispatch<ActionType>
 ) {
   e.preventDefault();
+  let invalidMembers = false;
   const inputRef = memberInputRef;
   const input: string =
     inputRef.current?.value !== undefined ? inputRef.current?.value : '';
@@ -25,6 +27,10 @@ export function onAddMember(
     .split(',')
     .reduce((result: Array<string>, value: string) => {
       const name = value.trim();
+      if (name.length > 50) {
+        invalidMembers = true;
+        return result;
+      }
       if (name !== '') {
         result.push(name);
       }
@@ -33,6 +39,12 @@ export function onAddMember(
   setCurrentMembers(new Set([...currentMembers, ...newMembers]));
   if (inputRef.current) {
     inputRef.current.value = '';
+  }
+  if (invalidMembers) {
+    dispatch({
+      type: ACTION_TYPES.OPEN_WARNING,
+      message: 'Maximum characters allowed for names is 50!',
+    });
   }
 }
 
@@ -48,7 +60,7 @@ export async function handleSubmit(
   const data: GroupCreation = <GroupCreation>{};
   data.groupName = groupNameRef.current!.value;
   data.currency = currencyNameCodeMap.get(currency) ?? '';
-  data.members = [...currentMembers];
+  data.members = [...currentMembers].sort((a, b) => a.localeCompare(b));
 
   const nextApiClient = new NextApiClient().jsonBody();
   const response = await nextApiClient.groups.create(data);
@@ -58,7 +70,7 @@ export async function handleSubmit(
       type: ACTION_TYPES.OPEN_ERROR,
       message:
         response.status === 400
-          ? 'Please add at least 2 members to group'
+          ? 'Please add at least 2 members to group and valid currency'
           : 'Services currently unavailable',
     });
     return;

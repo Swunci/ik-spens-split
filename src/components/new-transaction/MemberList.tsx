@@ -1,11 +1,9 @@
 import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import Typography from '@mui/material/Typography';
 import { useContext, useEffect } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
 
+import ListboxSelection from '../shared/ListboxSelection';
 import type { TransactionMember } from './helpers';
 import { getMembersListBySplitType, setSelectAllMembers } from './helpers';
 import Member from './Member';
@@ -53,27 +51,12 @@ export default function MembersList() {
           className="h-fit border-alice-main"
         >
           <div className="p-2">
-            <Select
-              className="bg-alice-base"
-              defaultValue={transactionContext!.splitType}
-              onChange={(e) => transactionContext!.setSplitType(e.target.value)}
-            >
-              <MenuItem key="Equal" value="Equal">
-                <Typography className="whitespace-normal break-words" noWrap>
-                  Equal
-                </Typography>
-              </MenuItem>
-              <MenuItem key="Weight" value="Weight">
-                <Typography className="whitespace-normal break-words" noWrap>
-                  Weight
-                </Typography>
-              </MenuItem>
-              <MenuItem key="Custom" value="Custom">
-                <Typography className="whitespace-normal break-words" noWrap>
-                  Custom
-                </Typography>
-              </MenuItem>
-            </Select>
+            <ListboxSelection
+              options={['Equal', 'Weight', 'Custom']}
+              selection={transactionContext!.splitType}
+              setSelection={transactionContext!.setSplitType}
+              customWidth="w-24"
+            />
           </div>
         </FormControl>
         <div className="flexbox-row max-w-fit gap-1 p-2">

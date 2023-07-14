@@ -1,8 +1,4 @@
 import { Alert, Snackbar } from '@mui/material';
-import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
@@ -15,6 +11,7 @@ import {
   initialState,
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
+import MemberSelection from '@/components/shared/MemberSelection';
 import FilterToggle from '@/components/transactions/FilterToggle';
 import PaidDebtsList from '@/components/transactions/PaidDebtsList';
 import TransactionsList from '@/components/transactions/TransactionsList';
@@ -162,45 +159,28 @@ export default function Transactions() {
             Back
           </button>
         </Link>
-        <div className="flexbox-row max-w-full items-center justify-end p-2">
-          <Typography className="min-w-fit p-1">View as</Typography>
-          <FormControl
-            size="small"
-            fullWidth={false}
-            className="border-alice-main"
-          >
-            <Select
-              className="static bg-alice-base"
-              defaultValue={groupData?.members.at(0)?.memberName}
-              onChange={(e) =>
-                setCurrentMemberId(memberIdToNameMap.revGet(e.target.value)!)
-              }
-            >
-              {groupData?.members.map((member: Member) => {
-                return (
-                  <MenuItem key={member.memberId} value={member.memberName}>
-                    <Typography
-                      className="whitespace-normal break-words"
-                      noWrap
-                    >
-                      {member.memberName}
-                    </Typography>
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
+      </div>
+      <div className="w-full py-2">
+        <div className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md">
+          <p className="px-2 py-1">View as</p>
+          <MemberSelection
+            currentMemberId={currentMemberId}
+            members={groupData!.members}
+            idNameMap={memberIdToNameMap}
+            setCurrentMemberId={setCurrentMemberId}
+          />
         </div>
       </div>
-      <div className="w-full p-2">
+
+      <div className="w-full py-2">
         <TypeToggle dataType={dataType} setDataType={setDataType} />
       </div>
 
-      <div className="w-full p-2">
+      <div className="w-full py-2">
         <FilterToggle dataOwner={dataOwner} setDataOwner={setDataOwner} />
       </div>
 
-      <div className="flexbox-col h-full w-full space-y-2 rounded bg-alice-main p-2 py-4">
+      <div className="flexbox-col mt-2 h-full w-full space-y-2 rounded bg-alice-main p-2 py-4">
         <MemberIdNameContext.Provider value={contextValue}>
           {renderByDataType()}
         </MemberIdNameContext.Provider>

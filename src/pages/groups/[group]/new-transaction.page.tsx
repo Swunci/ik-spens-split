@@ -1,7 +1,4 @@
 import Alert from '@mui/material/Alert';
-import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
 import Decimal from 'decimal.js';
@@ -29,6 +26,8 @@ import {
   resetSplitCosts,
 } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
+import ListboxSelection from '@/components/shared/ListboxSelection';
+import MemberSelection from '@/components/shared/MemberSelection';
 import type CustomError from '@/errors/customError';
 import type { Group, Member } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
@@ -154,62 +153,21 @@ export default function NewTransactionPage() {
         }}
       >
         <div className="flexbox-row w-full place-content-start gap-2 p-2">
-          <FormControl
-            size="small"
-            fullWidth={false}
-            className="h-fit border-alice-main"
-          >
-            <Select
-              className="static bg-alice-base py-0"
-              defaultValue={groupData?.members.at(0)?.memberName}
-              onChange={(e) =>
-                setPayerId(memberIdToNameMap.revGet(e.target.value)!)
-              }
-            >
-              {groupData?.members.map((member: Member) => {
-                return (
-                  <MenuItem key={member.memberId} value={member.memberName}>
-                    <Typography
-                      className="whitespace-normal break-words"
-                      noWrap
-                    >
-                      {member.memberName}
-                    </Typography>
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
+          <MemberSelection
+            currentMemberId={payerId}
+            members={membersList}
+            idNameMap={memberIdToNameMap}
+            setCurrentMemberId={setPayerId}
+          />
           <Typography className="flexbox-col max-w-fit justify-center">
             {getActionByTransactionType(transactionType)}
           </Typography>
-          <FormControl
-            size="small"
-            fullWidth={false}
-            className="h-fit border-alice-main"
-          >
-            <Select
-              className="static bg-alice-base py-0"
-              defaultValue="expense"
-              onChange={(e) => setTransactionType(e.target.value)}
-            >
-              <MenuItem value="expense">
-                <Typography className="whitespace-normal break-words" noWrap>
-                  expense
-                </Typography>
-              </MenuItem>
-              <MenuItem value="loan">
-                <Typography className="whitespace-normal break-words" noWrap>
-                  loan
-                </Typography>
-              </MenuItem>
-              <MenuItem value="income">
-                <Typography className="whitespace-normal break-words" noWrap>
-                  income
-                </Typography>
-              </MenuItem>
-            </Select>
-          </FormControl>
+          <ListboxSelection
+            options={['expense', 'loan', 'income']}
+            selection={transactionType}
+            setSelection={setTransactionType}
+            customWidth="w-28"
+          />
         </div>
 
         <div className="flexbox-col w-full space-y-4">

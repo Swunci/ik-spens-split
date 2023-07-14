@@ -1,8 +1,15 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { FormControl, MenuItem, Select, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import Decimal from 'decimal.js';
 import type { Dispatch, SetStateAction } from 'react';
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Fragment,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import type {
   TransactionMember,
@@ -15,20 +22,18 @@ import {
   handleTransactionDelete,
   handleTransactionUpdate,
 } from '@/components/new-transaction/helpers';
-import type {
-  Group,
-  Member,
-  ShareCost,
-  Transaction,
-} from '@/interfaces/response';
+import type { Group, ShareCost, Transaction } from '@/interfaces/response';
 import { displayWithCommas } from '@/utils/currencyUtil';
 import { getLocaleDateString } from '@/utils/timeUtils';
 
+import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import type { ActionType } from '../hooks/snackbarReducer';
 import { TransactionContext } from '../hooks/TransactionContext';
 import MembersList from '../new-transaction/MemberList';
+import ListboxSelection from '../shared/ListboxSelection';
+import MemberSelection from '../shared/MemberSelection';
 
-export default function EditDebtModal({
+export default function EditTransactionModal({
   open,
   setOpen,
   transaction,
@@ -51,6 +56,10 @@ export default function EditDebtModal({
   const descriptionRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
   const [currency, setCurrency] = useState(transaction.currency);
+
+  const memberIdNameContext = useContext(MemberIdNameContext);
+
+  const idNameMap = memberIdNameContext!.memberIdToNameMap;
 
   const contextValue = useMemo(
     () => ({
@@ -175,72 +184,21 @@ export default function EditDebtModal({
                   }}
                 >
                   <div className="flexbox-row w-full place-content-start gap-2 p-2">
-                    <FormControl
-                      size="small"
-                      fullWidth={false}
-                      className="h-fit border-alice-main"
-                    >
-                      <Select
-                        className="bg-alice-base py-0"
-                        defaultValue={transaction.payerId}
-                        onChange={(e) => setPayerId(e.target.value)}
-                      >
-                        {group.members.map((member: Member) => {
-                          return (
-                            <MenuItem
-                              key={member.memberId}
-                              value={member.memberId}
-                            >
-                              <Typography
-                                className="whitespace-normal break-words"
-                                noWrap
-                              >
-                                {member.memberName}
-                              </Typography>
-                            </MenuItem>
-                          );
-                        })}
-                      </Select>
-                    </FormControl>
+                    <MemberSelection
+                      currentMemberId={payerId}
+                      members={membersList}
+                      idNameMap={idNameMap}
+                      setCurrentMemberId={setPayerId}
+                    />
                     <Typography className="flexbox-col max-w-fit justify-center">
                       {getActionByTransactionType(transactionType)}
                     </Typography>
-                    <FormControl
-                      size="small"
-                      fullWidth={false}
-                      className="h-fit border-alice-main"
-                    >
-                      <Select
-                        className="bg-alice-base py-0"
-                        defaultValue={transaction.type}
-                        onChange={(e) => setTransactionType(e.target.value)}
-                      >
-                        <MenuItem value="expense">
-                          <Typography
-                            className="whitespace-normal break-words"
-                            noWrap
-                          >
-                            expense
-                          </Typography>
-                        </MenuItem>
-                        <MenuItem value="loan">
-                          <Typography
-                            className="whitespace-normal break-words"
-                            noWrap
-                          >
-                            loan
-                          </Typography>
-                        </MenuItem>
-                        <MenuItem value="income">
-                          <Typography
-                            className="whitespace-normal break-words"
-                            noWrap
-                          >
-                            income
-                          </Typography>
-                        </MenuItem>
-                      </Select>
-                    </FormControl>
+                    <ListboxSelection
+                      options={['expense', 'loan', 'income']}
+                      selection={transactionType}
+                      setSelection={setTransactionType}
+                      customWidth="w-28"
+                    />
                   </div>
                   <div className="flexbox-col w-full space-y-4">
                     <div className="w-full rounded bg-alice-main p-2">

@@ -10,7 +10,7 @@ export default function FilterToggle({
 }) {
   return (
     <RadioGroup
-      className="flexbox-row"
+      className="flexbox-row z-10"
       value={dataOwner}
       onChange={(value) => setDataOwner(value)}
     >

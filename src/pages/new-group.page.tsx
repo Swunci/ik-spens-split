@@ -85,7 +85,8 @@ export default function NewGroupPage() {
                   e,
                   currentMembers,
                   memberInputRef,
-                  setCurrentMembers
+                  setCurrentMembers,
+                  dispatch
                 )
               }
             >
@@ -109,6 +110,7 @@ export default function NewGroupPage() {
       </form>
       <Snackbar
         open={snackbarState.isOpen}
+        autoHideDuration={5000}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         onClick={() =>
           dispatch({

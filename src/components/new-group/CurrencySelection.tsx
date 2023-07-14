@@ -40,6 +40,7 @@ export default function CurrencySelection({
                 className="w-full rounded-md border p-2 text-base leading-5 text-gray-900"
                 displayValue={(currency) => currency as string}
                 required
+                id="mainCurrency"
                 onChange={(event) => setQuery(event.target.value)}
               />
               <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">

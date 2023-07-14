@@ -2,7 +2,7 @@ export interface Group {
   groupId: string;
   groupName: string;
   currency: string;
-  members: Member[];
+  members: Array<Member>;
   createdDate: Date;
 }
 
