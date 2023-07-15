@@ -1,6 +1,6 @@
 import { Dialog, Transition } from '@headlessui/react';
 import TextareaAutosize from '@mui/base/TextareaAutosize';
-import { FormControl, MenuItem, Select, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 import { Fragment, useContext, useState } from 'react';
 
@@ -8,6 +8,7 @@ import type { Comment, Member } from '@/interfaces/response';
 
 import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import type { ActionType } from '../hooks/snackbarReducer';
+import MemberSelection from '../shared/MemberSelection';
 import type { UpdateCommentForm } from './helpers';
 import { handleCommentDelete, handleCommentUpdate } from './helpers';
 
@@ -33,7 +34,7 @@ export default function EditCommentModal({
 
   return (
     <Transition appear show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={() => setOpen(false)}>
+      <Dialog as="div" className="absolute z-10" onClose={() => setOpen(false)}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -47,7 +48,7 @@ export default function EditCommentModal({
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-center justify-center p-2 text-center md:p-4">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -57,8 +58,8 @@ export default function EditCommentModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="flexbox-col m-2 w-full max-w-screen-md overflow-hidden rounded border-2 border-alice-accent bg-alice-main p-2 text-left align-middle shadow-xl transition-all">
-                <div className="flexbox-row p-2">
+              <Dialog.Panel className="flexbox-col m-2 min-h-96 w-full max-w-screen-md justify-start space-y-3 overflow-hidden rounded border-2 border-alice-accent bg-alice-main p-2 text-left align-middle shadow-xl transition-all">
+                <div className="flexbox-row pt-2 md:p-2">
                   <button
                     className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
                     type="button"
@@ -88,43 +89,28 @@ export default function EditCommentModal({
                     Delete
                   </button>
                 </div>
-                <Typography className="min-w-fit p-1">Commenter</Typography>
-                <FormControl
-                  size="small"
-                  fullWidth={false}
-                  className="border-alice-main"
-                >
-                  <Select
-                    className="static bg-alice-base"
-                    defaultValue={idNameMap.get(commentRecord.commenterId)}
-                    onChange={(e) =>
-                      setCommenterId(idNameMap.revGet(e.target.value)!)
-                    }
-                  >
-                    {members.map((member: Member) => {
-                      return (
-                        <MenuItem
-                          key={member.memberId}
-                          value={member.memberName}
-                        >
-                          <Typography
-                            className="whitespace-normal break-words"
-                            noWrap
-                          >
-                            {member.memberName}
-                          </Typography>
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
-                <TextareaAutosize
-                  className="my-2 inline-block w-full overflow-hidden rounded bg-alice-base p-1"
-                  id="commentText"
-                  onChange={(e) => setCommentText(e.target.value)}
-                  defaultValue={commentRecord.comment}
-                />
-                <div className="flexbox-row w-full p-2">
+                <div className="w-full">
+                  <Typography className="min-w-fit p-1">Commenter</Typography>
+                  <MemberSelection
+                    currentMemberId={commenterId}
+                    members={members}
+                    idNameMap={idNameMap}
+                    setCurrentMemberId={setCommenterId}
+                  />
+                </div>
+                <div className="w-full">
+                  <Typography className="min-w-fit p-1">Comment</Typography>
+                  <TextareaAutosize
+                    className="my-2 inline-block w-full overflow-hidden rounded bg-alice-base p-2"
+                    id="commentText"
+                    onChange={(e) => setCommentText(e.target.value)}
+                    defaultValue={commentRecord.comment}
+                    onFocus={() => {
+                      document.body.scrollTop = 0;
+                    }}
+                  />
+                </div>
+                <div className="flexbox-row w-full pb-2 md:p-2">
                   <button
                     className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
                     type="button"

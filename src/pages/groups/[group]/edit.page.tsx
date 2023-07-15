@@ -56,7 +56,7 @@ export default function EditGroupPage() {
 
   return (
     <RootLayout>
-      <div className="flexbox-row w-full p-2">
+      <div className="flexbox-row w-full py-2 md:p-2">
         <Link
           href={
             currentPath
@@ -90,7 +90,7 @@ export default function EditGroupPage() {
         </button>
       </div>
       <form
-        className="flex w-full flex-col items-start space-y-4"
+        className="flex w-full flex-col items-start space-y-4 py-2 md:p-2"
         onSubmit={(e) =>
           handleGroupUpdate(
             e,
@@ -133,7 +133,7 @@ export default function EditGroupPage() {
             {populateCurrencies()}
           </select>
         </label>
-        <div className="flexbox-row w-full p-2">
+        <div className="flexbox-row w-full">
           <button
             className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
             type="submit"

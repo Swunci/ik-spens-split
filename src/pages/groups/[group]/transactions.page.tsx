@@ -82,9 +82,8 @@ export default function Transactions() {
 
   return (
     <RootLayout>
-      <div className="flexbox-row w-full py-2">
+      <div className="flexbox-row w-full py-2 md:p-2">
         <Link
-          className="p-2"
           href={
             currentPath
               ? currentPath.substring(0, currentPath.lastIndexOf('/'))
@@ -100,7 +99,7 @@ export default function Transactions() {
           </button>
         </Link>
       </div>
-      <div className="w-full py-2">
+      <div className="w-full py-2 md:p-2">
         <div className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md">
           <p className="px-2 py-1">View as</p>
           <MemberSelection
@@ -112,7 +111,7 @@ export default function Transactions() {
         </div>
       </div>
 
-      <div className="w-full py-2">
+      <div className="w-full py-2 md:p-2">
         <MemberIdNameContext.Provider value={contextValue}>
           <TabSelection
             currentMemberId={currentMemberId}

@@ -1,6 +1,7 @@
 import { Typography } from '@mui/material';
 import type { Dispatch } from 'react';
 import { useContext, useState } from 'react';
+import { Balancer } from 'react-wrap-balancer';
 
 import type { Comment, Member } from '@/interfaces/response';
 import { getHowLongAgo } from '@/utils/timeUtils';
@@ -26,17 +27,19 @@ export default function CommmentItem({
 
   return (
     <li
-      className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
+      className="flexbox-col w-full rounded bg-alice-base shadow-md betterhover:hover:bg-alice-base/70"
       key={commentRecord.commentId}
     >
-      <button type="button" onClick={() => setOpen(true)}>
+      <button className="p-2" type="button" onClick={() => setOpen(true)}>
         <div className="flex">
           <div className="w-full">
             <div className="flexbox-row">
               <div>{idNameMap.get(commentRecord.commenterId)}</div>
               <div>{getHowLongAgo(commentRecord.createdDate)}</div>
             </div>
-            <div className="text-left">{commentRecord.comment}</div>
+            <div className="text-left">
+              <Balancer>{commentRecord.comment}</Balancer>
+            </div>
           </div>
           <div className="flexbox-col w-fit justify-center py-2 pl-2">
             <Typography>&gt;</Typography>

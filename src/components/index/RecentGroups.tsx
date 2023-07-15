@@ -44,9 +44,9 @@ export default function RecentGroups() {
   return groups.length === 0 ? (
     <div />
   ) : (
-    <section className="">
+    <section className="p-1 md:p-2">
       <h3 className="px-2 text-2xl text-alice-accent">Visited Groups</h3>
-      <div className="rounded bg-alice-main p-3 shadow-md">
+      <div className="rounded bg-alice-main p-2 shadow-md">
         <ul className="space-y-2">
           {isLoading ? (
             <CircularProgress />
@@ -54,12 +54,12 @@ export default function RecentGroups() {
             groups.map((group: Group) => {
               return (
                 <li
-                  className="flexbox-row w-full rounded bg-alice-base p-2 shadow-md"
+                  className="flexbox-row w-full rounded bg-alice-base shadow-md betterhover:hover:bg-alice-base/70"
                   key={group.groupId}
                 >
                   <div className="flexbox-col">
                     <Link
-                      className="w-full"
+                      className="w-full p-2"
                       href={`/groups/${group.groupId}`}
                       passHref
                     >
@@ -82,26 +82,31 @@ export default function RecentGroups() {
                     </Link>
                   </div>
                   <div className="block">
-                    <svg
+                    <button
+                      className="p-1"
+                      type="button"
                       onClick={(e) => {
                         e.preventDefault();
                         removeGroupFromLocalStorage(group.groupId);
                         onDeleteGroup(group.groupId);
                       }}
-                      className="text-gray-500"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
                     >
-                      <path stroke="none" d="M0 0h24v24H0z" />
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
+                      <svg
+                        className="text-gray-500"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" />
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
                   </div>
                 </li>
               );

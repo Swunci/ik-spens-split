@@ -6,7 +6,7 @@ import { Meta } from './Meta';
 
 export default function RootLayout({ children }: { children: any }) {
   return (
-    <div className="flex w-screen flex-col place-content-start items-center overflow-x-hidden bg-alice-base">
+    <div className="relative flex w-screen flex-col place-content-start items-center overflow-x-hidden bg-alice-base">
       <Meta
         title="GroupShare"
         description="Application for sharing group expenses"

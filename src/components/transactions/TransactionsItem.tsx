@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material';
 import { type Dispatch, useState } from 'react';
 import { useContext } from 'react';
 import Balancer from 'react-wrap-balancer';
@@ -34,10 +35,10 @@ export default function TransactionsItem({
 
   return (
     <li
-      className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
+      className="flexbox-col w-full rounded bg-alice-base shadow-md betterhover:hover:bg-alice-base/70"
       key={transaction.transactionId}
     >
-      <button type="button" onClick={() => setOpen(true)}>
+      <button className="p-2" type="button" onClick={() => setOpen(true)}>
         <div className="flexbox-row">
           <div className="w-full">
             <div className="flexbox-row text-base">
@@ -48,7 +49,7 @@ export default function TransactionsItem({
               } for ${transaction.description}`}</div>
             </div>
             <div className="flexbox-row gap-2 pt-1">
-              <div className="text-xs">
+              <div className="w-full text-left text-xs">
                 <Balancer>
                   {`People involved: ${getInvolvedMembers(
                     transaction.shareCosts,
@@ -68,7 +69,9 @@ export default function TransactionsItem({
               </div>
             </div>
           </div>
-          <div className="flexbox-col w-fit py-2 pl-2">&gt;</div>
+          <div className="flexbox-col w-fit justify-center py-2 pl-2">
+            <Typography>&gt;</Typography>
+          </div>
         </div>
       </button>
       <EditTransactionModal

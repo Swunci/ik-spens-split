@@ -22,6 +22,10 @@ body {
 	background-color: #B6C9FF;
 }
 
+.scroll-content {
+    padding-bottom: 0
+ }
+
 select {
   -o-appearance: none;
   -ms-appearance: none;

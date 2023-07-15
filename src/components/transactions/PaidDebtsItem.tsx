@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material';
 import type { Dispatch } from 'react';
 import { useContext, useState } from 'react';
 import Balancer from 'react-wrap-balancer';
@@ -26,8 +27,8 @@ export default function PaidDebtsItem({
   const idNameMap = memberIdNameContext!.memberIdToNameMap;
 
   return (
-    <li className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md">
-      <button type="button" onClick={() => setOpen(true)}>
+    <li className="flexbox-col w-full rounded bg-alice-base shadow-md betterhover:hover:bg-alice-base/70">
+      <button className="p-2" type="button" onClick={() => setOpen(true)}>
         <div className="flexbox-row">
           <div className="flex w-full justify-start p-2">
             <div className="text-base">
@@ -40,7 +41,9 @@ export default function PaidDebtsItem({
               </Balancer>
             </div>
           </div>
-          <div className="flexbox-col w-fit justify-center py-2 pl-2">&gt;</div>
+          <div className="flexbox-col w-fit justify-center py-2 pl-2">
+            <Typography>&gt;</Typography>
+          </div>
         </div>
       </button>
       <EditDebtModal

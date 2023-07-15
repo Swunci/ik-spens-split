@@ -114,7 +114,7 @@ export default function NewTransactionPage() {
 
   return (
     <RootLayout>
-      <div className="w-full p-2">
+      <div className="w-full pt-2 md:p-2">
         <Link
           href={currentPath.substring(0, currentPath.lastIndexOf('/'))}
           passHref
@@ -152,7 +152,7 @@ export default function NewTransactionPage() {
           }
         }}
       >
-        <div className="flexbox-row w-full place-content-start gap-2 p-2">
+        <div className="flexbox-row w-full place-content-start gap-2 py-4 md:p-2">
           <MemberSelection
             currentMemberId={payerId}
             members={membersList}
@@ -170,7 +170,7 @@ export default function NewTransactionPage() {
           />
         </div>
 
-        <div className="flexbox-col w-full space-y-4">
+        <div className="flexbox-col w-full space-y-4 md:p-2">
           <div className="w-full rounded bg-alice-main p-2">
             <label className="flex w-full flex-col" htmlFor="howMuch">
               How much?
@@ -215,14 +215,14 @@ export default function NewTransactionPage() {
           </div>
         </div>
 
-        <div className="w-full py-2">
+        <div className="w-full md:p-2">
           <div className="p-2">How to split?</div>
           <TransactionContext.Provider value={contextValue}>
             <MembersList />
           </TransactionContext.Provider>
         </div>
 
-        <div className="w-full p-2">
+        <div className="w-full py-2 md:p-2">
           <button
             className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
             type="submit"

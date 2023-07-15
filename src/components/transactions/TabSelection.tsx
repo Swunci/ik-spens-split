@@ -121,7 +121,7 @@ export default function TabSelection({
       ];
 
   return (
-    <div className="w-full space-y-2 md:p-2">
+    <div className="w-full space-y-2">
       <Tab.Group>
         <Tab.List className="flex space-x-1 rounded-md bg-alice-main p-1">
           {dataTypes.map((tabValue: string) => (

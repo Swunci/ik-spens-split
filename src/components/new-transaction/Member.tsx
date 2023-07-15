@@ -55,8 +55,8 @@ export default function Member({
   return (
     <li
       key={member.memberId}
-      className={`flex flex-row place-content-between items-center rounded-md border-4 bg-alice-base align-middle text-lg ${
-        member.isSelected ? 'border-alice-accent' : ''
+      className={`flex flex-row place-content-between items-center rounded-md border-2 bg-alice-base align-middle text-lg betterhover:hover:bg-alice-base/70 ${
+        member.isSelected ? 'border-alice-accent' : 'border-alice-base'
       } ${isOver && member.isSelected ? ' border-red-400' : ''}`}
     >
       <button

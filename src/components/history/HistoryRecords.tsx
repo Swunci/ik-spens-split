@@ -1,3 +1,5 @@
+import Balancer from 'react-wrap-balancer';
+
 import type {
   Comment,
   Group,
@@ -44,7 +46,7 @@ export default function HistoryRecords({
                   <div className="text-xs">Name: {group.groupName}</div>
                   <div className="text-xs">Currency: {group.currency}</div>
                   <div className="text-xs">
-                    Members: {getGroupMemberNames(group)}
+                    <Balancer>Members: {getGroupMemberNames(group)}</Balancer>
                   </div>
                 </div>
               </li>
@@ -75,11 +77,13 @@ export default function HistoryRecords({
                     Date: {getLocaleDateString(transaction.date)}
                   </div>
                   <div className="text-xs">
-                    {`Split: ${displaySplit(
-                      transaction.shareCosts,
-                      transaction.currency,
-                      memberIdToNameMap
-                    )}`}
+                    <Balancer>
+                      {`Split: ${displaySplit(
+                        transaction.shareCosts,
+                        transaction.currency,
+                        memberIdToNameMap
+                      )}`}
+                    </Balancer>
                   </div>
                 </div>
               </li>

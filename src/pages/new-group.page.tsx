@@ -30,11 +30,11 @@ export default function NewGroupPage() {
 
   return (
     <RootLayout>
-      <div className="w-full overscroll-none p-2 text-2xl">
+      <div className="w-full overscroll-none p-2 text-2xl md:px-4">
         Create a new group
       </div>
       <form
-        className="flex w-full flex-col items-start space-y-4"
+        className="flex w-full flex-col items-start space-y-4 md:p-2"
         onSubmit={(e) =>
           handleSubmit(
             e,

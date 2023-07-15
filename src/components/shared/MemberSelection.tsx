@@ -37,7 +37,7 @@ export default function MemberSelection({
       <div className="relative">
         <div className="relative h-full w-full cursor-default overflow-hidden text-ellipsis rounded-md bg-alice-base text-left shadow-md">
           <Combobox.Input
-            className="h-full w-full rounded-md border border-alice-accent bg-alice-base p-2 pr-7 text-base leading-5 text-gray-900 shadow-md"
+            className="h-full w-full rounded-md border border-alice-accent bg-alice-base p-2 pr-7 text-base leading-5 text-gray-900 shadow-md betterhover:hover:bg-alice-main/70"
             displayValue={(member) => member as string}
             required
             id="currentMember"

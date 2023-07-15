@@ -147,7 +147,7 @@ export default function GroupPage() {
       <Typography className="w-full min-w-fit whitespace-normal break-words p-1 text-center text-3xl">
         {groupData?.groupName}
       </Typography>
-      <div className="w-full space-y-6 py-2">
+      <div className="w-full space-y-6 py-2 md:p-2">
         <div className="w-full">
           <div className="">
             <div className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md">

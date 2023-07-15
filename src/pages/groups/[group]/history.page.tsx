@@ -74,7 +74,7 @@ export default function HistoryPage() {
 
   return (
     <RootLayout>
-      <div className="w-full p-2">
+      <div className="w-full py-2 md:p-2">
         <Link
           href={
             currentPath
@@ -92,15 +92,17 @@ export default function HistoryPage() {
         </Link>
       </div>
       <Typography className="pb-2 text-3xl">History</Typography>
-      <div className="w-full rounded bg-alice-main p-2">
-        {isLoadingHistory ? (
-          <CircularProgress />
-        ) : (
-          <HistoryRecords
-            historyRecords={historyData!.history}
-            memberIdToNameMap={memberIdToNameMap}
-          />
-        )}
+      <div className="w-full md:p-2">
+        <div className="w-full rounded bg-alice-main p-2">
+          {isLoadingHistory ? (
+            <CircularProgress />
+          ) : (
+            <HistoryRecords
+              historyRecords={historyData!.history}
+              memberIdToNameMap={memberIdToNameMap}
+            />
+          )}
+        </div>
       </div>
     </RootLayout>
   );
