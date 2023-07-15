@@ -17,7 +17,11 @@ export default function ListboxSelection({
   return (
     <Listbox value={selection} onChange={setSelection}>
       <div className={`relative ${customWidth}`}>
-        <Listbox.Button className="relative h-full w-full cursor-default rounded-md border border-alice-accent bg-alice-base py-2 pl-3 pr-10 text-left shadow-md betterhover:hover:bg-alice-main/70">
+        <Listbox.Button
+          className={`relative h-full w-full cursor-default rounded-md border-3 border-alice-main bg-alice-base
+                    py-2 pl-3 pr-10 text-left shadow-md focus:border-alice-accent
+                      focus:outline-none betterhover:hover:border-alice-accent betterhover:hover:bg-alice-base`}
+        >
           <span className="block">{selection}</span>
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
             <ChevronUpDownIcon

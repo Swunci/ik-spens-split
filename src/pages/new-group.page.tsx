@@ -52,7 +52,7 @@ export default function NewGroupPage() {
         >
           Group name
           <input
-            className="mt-2 rounded p-1"
+            className="custom-focus mt-2 rounded bg-alice-base p-2 focus:outline-alice-accent betterhover:hover:bg-alice-base/70"
             id="groupName"
             type="text"
             placeholder=""
@@ -71,7 +71,7 @@ export default function NewGroupPage() {
           Add member(s)
           <div className="flex flex-row place-content-between">
             <input
-              className="mt-2 w-full rounded p-2"
+              className="custom-focus mt-2 w-full rounded bg-alice-base p-2 focus:outline-alice-accent betterhover:hover:bg-alice-base/70"
               id="addMembers"
               type="text"
               placeholder="Alice, Bob, Charlie"

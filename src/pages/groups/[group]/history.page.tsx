@@ -74,21 +74,17 @@ export default function HistoryPage() {
 
   return (
     <RootLayout>
-      <div className="w-full py-2 md:p-2">
+      <div className="w-full py-4 md:px-2">
         <Link
+          className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+          focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
           href={
             currentPath
               ? currentPath.substring(0, currentPath.lastIndexOf('/'))
               : ''
           }
-          passHref
         >
-          <button
-            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
-            type="button"
-          >
-            Back
-          </button>
+          Back
         </Link>
       </div>
       <Typography className="pb-2 text-3xl">History</Typography>

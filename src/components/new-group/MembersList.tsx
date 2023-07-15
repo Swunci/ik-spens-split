@@ -16,7 +16,8 @@ export default function MembersList({
           return (
             <li
               key={member}
-              className="flexbox-col flex w-full flex-row place-content-between items-center rounded border bg-alice-base p-2 px-3 align-middle text-sm shadow-md"
+              className="flexbox-col flex w-full flex-row place-content-between items-center rounded border
+                       bg-alice-base p-2 px-3 align-middle text-sm shadow-md betterhover:hover:bg-alice-base/70"
             >
               <span className="w-11/12 break-words pr-2">{member}</span>
               <button type="button" onClick={() => handleDelete(member)}>

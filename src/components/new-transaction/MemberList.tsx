@@ -61,14 +61,18 @@ export default function MembersList() {
         </FormControl>
         <div className="flexbox-row max-w-fit gap-1 p-2">
           <button
-            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+            className={`custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-main
+                      focus:text-black focus:outline-alice-accent
+                      betterhover:hover:bg-alice-accent/90`}
             type="button"
             onClick={() => handleSelectAll(true)}
           >
             Select All
           </button>
           <button
-            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+            className={`custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-main
+                      focus:text-black focus:outline-alice-accent
+                      betterhover:hover:bg-alice-accent/90`}
             type="button"
             onClick={() => handleSelectAll(false)}
           >

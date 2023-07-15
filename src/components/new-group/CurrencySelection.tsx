@@ -37,7 +37,8 @@ export default function CurrencySelection({
           <div className="relative mt-2">
             <div className="relative w-full cursor-default overflow-hidden rounded-md bg-alice-base text-left">
               <Combobox.Input
-                className="w-full rounded-md border p-2 text-base leading-5 text-gray-900"
+                className="w-full rounded-md border-3 border-alice-base bg-alice-base p-2 text-base leading-5 text-gray-900
+                         focus:border-alice-accent focus:outline-none betterhover:hover:border-alice-accent betterhover:hover:bg-alice-main/30"
                 displayValue={(currency) => currency as string}
                 required
                 id="mainCurrency"

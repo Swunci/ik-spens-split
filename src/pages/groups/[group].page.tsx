@@ -170,21 +170,19 @@ export default function GroupPage() {
         />
 
         <div className="flexbox-row w-full py-2">
-          <Link href={`${currentPath}/transactions`} passHref>
-            <button
-              className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
-              type="button"
-            >
-              View Transactions
-            </button>
+          <Link
+            className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                       focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
+            href={`${currentPath}/transactions`}
+          >
+            View Transactions
           </Link>
-          <Link href={`${currentPath}/new-transaction`} passHref>
-            <button
-              className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
-              type="button"
-            >
-              Add
-            </button>
+          <Link
+            className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                       focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
+            href={`${currentPath}/new-transaction`}
+          >
+            Add
           </Link>
         </div>
 
@@ -210,13 +208,14 @@ export default function GroupPage() {
           <div className="text-center text-2xl">Comments</div>
           <div className="flexbox-row space-x-2 py-2">
             <TextareaAutosize
-              className="my-2 inline-block w-full overflow-hidden rounded bg-alice-base p-1"
+              className="custom-focus my-2 inline-block w-full overflow-hidden rounded bg-alice-base p-2 focus:outline-alice-accent"
               id="commentText"
               onChange={(e) => setCommentText(e.target.value)}
             />
             <div className="flexbox-col max-w-fit place-content-end">
               <button
-                className="m-1 rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                className="custom-focus m-1 rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                       focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
                 type="button"
                 onClick={(e) =>
                   createComment(

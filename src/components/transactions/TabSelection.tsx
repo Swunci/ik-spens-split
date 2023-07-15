@@ -130,7 +130,7 @@ export default function TabSelection({
               className={({ selected }) =>
                 classNames(
                   'w-full rounded-md py-2.5 text-alice-accent border',
-                  'ring-black ring-opacity-60 ring-offset-1 ring-offset-alice-accent focus:outline-none focus:ring-0',
+                  'custom-focus focus:outline-alice-accent',
                   selected
                     ? 'bg-alice-base text-alice-accent border-alice-accent'
                     : 'bg-alice-main text-black betterhover:hover:bg-alice-accent/70 betterhover:hover:text-alice-base border-alice-main'
@@ -143,7 +143,7 @@ export default function TabSelection({
         </Tab.List>
         <Tab.Panels className="mt-2">
           {dataTypes.map((dataType: string) => (
-            <Tab.Panel key={dataType}>
+            <Tab.Panel key={dataType} tabIndex={-1}>
               <Tab.Group>
                 <Tab.List className="flex space-x-1 rounded-md bg-alice-main p-1">
                   {dataOwners.map((dataOwner: string) => (
@@ -152,7 +152,7 @@ export default function TabSelection({
                       className={({ selected }) =>
                         classNames(
                           'w-full rounded-md py-2.5 text-alice-accent border',
-                          'ring-black ring-opacity-60 ring-offset-1 ring-offset-alice-accent focus:outline-none focus:ring-0',
+                          'custom-focus focus:outline-alice-accent',
                           selected
                             ? 'bg-alice-base text-alice-accent border-alice-accent'
                             : 'bg-alice-main text-black betterhover:hover:bg-alice-accent/70 betterhover:hover:text-alice-base border-alice-main'
@@ -167,9 +167,10 @@ export default function TabSelection({
                   {dataOwners.map((dataOwner: string) => (
                     <Tab.Panel
                       key={dataOwner}
+                      tabIndex={-1}
                       className={classNames(
                         'rounded-md bg-alice-main p-3',
-                        'ring-white ring-opacity-60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2'
+                        'custom-focus focus:outline-alice-accent'
                       )}
                     >
                       {renderByDataType(

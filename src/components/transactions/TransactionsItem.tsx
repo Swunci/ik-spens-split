@@ -38,7 +38,11 @@ export default function TransactionsItem({
       className="flexbox-col w-full rounded bg-alice-base shadow-md betterhover:hover:bg-alice-base/70"
       key={transaction.transactionId}
     >
-      <button className="p-2" type="button" onClick={() => setOpen(true)}>
+      <button
+        className="custom-focus rounded p-2 focus:outline-alice-accent"
+        type="button"
+        onClick={() => setOpen(true)}
+      >
         <div className="flexbox-row">
           <div className="w-full">
             <div className="flexbox-row text-base">

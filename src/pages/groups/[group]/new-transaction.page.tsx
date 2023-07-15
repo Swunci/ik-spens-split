@@ -114,17 +114,13 @@ export default function NewTransactionPage() {
 
   return (
     <RootLayout>
-      <div className="w-full pt-2 md:p-2">
+      <div className="w-full py-4 md:px-2">
         <Link
+          className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                   focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
           href={currentPath.substring(0, currentPath.lastIndexOf('/'))}
-          passHref
         >
-          <button
-            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
-            type="button"
-          >
-            Back
-          </button>
+          Back
         </Link>
       </div>
       <form
@@ -175,7 +171,7 @@ export default function NewTransactionPage() {
             <label className="flex w-full flex-col" htmlFor="howMuch">
               How much?
               <input
-                className="mt-2 rounded bg-alice-base p-1"
+                className="custom-focus mt-2 rounded bg-alice-base p-2 focus:outline-alice-accent betterhover:hover:bg-alice-base/70"
                 id="howMuch"
                 type="text"
                 placeholder="Amount"
@@ -190,7 +186,7 @@ export default function NewTransactionPage() {
             <label className="flex w-full flex-col" htmlFor="whatFor">
               What for?
               <input
-                className="mt-2 rounded bg-alice-base p-1"
+                className="custom-focus mt-2 rounded bg-alice-base p-2 focus:outline-alice-accent betterhover:hover:bg-alice-base/70"
                 id="whatFor"
                 type="text"
                 placeholder="Food"
@@ -204,7 +200,7 @@ export default function NewTransactionPage() {
             <label className="flex w-full flex-col" htmlFor="when">
               When?
               <input
-                className="mt-2 rounded bg-alice-base p-1"
+                className="custom-focus mt-2 rounded bg-alice-base p-2 focus:outline-alice-accent betterhover:hover:bg-alice-base/70"
                 id="when"
                 type="date"
                 defaultValue={todaysDate}
@@ -224,7 +220,8 @@ export default function NewTransactionPage() {
 
         <div className="w-full py-2 md:p-2">
           <button
-            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+            className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                     focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
             type="submit"
           >
             Create

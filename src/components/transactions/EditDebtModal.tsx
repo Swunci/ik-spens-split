@@ -68,14 +68,16 @@ export default function EditDebtModal({
               <Dialog.Panel className="flexbox-col m-2 min-h-96 w-full max-w-screen-md justify-start overflow-hidden rounded border-2 border-alice-accent bg-alice-main p-2 text-left align-middle shadow-xl transition-all">
                 <div className="flexbox-row w-full p-2">
                   <button
-                    className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                    className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                             focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
                     type="button"
                     onClick={() => setOpen(false)}
                   >
                     Close
                   </button>
                   <button
-                    className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                    className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                             focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
                     type="button"
                     onClick={async (e) => {
                       const isDeleted = await handlePaidDebtDelete(
@@ -132,7 +134,7 @@ export default function EditDebtModal({
                       <label className="flex w-full flex-col" htmlFor="howMuch">
                         How much?
                         <input
-                          className="mt-2 rounded bg-alice-base p-1"
+                          className="custom-focus mt-2 rounded bg-alice-base p-2 focus:outline-alice-accent"
                           id="howMuch"
                           type="text"
                           placeholder="Amount"
@@ -147,7 +149,8 @@ export default function EditDebtModal({
                   </div>
                   <div className="flexbox-row w-full p-2">
                     <button
-                      className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                      className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                               focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
                       type="submit"
                     >
                       Update

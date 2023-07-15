@@ -3,7 +3,7 @@ import type { Group } from '@prisma/client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
-import { useReducer, useRef } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import useSwr from 'swr';
 
 import {
@@ -11,6 +11,7 @@ import {
   initialState,
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
+import CurrencySelection from '@/components/new-group/CurrencySelection';
 import type CustomError from '@/errors/customError';
 import type { GroupUpdate } from '@/interfaces/request';
 import { RootLayout } from '@/layouts/RootLayout';
@@ -29,7 +30,7 @@ export default function EditGroupPage() {
   const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);
 
   const groupNameRef = useRef<HTMLInputElement>(null);
-  const currencyRef = useRef<HTMLSelectElement>(null);
+  const [currency, setCurrency] = useState('');
 
   const {
     data: groupData,
@@ -40,11 +41,11 @@ export default function EditGroupPage() {
     fetcher
   );
 
-  function populateCurrencies() {
-    return [...currencyNameCodeMap.map.keys()].map((currencyName) => {
-      return <option key={currencyName}>{currencyName}</option>;
-    });
-  }
+  useEffect(() => {
+    if (groupData) {
+      setCurrency(currencyNameCodeMap.revGet(groupData.currency)!);
+    }
+  }, [groupData]);
 
   if (isLoadingGroup || !groupId) {
     return displayBackdrop();
@@ -58,22 +59,19 @@ export default function EditGroupPage() {
     <RootLayout>
       <div className="flexbox-row w-full py-2 md:p-2">
         <Link
+          className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                   focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
           href={
             currentPath
               ? currentPath.substring(0, currentPath.lastIndexOf('/'))
               : ''
           }
-          passHref
         >
-          <button
-            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
-            type="button"
-          >
-            Back
-          </button>
+          Back
         </Link>
         <button
-          className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+          className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                   focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
           type="button"
           onClick={async (e) => {
             const isDeleted = await handleGroupDelete(
@@ -97,7 +95,7 @@ export default function EditGroupPage() {
             {
               groupId,
               groupName: groupNameRef.current!.value,
-              currency: currencyRef.current!.value,
+              currency,
             } as GroupUpdate,
             dispatch
           )
@@ -109,7 +107,7 @@ export default function EditGroupPage() {
         >
           Group name
           <input
-            className="mt-2 rounded p-1"
+            className="custom-focus mt-2 rounded bg-alice-base p-2 focus:outline-alice-accent betterhover:hover:bg-alice-base/70"
             id="groupName"
             type="text"
             placeholder="Trip to ?"
@@ -118,24 +116,14 @@ export default function EditGroupPage() {
             defaultValue={groupData!.groupName}
           />
         </label>
-        <label
-          className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
-          htmlFor="mainCurrency"
-        >
-          Main currency
-          <select
-            className="mt-2 rounded bg-white p-1"
-            id="mainCurrency"
-            required
-            ref={currencyRef}
-            defaultValue={currencyNameCodeMap.revGet(groupData!.currency)}
-          >
-            {populateCurrencies()}
-          </select>
-        </label>
+        <CurrencySelection
+          selectedCurrency={currency}
+          setSelectedCurrency={setCurrency}
+        />
         <div className="flexbox-row w-full">
           <button
-            className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+            className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                     focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
             type="submit"
           >
             Update

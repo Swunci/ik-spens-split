@@ -106,7 +106,8 @@ export default function DebtItem({
             ${debt.paidAmount.absoluteValue().toFixed(2)}`}
           </div>
           <button
-            className="rounded bg-alice-accent px-2 py-1 text-alice-base shadow-md"
+            className="custom-focus rounded bg-alice-accent px-2 py-1 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                     focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
             type="button"
             onClick={(e) => createPaidDebt(e)}
           >

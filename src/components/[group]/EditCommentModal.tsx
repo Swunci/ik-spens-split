@@ -61,7 +61,8 @@ export default function EditCommentModal({
               <Dialog.Panel className="flexbox-col m-2 min-h-96 w-full max-w-screen-md justify-start space-y-3 overflow-hidden rounded border-2 border-alice-accent bg-alice-main p-2 text-left align-middle shadow-xl transition-all">
                 <div className="flexbox-row pt-2 md:p-2">
                   <button
-                    className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                    className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                             focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
                     type="button"
                     onClick={() => setOpen(false)}
                   >
@@ -71,7 +72,8 @@ export default function EditCommentModal({
                     Edit
                   </Typography>
                   <button
-                    className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                    className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                             focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
                     type="button"
                     onClick={async (e) => {
                       const isDeleted = await handleCommentDelete(
@@ -101,7 +103,7 @@ export default function EditCommentModal({
                 <div className="w-full">
                   <Typography className="min-w-fit p-1">Comment</Typography>
                   <TextareaAutosize
-                    className="my-2 inline-block w-full overflow-hidden rounded bg-alice-base p-2"
+                    className="custom-focus my-2 inline-block w-full overflow-hidden rounded bg-alice-base p-2 focus:outline-alice-accent"
                     id="commentText"
                     onChange={(e) => setCommentText(e.target.value)}
                     defaultValue={commentRecord.comment}
@@ -112,7 +114,8 @@ export default function EditCommentModal({
                 </div>
                 <div className="flexbox-row w-full pb-2 md:p-2">
                   <button
-                    className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+                    className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                             focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
                     type="button"
                     onClick={async (e) => {
                       handleCommentUpdate(

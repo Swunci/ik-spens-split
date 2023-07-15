@@ -47,6 +47,12 @@ export const theme = {
     minHeight: {
       96: '24rem',
     },
+    borderWidth: {
+      3: '3px',
+    },
+    outlineWidth: {
+      3: '3px',
+    },
     screens: {
       betterhover: { raw: '(hover: hover)' },
     },

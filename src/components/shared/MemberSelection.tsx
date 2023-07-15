@@ -37,7 +37,8 @@ export default function MemberSelection({
       <div className="relative">
         <div className="relative h-full w-full cursor-default overflow-hidden text-ellipsis rounded-md bg-alice-base text-left shadow-md">
           <Combobox.Input
-            className="h-full w-full rounded-md border border-alice-accent bg-alice-base p-2 pr-7 text-base leading-5 text-gray-900 shadow-md betterhover:hover:bg-alice-main/70"
+            className="h-full w-full rounded-md border-3 border-alice-main bg-alice-base p-2 pr-7 text-base leading-5 text-gray-900 shadow-md
+                     focus:border-alice-accent focus:outline-none betterhover:hover:border-alice-accent betterhover:hover:bg-alice-base"
             displayValue={(member) => member as string}
             required
             id="currentMember"
@@ -57,7 +58,7 @@ export default function MemberSelection({
           leaveTo="opacity-0"
           afterLeave={() => setQuery('')}
         >
-          <Combobox.Options className="absolute z-10 mt-0 max-h-60 w-full overflow-auto rounded-md bg-alice-base py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+          <Combobox.Options className="absolute z-10 mt-0 max-h-60 w-full overflow-auto rounded-md bg-alice-base py-1 text-base shadow-lg sm:text-sm">
             {filteredMembers.length === 0 && query !== '' ? (
               <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                 Nothing found.
