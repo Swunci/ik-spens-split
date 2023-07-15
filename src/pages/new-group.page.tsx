@@ -102,7 +102,8 @@ export default function NewGroupPage() {
           />
         </div>
         <button
-          className="m-1 rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md"
+          className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                   focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
           type="submit"
         >
           Create

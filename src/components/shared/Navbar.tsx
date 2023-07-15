@@ -1,4 +1,4 @@
-import { Grow, MenuList, Typography } from '@mui/material';
+import { Alert, Grow, MenuList, Snackbar, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import MenuItem from '@mui/material/MenuItem';
@@ -7,7 +7,8 @@ import Popper from '@mui/material/Popper';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { SyntheticEvent } from 'react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useReducer, useRef, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import useSwr from 'swr';
 import * as XLSX from 'xlsx';
 
@@ -25,6 +26,12 @@ import { TwoWayReadonlyMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { getLocaleDateString } from '@/utils/timeUtils';
 
+import {
+  ACTION_TYPES,
+  initialState,
+  snackbarReducer,
+} from '../hooks/snackbarReducer';
+
 export default function Navbar() {
   const router = useRouter();
 
@@ -32,6 +39,9 @@ export default function Navbar() {
 
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);
+  const [groupLink, setGroupLink] = useState('');
+
+  const [snackbarState, dispatch] = useReducer(snackbarReducer, initialState);
 
   const [memberIdToNameMap, setMemberIdToNameMap] = useState(
     new TwoWayReadonlyMap(new Map<string, string>())
@@ -65,6 +75,12 @@ export default function Navbar() {
       setMemberIdToNameMap(readOnlyMap);
     }
   }, [groupData]);
+
+  useEffect(() => {
+    if (window) {
+      setGroupLink(window.location.host);
+    }
+  }, []);
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen);
@@ -158,6 +174,17 @@ export default function Navbar() {
     setOpen(false);
   }
 
+  function handleCopyGroupLink(e: React.MouseEvent) {
+    e.preventDefault();
+    if (groupId) {
+      dispatch({
+        type: ACTION_TYPES.OPEN_SUCCESS,
+        message: 'Group link copied!',
+      });
+    }
+    setOpen(false);
+  }
+
   function handleListKeyDown(event: React.KeyboardEvent) {
     if (event.key === 'Tab') {
       event.preventDefault();
@@ -233,6 +260,11 @@ export default function Navbar() {
                       <MenuItem onClick={(e) => handleExportToExcel(e)}>
                         Export as Excel
                       </MenuItem>
+                      <CopyToClipboard text={`${groupLink}/groups/${groupId}`}>
+                        <MenuItem onClick={(e) => handleCopyGroupLink(e)}>
+                          Copy group link
+                        </MenuItem>
+                      </CopyToClipboard>
                     </MenuList>
                   </ClickAwayListener>
                 </Paper>
@@ -241,6 +273,25 @@ export default function Navbar() {
           </Popper>
         </div>
       </div>
+      <Snackbar
+        open={snackbarState.isOpen}
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        onClick={() =>
+          dispatch({
+            type: ACTION_TYPES.CLOSE,
+            message: '',
+          })
+        }
+      >
+        {snackbarState.isOpen ? (
+          <Alert severity={snackbarState.alertType}>
+            {snackbarState.message}
+          </Alert>
+        ) : (
+          <div />
+        )}
+      </Snackbar>
     </div>
   );
 }
