@@ -12,7 +12,7 @@ CREATE TABLE "Group" (
 CREATE TABLE "Member" (
     "groupId" TEXT NOT NULL,
     "memberId" TEXT NOT NULL,
-    "memberName" VARCHAR(50) NOT NULL,
+    "memberName" VARCHAR(35) NOT NULL,
 
     CONSTRAINT "Member_pkey" PRIMARY KEY ("memberId")
 );
@@ -97,7 +97,7 @@ CREATE UNIQUE INDEX "Comment_groupId_commentId_key" ON "Comment"("groupId", "com
 ALTER TABLE "Member" ADD CONSTRAINT "Member_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("groupId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ShareCost" ADD CONSTRAINT "ShareCost_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "Member"("memberId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ShareCost" ADD CONSTRAINT "ShareCost_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "Member"("memberId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ShareCost" ADD CONSTRAINT "ShareCost_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "Transaction"("transactionId") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -106,7 +106,7 @@ ALTER TABLE "ShareCost" ADD CONSTRAINT "ShareCost_transactionId_fkey" FOREIGN KE
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("groupId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_payerId_fkey" FOREIGN KEY ("payerId") REFERENCES "Member"("memberId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_payerId_fkey" FOREIGN KEY ("payerId") REFERENCES "Member"("memberId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "History" ADD CONSTRAINT "History_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("groupId") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -115,10 +115,10 @@ ALTER TABLE "History" ADD CONSTRAINT "History_groupId_fkey" FOREIGN KEY ("groupI
 ALTER TABLE "PaidDebt" ADD CONSTRAINT "PaidDebt_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("groupId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PaidDebt" ADD CONSTRAINT "PaidDebt_creditor_fkey" FOREIGN KEY ("creditor") REFERENCES "Member"("memberId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PaidDebt" ADD CONSTRAINT "PaidDebt_creditor_fkey" FOREIGN KEY ("creditor") REFERENCES "Member"("memberId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PaidDebt" ADD CONSTRAINT "PaidDebt_debtor_fkey" FOREIGN KEY ("debtor") REFERENCES "Member"("memberId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PaidDebt" ADD CONSTRAINT "PaidDebt_debtor_fkey" FOREIGN KEY ("debtor") REFERENCES "Member"("memberId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Comment" ADD CONSTRAINT "Comment_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "Group"("groupId") ON DELETE CASCADE ON UPDATE CASCADE;

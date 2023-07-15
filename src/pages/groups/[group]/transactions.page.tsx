@@ -12,22 +12,15 @@ import {
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
 import MemberSelection from '@/components/shared/MemberSelection';
-import FilterToggle from '@/components/transactions/FilterToggle';
-import PaidDebtsList from '@/components/transactions/PaidDebtsList';
-import TransactionsList from '@/components/transactions/TransactionsList';
-import TypeToggle from '@/components/transactions/TypeToggle';
 import type CustomError from '@/errors/customError';
-import type {
-  Group,
-  Member,
-  PaidDebtResponse,
-  TransactionResponse,
-} from '@/interfaces/response';
+import type { Group, Member } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop } from '@/utils/component/helpers';
 import { TwoWayReadonlyMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
+
+import TabSelection from '../../../components/transactions/TabSelection';
 
 export default function Transactions() {
   const router = useRouter();
@@ -35,8 +28,6 @@ export default function Transactions() {
 
   const { group: groupId } = router.query;
 
-  const [dataOwner, setDataOwner] = useState('all');
-  const [dataType, setDataType] = useState('transactions');
   const [currentMemberId, setCurrentMemberId] = useState('');
   const [memberIdToNameMap, setMemberIdToNameMap] = useState(
     new TwoWayReadonlyMap(new Map<string, string>())
@@ -60,26 +51,6 @@ export default function Transactions() {
     fetcher
   );
 
-  const {
-    data: transactionsData,
-    error: transactionsError,
-    isLoading: isLoadingTransactions,
-  } = useSwr<TransactionResponse, CustomError>(
-    currentPath ? `/api${currentPath}` : null,
-    fetcher
-  );
-
-  const {
-    data: paidDebtsData,
-    error: paidDebtsError,
-    isLoading: isLoadingPaidDebts,
-  } = useSwr<PaidDebtResponse, CustomError>(
-    currentPath
-      ? `/api${currentPath.slice(0, currentPath.lastIndexOf('/'))}/debts`
-      : null,
-    fetcher
-  );
-
   useEffect(() => {
     if (groupData) {
       const idNameMap = groupData.members.reduce(
@@ -98,48 +69,17 @@ export default function Transactions() {
     }
   }, [groupData]);
 
-  if (
-    isLoadingTransactions ||
-    isLoadingPaidDebts ||
-    isLoadingGroup ||
-    !currentPath
-  ) {
+  if (isLoadingGroup || !currentPath) {
     return displayBackdrop();
   }
 
-  if (transactionsError || paidDebtsError || groupError) {
-    if (groupError?.status === 404) {
+  if (groupError) {
+    if (groupError.status === 404) {
       return router.push('/404');
     }
     return router.push('/500');
   }
 
-  function renderByDataType() {
-    switch (dataType) {
-      case 'transactions':
-        return (
-          <TransactionsList
-            transactions={transactionsData!.transactions}
-            dataOwner={dataOwner}
-            currentMemberId={currentMemberId}
-            group={groupData!}
-            dispatch={dispatch}
-          />
-        );
-      case 'debts':
-        return (
-          <PaidDebtsList
-            paidDebts={paidDebtsData!.paidDebts}
-            dataOwner={dataOwner}
-            currentMemberId={currentMemberId}
-            groupData={groupData!}
-            dispatch={dispatch}
-          />
-        );
-      default:
-        return <div>Nothing to see here</div>;
-    }
-  }
   return (
     <RootLayout>
       <div className="flexbox-row w-full py-2">
@@ -173,18 +113,15 @@ export default function Transactions() {
       </div>
 
       <div className="w-full py-2">
-        <TypeToggle dataType={dataType} setDataType={setDataType} />
-      </div>
-
-      <div className="w-full py-2">
-        <FilterToggle dataOwner={dataOwner} setDataOwner={setDataOwner} />
-      </div>
-
-      <div className="flexbox-col mt-2 h-full w-full space-y-2 rounded bg-alice-main p-2 py-4">
         <MemberIdNameContext.Provider value={contextValue}>
-          {renderByDataType()}
+          <TabSelection
+            currentMemberId={currentMemberId}
+            groupData={groupData!}
+            dispatch={dispatch}
+          />
         </MemberIdNameContext.Provider>
       </div>
+
       <Snackbar
         autoHideDuration={5000}
         open={snackbarState.isOpen}

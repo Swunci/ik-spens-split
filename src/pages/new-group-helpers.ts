@@ -27,7 +27,7 @@ export function onAddMember(
     .split(',')
     .reduce((result: Array<string>, value: string) => {
       const name = value.trim();
-      if (name.length > 50) {
+      if (name.length > 35) {
         invalidMembers = true;
         return result;
       }

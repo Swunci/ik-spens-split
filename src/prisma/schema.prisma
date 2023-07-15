@@ -15,7 +15,7 @@ model Member {
 	group Group @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
 
   memberId String @id @default(uuid())
-  memberName String @db.VarChar(50)
+  memberName String @db.VarChar(35)
 
   paidTransactions Transaction[]
   shareCosts ShareCost[]
@@ -30,7 +30,7 @@ model Member {
 
 model ShareCost {
   memberId String
-  member Member @relation(fields: [memberId], references: [memberId])
+  member Member @relation(fields: [memberId], references: [memberId], onDelete: Cascade)
 
   transactionId String
   transaction Transaction @relation(fields: [transactionId], references: [transactionId], onDelete: Cascade)
@@ -46,7 +46,7 @@ model Transaction {
   group Group @relation(fields: [groupId], references: [groupId], onDelete: Cascade)
 
   payerId String
-  member Member @relation(fields: [payerId], references: [memberId])
+  member Member @relation(fields: [payerId], references: [memberId], onDelete: Cascade)
 
 	transactionId String @id @default(uuid())
 	description String @db.VarChar(1000)
@@ -80,8 +80,8 @@ model PaidDebt {
 
 	creditor String
 	debtor String
-  creditorMember Member @relation("creditor", fields: [creditor], references: [memberId])
-  debtorMember Member @relation("debtor", fields: [debtor], references: [memberId])
+  creditorMember Member @relation("creditor", fields: [creditor], references: [memberId], onDelete: Cascade)
+  debtorMember Member @relation("debtor", fields: [debtor], references: [memberId], onDelete: Cascade)
 
 	debtId String @id @default(uuid())
 	amount Decimal @db.Decimal(36, 18)

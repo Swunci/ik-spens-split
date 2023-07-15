@@ -1,5 +1,6 @@
 import type { Dispatch } from 'react';
 import { useContext, useState } from 'react';
+import Balancer from 'react-wrap-balancer';
 
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 import { getLocaleDateString } from '@/utils/timeUtils';
@@ -30,11 +31,13 @@ export default function PaidDebtsItem({
         <div className="flexbox-row">
           <div className="flex w-full justify-start p-2">
             <div className="text-base">
-              {`${idNameMap.get(paidDebt.debtor)} paid ${idNameMap.get(
-                paidDebt.creditor
-              )} ${currencyCodeSymbolMap.get(paidDebt.currency)}${
-                paidDebt.amount
-              } on ${getLocaleDateString(paidDebt.date)}`}
+              <Balancer>
+                {`${idNameMap.get(paidDebt.debtor)} paid ${idNameMap.get(
+                  paidDebt.creditor
+                )} ${currencyCodeSymbolMap.get(paidDebt.currency)}${
+                  paidDebt.amount
+                } on ${getLocaleDateString(paidDebt.date)}`}
+              </Balancer>
             </div>
           </div>
           <div className="flexbox-col w-fit justify-center py-2 pl-2">&gt;</div>

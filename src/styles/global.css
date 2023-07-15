@@ -6,9 +6,13 @@ a {
   @apply no-underline;
 }
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 ::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
+  width: 0px;
+  background: transparent;
 }
 
 html {
@@ -19,11 +23,11 @@ body {
 }
 
 select {
-   -o-appearance: none;
-   -ms-appearance: none;
-   -webkit-appearance: none;
-   -moz-appearance: none;
-   appearance: none;
+  -o-appearance: none;
+  -ms-appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 @tailwind components;

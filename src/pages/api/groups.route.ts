@@ -11,7 +11,11 @@ import validate from '../../middleware/validation';
 const schema = Joi.object({
   groupName: Joi.string().min(1).max(100).required(),
   currency: Joi.string().min(3).max(3).required(),
-  members: Joi.array().min(2).required(),
+  members: Joi.array()
+    .min(2)
+    .items(Joi.string().max(35).min(1))
+    .unique()
+    .required(),
 });
 
 const router = createRouter<NextApiRequest, NextApiResponse>();

@@ -1,6 +1,7 @@
 import CircularProgress from '@mui/material/CircularProgress';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import Balancer from 'react-wrap-balancer';
 
 import type { Group, GroupList } from '@/interfaces/response';
 import { getGroupMemberNames } from '@/pages/groups/[group]/history-helpers';
@@ -43,7 +44,7 @@ export default function RecentGroups() {
   return groups.length === 0 ? (
     <div />
   ) : (
-    <section className="p-3">
+    <section className="">
       <h3 className="px-2 text-2xl text-alice-accent">Visited Groups</h3>
       <div className="rounded bg-alice-main p-3 shadow-md">
         <ul className="space-y-2">
@@ -53,30 +54,34 @@ export default function RecentGroups() {
             groups.map((group: Group) => {
               return (
                 <li
-                  className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md"
+                  className="flexbox-row w-full rounded bg-alice-base p-2 shadow-md"
                   key={group.groupId}
                 >
-                  <div className="flexbox-row gap-2">
+                  <div className="flexbox-col">
                     <Link
                       className="w-full"
                       href={`/groups/${group.groupId}`}
                       passHref
                     >
-                      <div className="flexbox-row">
+                      <div className="flexbox-row w-full">
                         <div className="text-base">{group.groupName}</div>
                         <div className="text-xs">
                           {getLocaleDateString(group.createdDate)}
                         </div>
                       </div>
-                      <div className="flexbox-row">
-                        <div className="text-xs">
-                          Members: {getGroupMemberNames(group)}
+                      <div className="flexbox-row w-full gap-2 text-xs">
+                        <div className="block overflow-hidden break-words">
+                          <Balancer>
+                            {`Members: ${getGroupMemberNames(group)}`}
+                          </Balancer>
                         </div>
-                        <div className="text-xs">
+                        <div className="w-fit whitespace-nowrap">
                           Currency: {group.currency}
                         </div>
                       </div>
                     </Link>
+                  </div>
+                  <div className="block">
                     <svg
                       onClick={(e) => {
                         e.preventDefault();

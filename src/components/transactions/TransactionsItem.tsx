@@ -1,5 +1,6 @@
 import { type Dispatch, useState } from 'react';
 import { useContext } from 'react';
+import Balancer from 'react-wrap-balancer';
 
 import type { Group, Transaction } from '@/interfaces/response';
 import {
@@ -48,10 +49,12 @@ export default function TransactionsItem({
             </div>
             <div className="flexbox-row gap-2 pt-1">
               <div className="text-xs">
-                {`People involved: ${getInvolvedMembers(
-                  transaction.shareCosts,
-                  idNameMap
-                )}.`}
+                <Balancer>
+                  {`People involved: ${getInvolvedMembers(
+                    transaction.shareCosts,
+                    idNameMap
+                  )}.`}
+                </Balancer>
               </div>
               <div className="text-xs">
                 {isMemberInvolved(transaction.shareCosts, currentMemberId)
