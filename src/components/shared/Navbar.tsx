@@ -265,6 +265,11 @@ export default function Navbar() {
                           Copy group link
                         </MenuItem>
                       </CopyToClipboard>
+                      <MenuItem
+                        onClick={() => router.push(`/groups/${groupId}/ocr`)}
+                      >
+                        OCR
+                      </MenuItem>
                     </MenuList>
                   </ClickAwayListener>
                 </Paper>
