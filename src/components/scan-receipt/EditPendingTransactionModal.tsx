@@ -1,25 +1,25 @@
 import { Dialog, Transition } from '@headlessui/react';
 import Decimal from 'decimal.js';
 import type { Dispatch, SetStateAction } from 'react';
-import { Fragment, useRef, useState } from 'react';
+import { Fragment, useContext, useRef, useState } from 'react';
 
-import type { TransactionMember } from '@/components/new-transaction/helpers';
 import { handleTotalCostInput } from '@/components/new-transaction/helpers';
 import { displayWithCommas } from '@/utils/currencyUtil';
 
-import type { PendingTransaction } from './PendingTransactionsList';
+import { PendingTransactionContext } from '../hooks/PendingTransactionContext';
+import MembersList from './MemberList';
 
 export default function EditPendingTransactionModal({
   open,
   setOpen,
-  transaction,
-  membersList,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  transaction: PendingTransaction;
-  membersList: Array<TransactionMember>;
 }) {
+  const pendingTransactionContext = useContext(PendingTransactionContext);
+
+  const { transaction } = pendingTransactionContext!;
+
   const [totalCost, setTotalCost] = useState(new Decimal(transaction.amount));
   const descriptionRef = useRef<HTMLInputElement>(null);
 
@@ -104,13 +104,7 @@ export default function EditPendingTransactionModal({
                   </div>
                   <div className="w-full py-2">
                     <div className="p-2">How to split?</div>
-                    <div>
-                      {membersList.map((member: TransactionMember) => {
-                        return (
-                          <li key={member.memberName}>{member.memberName}</li>
-                        );
-                      })}
-                    </div>
+                    <MembersList />
                   </div>
                   <div className="flexbox-row w-full p-2">
                     <button

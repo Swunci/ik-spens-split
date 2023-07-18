@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto';
 import type Decimal from 'decimal.js';
 
 import PendingTransactionsItem from './PendingTransactionsItem';
@@ -6,6 +5,7 @@ import PendingTransactionsItem from './PendingTransactionsItem';
 export interface PendingTransaction {
   description: string;
   amount: Decimal;
+  id: string;
 }
 
 export default function PendingTransactionsList({
@@ -18,11 +18,11 @@ export default function PendingTransactionsList({
   }
 
   return (
-    <ul className="space-y-2">
+    <ul className="custom-focus space-y-2 rounded-md bg-alice-main p-2 focus:outline-alice-accent">
       {transactions.map((transaction: PendingTransaction) => {
         return (
           <PendingTransactionsItem
-            key={randomUUID.toString()}
+            key={transaction.id}
             transaction={transaction}
           />
         );

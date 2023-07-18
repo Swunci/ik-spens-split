@@ -1,20 +1,17 @@
-import type { Dispatch } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { createContext } from 'react';
 
-import type { Group } from '@/interfaces/response';
-import type { TwoWayReadonlyMap } from '@/utils/currencyUtil';
-
-import type { ActionType } from './snackbarReducer';
+import type { TransactionMember } from '../new-transaction/helpers';
+import type { PendingTransaction } from '../scan-receipt/PendingTransactionsList';
 
 export const PendingTransactionContext = createContext<
-  PendingTransactionContextType | undefined
+  PendingTransactionType | undefined
 >(undefined);
 
-type PendingTransactionContextType = {
-  payerId: string;
-  group: Group;
-  date: string;
-  currency: string;
-  memberIdToNameMap: TwoWayReadonlyMap<string, string>;
-  dispatch: Dispatch<ActionType>;
+type PendingTransactionType = {
+  splitType: string;
+  setSplitType: Dispatch<SetStateAction<string>>;
+  membersList: Array<TransactionMember>;
+  setMembersList: Dispatch<SetStateAction<Array<TransactionMember>>>;
+  transaction: PendingTransaction;
 };

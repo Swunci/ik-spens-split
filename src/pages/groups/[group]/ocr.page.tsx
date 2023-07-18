@@ -1,15 +1,19 @@
 import { Alert, CircularProgress, Snackbar } from '@mui/material';
+import Decimal from 'decimal.js';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import useSwr from 'swr';
 import Tesseract from 'tesseract.js';
+import { v4 as uuid } from 'uuid';
 
-import { PendingTransactionContext } from '@/components/hooks/PendingTransactionContext';
+import { ReceiptScanningContext } from '@/components/hooks/ReceiptScanningContext';
 import {
   ACTION_TYPES,
   initialState,
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
+import type { PendingTransaction } from '@/components/scan-receipt/PendingTransactionsList';
+import PendingTransactionsList from '@/components/scan-receipt/PendingTransactionsList';
 import MemberSelection from '@/components/shared/MemberSelection';
 import type CustomError from '@/errors/customError';
 import type { Group, Member } from '@/interfaces/response';
@@ -35,6 +39,9 @@ export default function OcrTestPage() {
   const [date, setDate] = useState(getTodaysDate());
   const [memberIdToNameMap, setMemberIdToNameMap] = useState(
     new TwoWayReadonlyMap(new Map<string, string>())
+  );
+  const [transactions, setTransactions] = useState(
+    new Array<PendingTransaction>()
   );
 
   const groupId = router.query.group as string;
@@ -87,6 +94,41 @@ export default function OcrTestPage() {
   };
   workerGen();
 
+  function setPendingTransactions(text: string) {
+    const lines = text.split(/\n/);
+
+    const pendingTransactions = new Array<PendingTransaction>();
+
+    lines.forEach((line: string) => {
+      let amount = new Decimal(0);
+      const description = line
+        .split(' ')
+        .map((word: string) => {
+          if (word.includes('.')) {
+            amount = new Decimal(word);
+            return '';
+          }
+          return word.trim();
+        })
+        .join(' ');
+      if (
+        !amount.equals(0) &&
+        description !== '' &&
+        !description.toLowerCase().includes('total')
+      ) {
+        pendingTransactions.push({
+          amount,
+          description: description
+            .replace(/[&/\\#,+()$~%.'":*?<>{}]/g, '')
+            .trim(),
+          id: uuid(),
+        } as PendingTransaction);
+      }
+    });
+
+    setTransactions(pendingTransactions);
+  }
+
   async function handleImageProcessing(e: React.MouseEvent) {
     e.preventDefault();
     if (selectedImage && isSupported) {
@@ -94,6 +136,7 @@ export default function OcrTestPage() {
       await scheduler.addJob('recognize', filePath).then((x) => {
         setIsProcessing(false);
         setData(x.data.text);
+        setPendingTransactions(x.data.text);
       });
     } else {
       dispatch({
@@ -109,6 +152,7 @@ export default function OcrTestPage() {
       setSelectedImage(file);
     }
     if (file && file.name.toLowerCase().match(/\.(bmp|jpg|png|pbm|webp)$/)) {
+      URL.revokeObjectURL(filePath);
       setFilePath(URL.createObjectURL(file));
       setIsSupported(true);
       return;
@@ -116,17 +160,6 @@ export default function OcrTestPage() {
     setIsSupported(false);
   }
 
-  function parseData(text: string) {
-    const lines = text.split(/\n/);
-    return (
-      <ul>
-        {lines.map((line: string, index: number) => {
-          // eslint-disable-next-line react/jsx-key, react/no-array-index-key
-          return <div key={index}>{line}</div>;
-        })}
-      </ul>
-    );
-  }
   if (isLoadingGroup || !groupId) {
     return displayBackdrop();
   }
@@ -171,7 +204,8 @@ export default function OcrTestPage() {
           <div className="flex w-full place-content-evenly">
             <CircularProgress className="text-alice-accent" />
           </div>
-        ) : (
+        ) : null}
+        {data !== '' && !isProcessing ? (
           <>
             <MemberSelection
               members={groupData!.members}
@@ -192,10 +226,11 @@ export default function OcrTestPage() {
                 />
               </label>
             </div>
-            {parseData(data)}
-            <PendingTransactionContext.Provider value={contextValue} />
+            <ReceiptScanningContext.Provider value={contextValue}>
+              <PendingTransactionsList transactions={transactions} />
+            </ReceiptScanningContext.Provider>
           </>
-        )}
+        ) : null}
       </div>
       <Snackbar
         autoHideDuration={5000}

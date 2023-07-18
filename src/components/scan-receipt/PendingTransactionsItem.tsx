@@ -1,12 +1,14 @@
 import { Typography } from '@mui/material';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import Balancer from 'react-wrap-balancer';
 
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 
 import { PendingTransactionContext } from '../hooks/PendingTransactionContext';
+import { ReceiptScanningContext } from '../hooks/ReceiptScanningContext';
 import type { TransactionMember } from '../new-transaction/helpers';
-import { getInitialMemberList } from '../new-transaction/helpers';
 import EditPendingTransactionModal from './EditPendingTransactionModal';
+import { getInitialMemberList, getInvolvedMembers } from './helpers';
 import type { PendingTransaction } from './PendingTransactionsList';
 
 export default function PendingTransactionsItem({
@@ -16,16 +18,29 @@ export default function PendingTransactionsItem({
 }) {
   const [open, setOpen] = useState(false);
 
-  const pendingTransactionContext = useContext(PendingTransactionContext);
+  const receiptScanningContext = useContext(ReceiptScanningContext);
 
-  const { group, currency, payerId } = pendingTransactionContext!;
+  const { group, currency } = receiptScanningContext!;
+
+  const [splitType, setSplitType] = useState('Equal');
 
   const [membersList, setMembersList] = useState(
     new Array<TransactionMember>()
   );
 
+  const contextValue = useMemo(
+    () => ({
+      splitType,
+      setSplitType,
+      membersList,
+      setMembersList,
+      transaction,
+    }),
+    [splitType, membersList, transaction]
+  );
+
   useEffect(() => {
-    setMembersList(getInitialMemberList(group.members, 'expense', payerId));
+    setMembersList(getInitialMemberList(group.members, transaction.amount));
   }, []);
 
   return (
@@ -42,19 +57,23 @@ export default function PendingTransactionsItem({
                 transaction.amount
               } for ${transaction.description}`}</div>
             </div>
-            <div className="flexbox-row gap-2 pt-1" />
+            <div className="flexbox-row gap-2 pt-1">
+              <div className="w-full text-left text-xs">
+                <Balancer>{`People involved: ${getInvolvedMembers(
+                  membersList
+                )}.`}</Balancer>
+              </div>
+              <div className="text-xs">your share</div>
+            </div>
           </div>
           <div className="flexbox-col w-fit justify-center py-2 pl-2">
             <Typography>&gt;</Typography>
           </div>
         </div>
       </button>
-      <EditPendingTransactionModal
-        open={open}
-        setOpen={setOpen}
-        transaction={transaction}
-        membersList={membersList}
-      />
+      <PendingTransactionContext.Provider value={contextValue}>
+        <EditPendingTransactionModal open={open} setOpen={setOpen} />
+      </PendingTransactionContext.Provider>
     </li>
   );
 }
