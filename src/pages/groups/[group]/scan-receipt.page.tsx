@@ -29,6 +29,8 @@ import { getTodaysDate } from '@/utils/timeUtils';
 export default function OcrTestPage() {
   const router = useRouter();
 
+  const [scheduler] = useState(Tesseract.createScheduler());
+
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isSupported, setIsSupported] = useState(false);
   const [filePath, setFilePath] = useState('');
@@ -92,15 +94,15 @@ export default function OcrTestPage() {
     }
   }, [groupData]);
 
-  const scheduler = Tesseract.createScheduler();
-
-  const workerGen = async () => {
-    const worker = await Tesseract.createWorker();
-    await worker.loadLanguage('eng');
-    await worker.initialize('eng');
-    scheduler.addWorker(worker);
-  };
-  workerGen();
+  useEffect(() => {
+    const workerGen = async () => {
+      const worker = await Tesseract.createWorker();
+      await worker.loadLanguage('eng');
+      await worker.initialize('eng');
+      scheduler.addWorker(worker);
+    };
+    workerGen();
+  }, []);
 
   function setPendingTransactions(text: string) {
     const lines = text.split(/\n/);
@@ -113,8 +115,12 @@ export default function OcrTestPage() {
         .split(' ')
         .map((word: string) => {
           if (word.includes('.')) {
-            amount = new Decimal(word).toDecimalPlaces(2);
-            return '';
+            try {
+              amount = new Decimal(word).toDecimalPlaces(2);
+              return '';
+            } catch (err) {
+              return '';
+            }
           }
           return word.trim();
         })
@@ -201,7 +207,7 @@ export default function OcrTestPage() {
 
         {selectedImage && (
           <>
-            <img src={`${URL.createObjectURL(selectedImage)}`} alt="" />
+            <img src={filePath} alt="" />
             <button
               className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md betterhover:hover:bg-alice-accent/90"
               type="button"

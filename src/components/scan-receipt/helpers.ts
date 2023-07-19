@@ -95,12 +95,6 @@ export async function handleCreateTransactions(
 
   const results: Array<string> = await Promise.all(
     transactions.map(async (transaction: PendingTransaction) => {
-      console.log(
-        `${transaction.description}: ${!mathChecksOut(
-          transaction.membersList,
-          transaction.amount
-        )} `
-      );
       if (
         transaction.amount.greaterThan(10 ** 9) ||
         transaction.amount.lessThanOrEqualTo(0) ||
@@ -155,4 +149,21 @@ export async function handleCreateTransactions(
       message: 'Successfully created all transactions',
     });
   }
+}
+
+export function handleDeletePendingTransaction(
+  e: React.MouseEvent,
+  transaction: PendingTransaction,
+  transactions: Array<PendingTransaction>,
+  setTransactions: Dispatch<SetStateAction<Array<PendingTransaction>>>,
+  setOpen: Dispatch<SetStateAction<boolean>>
+) {
+  e.preventDefault();
+  const pendingTransactions = transactions.filter(
+    (pendingTransaction: PendingTransaction) => {
+      return pendingTransaction.id !== transaction.id;
+    }
+  );
+  setTransactions(pendingTransactions);
+  setOpen(false);
 }

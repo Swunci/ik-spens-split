@@ -257,6 +257,13 @@ export default function Navbar() {
                       <MenuItem onClick={(e) => handleHistoryClick(e)}>
                         History
                       </MenuItem>
+                      <MenuItem
+                        onClick={() =>
+                          router.push(`/groups/${groupId}/scan-receipt`)
+                        }
+                      >
+                        Scan Receipt
+                      </MenuItem>
                       <MenuItem onClick={(e) => handleExportToExcel(e)}>
                         Export as Excel
                       </MenuItem>
@@ -265,11 +272,6 @@ export default function Navbar() {
                           Copy group link
                         </MenuItem>
                       </CopyToClipboard>
-                      <MenuItem
-                        onClick={() => router.push(`/groups/${groupId}/ocr`)}
-                      >
-                        OCR
-                      </MenuItem>
                     </MenuList>
                   </ClickAwayListener>
                 </Paper>

@@ -8,8 +8,8 @@ import { displayWithCommas } from '@/utils/currencyUtil';
 
 import { PendingTransactionContext } from '../hooks/PendingTransactionContext';
 import { ReceiptScanningContext } from '../hooks/ReceiptScanningContext';
+import { handleDeletePendingTransaction } from './helpers';
 import MembersList from './MemberList';
-import type { PendingTransaction } from './PendingTransactionsList';
 
 export default function EditPendingTransactionModal({
   open,
@@ -26,17 +26,6 @@ export default function EditPendingTransactionModal({
 
   const [totalCost, setTotalCost] = useState(new Decimal(transaction.amount));
   const descriptionRef = useRef<HTMLInputElement>(null);
-
-  function handleDeletePendingTransaction(e: React.MouseEvent) {
-    e.preventDefault();
-    const pendingTransactions = transactions.filter(
-      (pendingTransaction: PendingTransaction) => {
-        return pendingTransaction.id !== transaction.id;
-      }
-    );
-    setTransactions(pendingTransactions);
-    setOpen(false);
-  }
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -76,7 +65,15 @@ export default function EditPendingTransactionModal({
                   <button
                     className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md betterhover:hover:bg-alice-accent/90"
                     type="button"
-                    onClick={(e) => handleDeletePendingTransaction(e)}
+                    onClick={(e) =>
+                      handleDeletePendingTransaction(
+                        e,
+                        transaction,
+                        transactions,
+                        setTransactions,
+                        setOpen
+                      )
+                    }
                   >
                     Delete
                   </button>
