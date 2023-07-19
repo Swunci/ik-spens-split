@@ -47,7 +47,7 @@ export function handleTotalCostInput(
   setTotalCost(new Decimal(trimLeadingZeros(num)));
 }
 
-function assignRemainingToSomeone(
+export function assignRemainingToSomeone(
   membersList: Array<TransactionMember>,
   totalCost: Decimal,
   isWeightSplit: boolean
@@ -255,7 +255,10 @@ export function getInitialMemberList(
   return list;
 }
 
-function mathChecksOut(membersList: TransactionMember[], totalCost: Decimal) {
+export function mathChecksOut(
+  membersList: TransactionMember[],
+  totalCost: Decimal
+) {
   const sum = membersList.reduce((cost: Decimal, member: TransactionMember) => {
     if (member.isSelected) {
       return cost.plus(member.amount);

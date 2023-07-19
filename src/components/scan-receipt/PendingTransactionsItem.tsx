@@ -8,7 +8,12 @@ import { PendingTransactionContext } from '../hooks/PendingTransactionContext';
 import { ReceiptScanningContext } from '../hooks/ReceiptScanningContext';
 import type { TransactionMember } from '../new-transaction/helpers';
 import EditPendingTransactionModal from './EditPendingTransactionModal';
-import { getInitialMemberList, getInvolvedMembers } from './helpers';
+import {
+  getInitialMemberList,
+  getInvolvedMembers,
+  getYourShare,
+  isMemberInvolved,
+} from './helpers';
 import type { PendingTransaction } from './PendingTransactionsList';
 
 export default function PendingTransactionsItem({
@@ -20,7 +25,8 @@ export default function PendingTransactionsItem({
 
   const receiptScanningContext = useContext(ReceiptScanningContext);
 
-  const { group, currency } = receiptScanningContext!;
+  const { group, currency, currentMemberId, transactions, setTransactions } =
+    receiptScanningContext!;
 
   const [splitType, setSplitType] = useState('Equal');
 
@@ -43,6 +49,19 @@ export default function PendingTransactionsItem({
     setMembersList(getInitialMemberList(group.members, transaction.amount));
   }, []);
 
+  useEffect(() => {
+    const newTransactions = transactions.map(
+      (pendingTransaction: PendingTransaction) => {
+        const newTransaction = pendingTransaction;
+        if (newTransaction.id === transaction.id) {
+          newTransaction.membersList = membersList;
+        }
+        return newTransaction;
+      }
+    );
+    setTransactions(newTransactions);
+  }, [membersList]);
+
   return (
     <li className="flexbox-col w-full rounded bg-alice-base shadow-md betterhover:hover:bg-alice-base/70">
       <button
@@ -63,7 +82,13 @@ export default function PendingTransactionsItem({
                   membersList
                 )}.`}</Balancer>
               </div>
-              <div className="text-xs">your share</div>
+              <div className="text-xs">
+                {isMemberInvolved(membersList, currentMemberId)
+                  ? `Your share: ${currencyCodeSymbolMap.get(
+                      currency
+                    )}${getYourShare(membersList, currentMemberId).toFixed(2)}`
+                  : null}
+              </div>
             </div>
           </div>
           <div className="flexbox-col w-fit justify-center py-2 pl-2">

@@ -1,11 +1,14 @@
 import type Decimal from 'decimal.js';
 
+import type { TransactionMember } from '../new-transaction/helpers';
 import PendingTransactionsItem from './PendingTransactionsItem';
 
 export interface PendingTransaction {
   description: string;
   amount: Decimal;
   id: string;
+  splitType: string;
+  membersList: Array<TransactionMember>;
 }
 
 export default function PendingTransactionsList({
@@ -14,7 +17,13 @@ export default function PendingTransactionsList({
   transactions: Array<PendingTransaction>;
 }) {
   if (transactions.length === 0) {
-    return <div>No transactions to show</div>;
+    return (
+      <div className="rounded-md bg-alice-main p-2">
+        <div className="flexbox-col w-full rounded bg-alice-base p-2 shadow-md">
+          No pending transactions left
+        </div>
+      </div>
+    );
   }
 
   return (

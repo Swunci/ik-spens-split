@@ -7,7 +7,9 @@ import { handleTotalCostInput } from '@/components/new-transaction/helpers';
 import { displayWithCommas } from '@/utils/currencyUtil';
 
 import { PendingTransactionContext } from '../hooks/PendingTransactionContext';
+import { ReceiptScanningContext } from '../hooks/ReceiptScanningContext';
 import MembersList from './MemberList';
+import type { PendingTransaction } from './PendingTransactionsList';
 
 export default function EditPendingTransactionModal({
   open,
@@ -17,11 +19,24 @@ export default function EditPendingTransactionModal({
   setOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const pendingTransactionContext = useContext(PendingTransactionContext);
-
   const { transaction } = pendingTransactionContext!;
+
+  const receiptScanningContext = useContext(ReceiptScanningContext);
+  const { transactions, setTransactions } = receiptScanningContext!;
 
   const [totalCost, setTotalCost] = useState(new Decimal(transaction.amount));
   const descriptionRef = useRef<HTMLInputElement>(null);
+
+  function handleDeletePendingTransaction(e: React.MouseEvent) {
+    e.preventDefault();
+    const pendingTransactions = transactions.filter(
+      (pendingTransaction: PendingTransaction) => {
+        return pendingTransaction.id !== transaction.id;
+      }
+    );
+    setTransactions(pendingTransactions);
+    setOpen(false);
+  }
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -52,22 +67,21 @@ export default function EditPendingTransactionModal({
               <Dialog.Panel className="flexbox-col m-2 w-full max-w-screen-md overflow-hidden rounded border-2 border-alice-accent bg-alice-main p-2 text-left align-middle shadow-xl transition-all">
                 <div className="flexbox-row w-full p-2">
                   <button
-                    className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
-                             focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
+                    className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md betterhover:hover:bg-alice-accent/90"
                     type="button"
                     onClick={() => setOpen(false)}
                   >
                     Back
                   </button>
                   <button
-                    className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
-                             focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
+                    className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md betterhover:hover:bg-alice-accent/90"
                     type="button"
+                    onClick={(e) => handleDeletePendingTransaction(e)}
                   >
                     Delete
                   </button>
                 </div>
-                <form className="flex w-full flex-col items-center">
+                <div className="flex w-full flex-col items-center">
                   <div className="flexbox-col w-full space-y-4">
                     <div className="w-full rounded bg-alice-main p-2">
                       <label className="flex w-full flex-col" htmlFor="howMuch">
@@ -106,16 +120,7 @@ export default function EditPendingTransactionModal({
                     <div className="p-2">How to split?</div>
                     <MembersList />
                   </div>
-                  <div className="flexbox-row w-full p-2">
-                    <button
-                      className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
-                               focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
-                      type="submit"
-                    >
-                      Update
-                    </button>
-                  </div>
-                </form>
+                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>

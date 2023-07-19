@@ -60,14 +60,13 @@ export default function MembersList() {
               options={['Equal', 'Weight', 'Custom']}
               selection={splitType}
               setSelection={setSplitType}
-              customWidth="w-24"
+              customWidth="w-28"
             />
           </div>
         </FormControl>
         <div className="flexbox-row max-w-fit gap-1 p-2">
           <button
-            className={`custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-main
-                      focus:text-black focus:outline-alice-accent
+            className={`rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md
                       betterhover:hover:bg-alice-accent/90`}
             type="button"
             onClick={() => handleSelectAll(true)}
@@ -75,8 +74,7 @@ export default function MembersList() {
             Select All
           </button>
           <button
-            className={`custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-main
-                      focus:text-black focus:outline-alice-accent
+            className={`rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md
                       betterhover:hover:bg-alice-accent/90`}
             type="button"
             onClick={() => handleSelectAll(false)}
