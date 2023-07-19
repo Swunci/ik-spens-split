@@ -1,6 +1,7 @@
 import type Decimal from 'decimal.js';
 
-import type { TransactionMember } from '../new-transaction/helpers';
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
+
 import PendingTransactionsItem from './PendingTransactionsItem';
 
 export interface PendingTransaction {

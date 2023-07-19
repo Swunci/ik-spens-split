@@ -1,17 +1,9 @@
 import Decimal from 'decimal.js';
-import type { Dispatch, SetStateAction } from 'react';
 
-import type { TransactionCreation } from '@/interfaces/request';
-import type { Member, ShareCost } from '@/interfaces/response';
-import NextApiClient from '@/utils/api/NextApiClient';
+import type { Member } from '@/interfaces/response';
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
 
-import { ACTION_TYPES, type ActionType } from '../hooks/snackbarReducer';
-import {
-  assignRemainingToSomeone,
-  mathChecksOut,
-  type TransactionMember,
-} from '../new-transaction/helpers';
-import type { PendingTransaction } from './PendingTransactionsList';
+import { assignRemainingToSomeone } from '../new-transaction/helpers';
 
 export function getInitialMemberList(
   members: Array<Member>,
@@ -66,104 +58,4 @@ export function getYourShare(
     }
   }
   return new Decimal(0);
-}
-
-export interface MultiTransactionCreationForm {
-  groupId: string;
-  payerId: string;
-  transactions: Array<PendingTransaction>;
-  type: string;
-  date: string;
-  currency: string;
-}
-
-export async function handleCreateTransactions(
-  e: React.MouseEvent,
-  formDetails: MultiTransactionCreationForm,
-  setTransactions: Dispatch<SetStateAction<Array<PendingTransaction>>>,
-  dispatch: Dispatch<ActionType>
-) {
-  e.preventDefault();
-  const { groupId } = formDetails;
-  const { payerId } = formDetails;
-  const { transactions } = formDetails;
-  const { type } = formDetails;
-  const { date } = formDetails;
-  const { currency } = formDetails;
-
-  const nextApiClient = new NextApiClient().jsonBody();
-
-  const results: Array<string> = await Promise.all(
-    transactions.map(async (transaction: PendingTransaction) => {
-      if (
-        transaction.amount.greaterThan(10 ** 9) ||
-        transaction.amount.lessThanOrEqualTo(0) ||
-        !mathChecksOut(transaction.membersList, transaction.amount)
-      ) {
-        return '';
-      }
-
-      const requestBody: TransactionCreation = {} as TransactionCreation;
-      requestBody.groupId = groupId;
-      requestBody.payerId = payerId;
-      requestBody.type = type.toLowerCase();
-      requestBody.date = date;
-      requestBody.currency = currency;
-      requestBody.splitType = transaction.splitType.toLowerCase();
-      requestBody.amount = transaction.amount.toFixed(2);
-      requestBody.description = transaction.description;
-      requestBody.splits = transaction.membersList.map(
-        (member: TransactionMember) => {
-          return {
-            memberId: member.memberId,
-            shareCost: member.amount.toString(),
-            weight: member.weight,
-          } as ShareCost;
-        }
-      );
-      requestBody.currency = currency;
-      const response = await nextApiClient.transactions.create(requestBody);
-
-      if (!response.ok) {
-        return '';
-      }
-      return transaction.id;
-    })
-  );
-
-  const successfullIds = new Set(results);
-  const failedTransactions = transactions.filter(
-    (transaction: PendingTransaction) => {
-      return !successfullIds.has(transaction.id);
-    }
-  );
-  setTransactions(failedTransactions);
-  if (failedTransactions.length > 0) {
-    dispatch({
-      type: ACTION_TYPES.OPEN_ERROR,
-      message: 'Failed to create some transactions',
-    });
-  } else {
-    dispatch({
-      type: ACTION_TYPES.OPEN_SUCCESS,
-      message: 'Successfully created all transactions',
-    });
-  }
-}
-
-export function handleDeletePendingTransaction(
-  e: React.MouseEvent,
-  transaction: PendingTransaction,
-  transactions: Array<PendingTransaction>,
-  setTransactions: Dispatch<SetStateAction<Array<PendingTransaction>>>,
-  setOpen: Dispatch<SetStateAction<boolean>>
-) {
-  e.preventDefault();
-  const pendingTransactions = transactions.filter(
-    (pendingTransaction: PendingTransaction) => {
-      return pendingTransaction.id !== transaction.id;
-    }
-  );
-  setTransactions(pendingTransactions);
-  setOpen(false);
 }

@@ -1,7 +1,8 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { createContext } from 'react';
 
-import type { TransactionMember } from '../new-transaction/helpers';
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
+
 import type { PendingTransaction } from '../scan-receipt/PendingTransactionsList';
 
 export const PendingTransactionContext = createContext<

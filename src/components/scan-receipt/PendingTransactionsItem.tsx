@@ -2,11 +2,11 @@ import { Typography } from '@mui/material';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import Balancer from 'react-wrap-balancer';
 
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 
 import { PendingTransactionContext } from '../hooks/PendingTransactionContext';
 import { ReceiptScanningContext } from '../hooks/ReceiptScanningContext';
-import type { TransactionMember } from '../new-transaction/helpers';
 import EditPendingTransactionModal from './EditPendingTransactionModal';
 import {
   getInitialMemberList,

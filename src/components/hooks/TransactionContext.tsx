@@ -2,7 +2,7 @@ import type Decimal from 'decimal.js';
 import type { Dispatch, SetStateAction } from 'react';
 import { createContext } from 'react';
 
-import type { TransactionMember } from '@/components/new-transaction/helpers';
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
 
 export const TransactionContext = createContext<
   TransactionContextType | undefined

@@ -1,9 +1,10 @@
 import FormControl from '@mui/material/FormControl';
 import { useContext, useEffect } from 'react';
 
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
+
 import { PendingTransactionContext } from '../hooks/PendingTransactionContext';
 import { ReceiptScanningContext } from '../hooks/ReceiptScanningContext';
-import type { TransactionMember } from '../new-transaction/helpers';
 import {
   getMembersListBySplitType,
   setSelectAllMembers,

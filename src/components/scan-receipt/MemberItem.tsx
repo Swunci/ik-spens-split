@@ -2,9 +2,10 @@ import Typography from '@mui/material/Typography';
 import Decimal from 'decimal.js';
 import { useContext, useEffect, useState } from 'react';
 
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
+
 import { PendingTransactionContext } from '../hooks/PendingTransactionContext';
 import { ReceiptScanningContext } from '../hooks/ReceiptScanningContext';
-import type { TransactionMember } from '../new-transaction/helpers';
 import { getMembersListBySplitType } from '../new-transaction/helpers';
 import MemberField from './MemberField';
 

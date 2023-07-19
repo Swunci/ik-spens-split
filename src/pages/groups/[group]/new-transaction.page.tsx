@@ -14,17 +14,7 @@ import {
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
 import { TransactionContext } from '@/components/hooks/TransactionContext';
-import type {
-  CreateTransactionForm,
-  TransactionMember,
-} from '@/components/new-transaction/helpers';
-import {
-  getActionByTransactionType,
-  getInitialMemberList,
-  handleTotalCostInput,
-  handleTransactionCreation,
-  resetSplitCosts,
-} from '@/components/new-transaction/helpers';
+import { getInitialMemberList } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
 import ListboxSelection from '@/components/shared/ListboxSelection';
 import MemberSelection from '@/components/shared/MemberSelection';
@@ -35,6 +25,17 @@ import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
 import { displayWithCommas, TwoWayReadonlyMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { getTodaysDate } from '@/utils/timeUtils';
+
+import type {
+  CreateTransactionForm,
+  TransactionMember,
+} from './new-transaction-helpers';
+import {
+  getActionByTransactionType,
+  handleTotalCostInput,
+  handleTransactionCreation,
+  resetSplitCosts,
+} from './new-transaction-helpers';
 
 export default function NewTransactionPage() {
   const todaysDate = getTodaysDate();

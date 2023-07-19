@@ -3,10 +3,10 @@ import type Decimal from 'decimal.js';
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react';
 import { useContext } from 'react';
 
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 
 import { ReceiptScanningContext } from '../hooks/ReceiptScanningContext';
-import type { TransactionMember } from '../new-transaction/helpers';
 import { getMembersListBySplitType } from '../new-transaction/helpers';
 
 export default function Weight({

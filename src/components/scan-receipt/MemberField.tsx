@@ -2,10 +2,10 @@ import { TextField } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 import { useContext, useRef } from 'react';
 
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 
 import { ReceiptScanningContext } from '../hooks/ReceiptScanningContext';
-import type { TransactionMember } from '../new-transaction/helpers';
 import Custom from './Custom';
 import type { PendingTransaction } from './PendingTransactionsList';
 import Weight from './Weight';

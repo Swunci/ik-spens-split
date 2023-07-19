@@ -11,18 +11,13 @@ import {
   useState,
 } from 'react';
 
-import type {
-  TransactionMember,
-  UpdateTransactionForm,
-} from '@/components/new-transaction/helpers';
+import { getInitialMemberList } from '@/components/new-transaction/helpers';
+import type { Group, ShareCost, Transaction } from '@/interfaces/response';
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
 import {
   getActionByTransactionType,
-  getInitialMemberList,
   handleTotalCostInput,
-  handleTransactionDelete,
-  handleTransactionUpdate,
-} from '@/components/new-transaction/helpers';
-import type { Group, ShareCost, Transaction } from '@/interfaces/response';
+} from '@/pages/groups/[group]/new-transaction-helpers';
 import { displayWithCommas } from '@/utils/currencyUtil';
 import { getLocaleDateString } from '@/utils/timeUtils';
 
@@ -32,6 +27,11 @@ import { TransactionContext } from '../hooks/TransactionContext';
 import MembersList from '../new-transaction/MemberList';
 import ListboxSelection from '../shared/ListboxSelection';
 import MemberSelection from '../shared/MemberSelection';
+import type { UpdateTransactionForm } from './EditDebtModalHelpers';
+import {
+  handleTransactionDelete,
+  handleTransactionUpdate,
+} from './EditDebtModalHelpers';
 
 export default function EditTransactionModal({
   open,

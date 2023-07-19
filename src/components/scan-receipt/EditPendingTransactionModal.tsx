@@ -3,12 +3,12 @@ import Decimal from 'decimal.js';
 import type { Dispatch, SetStateAction } from 'react';
 import { Fragment, useContext, useRef, useState } from 'react';
 
-import { handleTotalCostInput } from '@/components/new-transaction/helpers';
+import { handleTotalCostInput } from '@/pages/groups/[group]/new-transaction-helpers';
+import { handleDeletePendingTransaction } from '@/pages/groups/[group]/scan-receipt-helpers';
 import { displayWithCommas } from '@/utils/currencyUtil';
 
 import { PendingTransactionContext } from '../hooks/PendingTransactionContext';
 import { ReceiptScanningContext } from '../hooks/ReceiptScanningContext';
-import { handleDeletePendingTransaction } from './helpers';
 import MembersList from './MemberList';
 
 export default function EditPendingTransactionModal({

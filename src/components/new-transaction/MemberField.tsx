@@ -2,11 +2,11 @@ import { TextField } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 import { useContext, useRef } from 'react';
 
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 
 import { TransactionContext } from '../hooks/TransactionContext';
 import Custom from './Custom';
-import type { TransactionMember } from './helpers';
 import Weight from './Weight';
 
 export default function MemberField({

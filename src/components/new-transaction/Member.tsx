@@ -3,8 +3,8 @@ import Decimal from 'decimal.js';
 import { useContext, useEffect, useState } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
 
-import type { TransactionMember } from './helpers';
 import { getMembersListBySplitType } from './helpers';
 import MemberField from './MemberField';
 

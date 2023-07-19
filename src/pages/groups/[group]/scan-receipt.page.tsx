@@ -1,10 +1,8 @@
-import { Alert, CircularProgress, Snackbar } from '@mui/material';
-import Decimal from 'decimal.js';
+import { Alert, CircularProgress, Link, Snackbar } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import useSwr from 'swr';
 import Tesseract from 'tesseract.js';
-import { v4 as uuid } from 'uuid';
 
 import { ReceiptScanningContext } from '@/components/hooks/ReceiptScanningContext';
 import {
@@ -12,21 +10,25 @@ import {
   initialState,
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
-import type { TransactionMember } from '@/components/new-transaction/helpers';
-import type { MultiTransactionCreationForm } from '@/components/scan-receipt/helpers';
-import { handleCreateTransactions } from '@/components/scan-receipt/helpers';
 import type { PendingTransaction } from '@/components/scan-receipt/PendingTransactionsList';
 import PendingTransactionsList from '@/components/scan-receipt/PendingTransactionsList';
 import MemberSelection from '@/components/shared/MemberSelection';
 import type CustomError from '@/errors/customError';
 import type { Group, Member } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
-import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
+import { displayBackdrop } from '@/utils/component/helpers';
 import { TwoWayReadonlyMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { getTodaysDate } from '@/utils/timeUtils';
 
-export default function OcrTestPage() {
+import type { MultiTransactionCreationForm } from './scan-receipt-helpers';
+import {
+  handleCreateTransactions,
+  handleFileInput,
+  handleImageProcessing,
+} from './scan-receipt-helpers';
+
+export default function ScanReceiptPage() {
   const router = useRouter();
 
   const [scheduler] = useState(Tesseract.createScheduler());
@@ -104,88 +106,25 @@ export default function OcrTestPage() {
     workerGen();
   }, []);
 
-  function setPendingTransactions(text: string) {
-    const lines = text.split(/\n/);
-
-    const pendingTransactions = new Array<PendingTransaction>();
-
-    lines.forEach((line: string) => {
-      let amount = new Decimal(0);
-      const description = line
-        .split(' ')
-        .map((word: string) => {
-          if (word.includes('.')) {
-            try {
-              amount = new Decimal(word).toDecimalPlaces(2);
-              return '';
-            } catch (err) {
-              return '';
-            }
-          }
-          return word.trim();
-        })
-        .join(' ');
-      if (
-        !amount.equals(0) &&
-        description !== '' &&
-        !description.toLowerCase().includes('total')
-      ) {
-        pendingTransactions.push({
-          amount,
-          description: description
-            .replace(/[&/\\#,+()$~%.'":*?<>{}]/g, '')
-            .trim(),
-          id: uuid(),
-          splitType: 'Equal',
-          membersList: new Array<TransactionMember>(),
-        } as PendingTransaction);
-      }
-    });
-
-    setTransactions(pendingTransactions);
-  }
-
-  async function handleImageProcessing(e: React.MouseEvent) {
-    e.preventDefault();
-    if (selectedImage && isSupported) {
-      setIsProcessing(true);
-      await scheduler.addJob('recognize', filePath).then((x) => {
-        setIsProcessing(false);
-        setData(x.data.text);
-        setPendingTransactions(x.data.text);
-      });
-    } else {
-      dispatch({
-        type: ACTION_TYPES.OPEN_WARNING,
-        message: 'Only bmp, jpg, png, pbm, webp images are supported',
-      });
-    }
-  }
-
-  function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files ? e.target.files[0]! : null;
-    if (file) {
-      setSelectedImage(file);
-    }
-    if (file && file.name.toLowerCase().match(/\.(bmp|jpg|png|pbm|webp)$/)) {
-      URL.revokeObjectURL(filePath);
-      setFilePath(URL.createObjectURL(file));
-      setIsSupported(true);
-      return;
-    }
-    setIsSupported(false);
-  }
-
   if (isLoadingGroup || !groupId) {
     return displayBackdrop();
   }
   if (groupError) {
-    return displaySnackbar('error loading group');
+    return router.push('/404');
   }
 
   return (
     <RootLayout>
-      <div className="flexbox-col w-full gap-y-2">
+      <div className="w-full py-4 md:px-2">
+        <Link
+          className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                   focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
+          href={`/groups/${group.groupId}`}
+        >
+          Back
+        </Link>
+      </div>
+      <div className="flexbox-col w-full gap-y-2 py-2 md:px-2">
         <div className="flexbox-row justify-start gap-x-2">
           <label
             className="w-fit cursor-pointer rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md betterhover:hover:bg-alice-accent/90"
@@ -198,7 +137,15 @@ export default function OcrTestPage() {
               id="file-input"
               type="file"
               disabled={isProcessing}
-              onChange={handleFileInput}
+              onChange={(e) =>
+                handleFileInput(
+                  e,
+                  filePath,
+                  setFilePath,
+                  setIsSupported,
+                  setSelectedImage
+                )
+              }
               hidden
             />
           </label>
@@ -212,7 +159,19 @@ export default function OcrTestPage() {
               className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md betterhover:hover:bg-alice-accent/90"
               type="button"
               disabled={isProcessing}
-              onClick={(e) => handleImageProcessing(e)}
+              onClick={(e) =>
+                handleImageProcessing(
+                  e,
+                  selectedImage,
+                  filePath,
+                  isSupported,
+                  scheduler,
+                  setIsProcessing,
+                  setData,
+                  setTransactions,
+                  dispatch
+                )
+              }
             >
               Process receipt
             </button>
@@ -225,7 +184,7 @@ export default function OcrTestPage() {
         ) : null}
         {data !== '' && !isProcessing ? (
           <>
-            <div className="w-full py-2 md:p-2">
+            <div className="w-full py-2">
               <div className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md">
                 <p className="px-2 py-1">Who paid?</p>
                 <MemberSelection
@@ -236,7 +195,7 @@ export default function OcrTestPage() {
                 />
               </div>
             </div>
-            <div className="w-full py-2 md:p-2">
+            <div className="w-full py-2">
               <div className="w-full rounded bg-alice-main p-2">
                 <label className="flex w-full flex-col" htmlFor="when">
                   When?
@@ -251,7 +210,7 @@ export default function OcrTestPage() {
                 </label>
               </div>
             </div>
-            <div className="w-full py-2 md:p-2">
+            <div className="w-full py-2">
               <div className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md">
                 <p className="px-2 py-1">View as</p>
                 <MemberSelection
@@ -262,7 +221,7 @@ export default function OcrTestPage() {
                 />
               </div>
             </div>
-            <div className="w-full py-2 md:p-2">
+            <div className="w-full py-2">
               <ReceiptScanningContext.Provider value={contextValue}>
                 <PendingTransactionsList transactions={transactions} />
               </ReceiptScanningContext.Provider>

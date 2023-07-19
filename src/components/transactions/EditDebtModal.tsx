@@ -5,18 +5,18 @@ import type { Dispatch, SetStateAction } from 'react';
 import { Fragment, useContext, useState } from 'react';
 import { mutate } from 'swr';
 
-import type { UpdatePaidDebtForm } from '@/components/new-transaction/helpers';
-import {
-  handlePaidDebtDelete,
-  handlePaidDebtUpdate,
-  handleTotalCostInput,
-} from '@/components/new-transaction/helpers';
 import type { Group, PaidDebt } from '@/interfaces/response';
+import { handleTotalCostInput } from '@/pages/groups/[group]/new-transaction-helpers';
 import { displayWithCommas } from '@/utils/currencyUtil';
 
 import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import type { ActionType } from '../hooks/snackbarReducer';
 import MemberSelection from '../shared/MemberSelection';
+import type { UpdatePaidDebtForm } from './EditDebtModalHelpers';
+import {
+  handlePaidDebtDelete,
+  handlePaidDebtUpdate,
+} from './EditDebtModalHelpers';
 
 export default function EditDebtModal({
   open,

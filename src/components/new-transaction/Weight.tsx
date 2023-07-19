@@ -4,9 +4,9 @@ import type { MutableRefObject } from 'react';
 import { useContext } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
 
-import type { TransactionMember } from './helpers';
 import { getMembersListBySplitType } from './helpers';
 
 export default function Weight({

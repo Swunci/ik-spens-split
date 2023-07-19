@@ -2,9 +2,9 @@ import FormControl from '@mui/material/FormControl';
 import { useContext, useEffect } from 'react';
 
 import { TransactionContext } from '@/components/hooks/TransactionContext';
+import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
 
 import ListboxSelection from '../shared/ListboxSelection';
-import type { TransactionMember } from './helpers';
 import { getMembersListBySplitType, setSelectAllMembers } from './helpers';
 import Member from './Member';
 
