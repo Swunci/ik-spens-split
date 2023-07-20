@@ -6,6 +6,13 @@ export default function Footer() {
         <button type="button">Privacy Policy</button>
         <button type="button">Contact</button>
       </div>
+      <a
+        className="w-full bg-alice-secondary p-2"
+        href="https://www.flaticon.com/free-icons/divide"
+        title="icons"
+      >
+        Icons by Uniconlabs - Flaticon
+      </a>
     </footer>
   );
 }

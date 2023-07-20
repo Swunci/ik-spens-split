@@ -156,13 +156,23 @@ export default function GroupPage() {
         >
           Back
         </Link>
-        <Link
-          className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+        {groupData!.level > 0 ? (
+          <Link
+            className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
                    focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
-          href={currentPath ? `${currentPath}/upgrade` : ''}
-        >
-          Upgrade Group
-        </Link>
+            href={currentPath ? `${currentPath}/scan-receipt` : ''}
+          >
+            Scan Receipt
+          </Link>
+        ) : (
+          <Link
+            className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                   focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
+            href={currentPath ? `${currentPath}/upgrade` : ''}
+          >
+            Upgrade Group
+          </Link>
+        )}
       </div>
       <Typography className="w-full min-w-fit whitespace-normal break-words p-1 text-center text-3xl">
         {groupData?.groupName}

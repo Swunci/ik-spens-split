@@ -134,12 +134,8 @@ export default function EditGroupPage() {
         autoHideDuration={5000}
         open={snackbarState.isOpen}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        onClick={() =>
-          dispatch({
-            type: ACTION_TYPES.CLOSE,
-            message: '',
-          })
-        }
+        onClick={() => dispatch({ type: ACTION_TYPES.CLOSE })}
+        onClose={() => dispatch({ type: ACTION_TYPES.CLOSE })}
       >
         {snackbarState.isOpen ? (
           <Alert severity={snackbarState.alertType}>

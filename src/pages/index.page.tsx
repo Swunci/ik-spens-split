@@ -9,13 +9,13 @@ const Index = () => {
   return (
     <>
       <Meta
-        title="GroupShare"
+        title="ShareCost"
         description="Application for sharing group expenses"
       />
       <HomeLayout>
         <div className="flexbox-col space-y-4">
           <header className="text-center">
-            <h1 className="text-3xl">Welcome to GroupShare!</h1>
+            <h1 className="text-3xl">Welcome to Share Cost!</h1>
             <h2 className="text-2xl">
               Effortless Group Expense Management Made Easy
             </h2>

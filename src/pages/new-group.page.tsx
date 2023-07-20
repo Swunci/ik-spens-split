@@ -113,12 +113,8 @@ export default function NewGroupPage() {
         open={snackbarState.isOpen}
         autoHideDuration={5000}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        onClick={() =>
-          dispatch({
-            type: ACTION_TYPES.CLOSE,
-            message: '',
-          })
-        }
+        onClick={() => dispatch({ type: ACTION_TYPES.CLOSE })}
+        onClose={() => dispatch({ type: ACTION_TYPES.CLOSE })}
       >
         {snackbarState.isOpen ? (
           <Alert severity={snackbarState.alertType}>

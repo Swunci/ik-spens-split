@@ -4,6 +4,7 @@ export interface Group {
   currency: string;
   members: Array<Member>;
   createdDate: Date;
+  level: number;
 }
 
 export interface GroupList {
