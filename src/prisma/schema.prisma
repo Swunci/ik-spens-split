@@ -8,6 +8,7 @@ model Group {
 	paidDebts PaidDebt[]
 	comments Comment[]
 	createdDate DateTime
+  level Int @default(0)
 }
 
 model Member {

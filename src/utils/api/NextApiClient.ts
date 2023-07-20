@@ -69,6 +69,15 @@ class NextApiClient extends HttpClient {
         this.delete(`/api/groups/${groupId}/comments/${commentId}`),
     };
   }
+
+  get orders() {
+    return {
+      create: (groupId: string) =>
+        this.post(`/api/groups/${groupId}/paypal/orders`, {}),
+      capture: (groupId: string, orderId: string) =>
+        this.post(`/api/groups/${groupId}/paypal/orders/${orderId}`, {}),
+    };
+  }
 }
 
 export default NextApiClient;
