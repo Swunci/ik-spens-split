@@ -3,14 +3,9 @@ import { useEffect } from 'react';
 
 import NextApiClient from '@/utils/api/NextApiClient';
 
-const amount = '2';
-const currency = 'USD';
-const style = { layout: 'horizontal' };
-const groupId = 'ded9b85a-4b61-4e1f-b04e-fad2c66372be';
-
 const nextApiClient = new NextApiClient().jsonBody();
 
-export default function PaypalCheckout() {
+export default function PaypalCheckout({ groupId }: { groupId: string }) {
   const showSpinner = true;
   const [{ options, isPending }, dispatch] = usePayPalScriptReducer();
 
@@ -19,21 +14,19 @@ export default function PaypalCheckout() {
       type: 'resetOptions',
       value: {
         ...options,
-        currency,
       },
     });
-  }, [currency, showSpinner]);
+  }, [showSpinner]);
 
   return (
     <>
       {showSpinner && isPending}
       <PayPalButtons
         style={{
-          layout: 'horizontal',
+          layout: 'vertical',
+          height: 50,
         }}
         disabled={false}
-        forceReRender={[amount, currency, style]}
-        fundingSource={undefined}
         createOrder={async () => {
           const response = await nextApiClient.orders.create(groupId);
           if (response.ok) {

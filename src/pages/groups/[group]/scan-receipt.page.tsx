@@ -30,6 +30,7 @@ import {
 
 export default function ScanReceiptPage() {
   const router = useRouter();
+  const groupId = router.query.group as string;
 
   const [scheduler] = useState(Tesseract.createScheduler());
 
@@ -52,8 +53,6 @@ export default function ScanReceiptPage() {
   );
 
   const [currentMemberId, setCurrentMemberId] = useState('');
-
-  const groupId = router.query.group as string;
 
   const {
     data: groupData,
@@ -115,10 +114,11 @@ export default function ScanReceiptPage() {
 
   return (
     <RootLayout>
-      <div className="w-full py-4 md:px-2">
+      <div className="w-full py-2 md:px-2">
         <Link
           className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
                    focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
+          type="button"
           href={`/groups/${group.groupId}`}
         >
           Back

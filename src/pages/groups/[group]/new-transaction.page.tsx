@@ -118,7 +118,8 @@ export default function NewTransactionPage() {
       <div className="w-full py-4 md:px-2">
         <Link
           className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
-                   focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
+          focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
+          type="button"
           href={currentPath.substring(0, currentPath.lastIndexOf('/'))}
         >
           Back
