@@ -168,7 +168,7 @@ export default function GroupPage() {
     isLoadingGroup ||
     isLoadingTransactions ||
     isLoadingPaidDebts ||
-    exchangeRates.size === 0
+    (exchangeRates.size === 0 && groupData!.level > 0)
       ? [new Decimal(0), new Map<string, MemberDetails>()]
       : getOverviewStats(
           transactionsData!.transactions,
@@ -193,11 +193,7 @@ export default function GroupPage() {
         <Link
           className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
                    focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
-          href={
-            currentPath
-              ? currentPath.substring(0, currentPath.lastIndexOf('/'))
-              : ''
-          }
+          href="/new-group"
         >
           Back
         </Link>
