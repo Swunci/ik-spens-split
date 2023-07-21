@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useReducer, useState } from 'react';
+import Balancer from 'react-wrap-balancer';
 import useSwr from 'swr';
 
 import { MemberIdNameContext } from '@/components/hooks/MemberIdNameContext';
@@ -126,7 +127,7 @@ export default function Transactions() {
       >
         {snackbarState.isOpen ? (
           <Alert severity={snackbarState.alertType}>
-            {snackbarState.message}
+            <Balancer>{snackbarState.message}</Balancer>
           </Alert>
         ) : (
           <div />

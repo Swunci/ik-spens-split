@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import Balancer from 'react-wrap-balancer';
 import useSwr from 'swr';
 
 import {
@@ -14,6 +15,7 @@ import {
   snackbarReducer,
 } from '@/components/hooks/snackbarReducer';
 import { TransactionContext } from '@/components/hooks/TransactionContext';
+import CurrencySelection from '@/components/new-group/CurrencySelection';
 import { getInitialMemberList } from '@/components/new-transaction/helpers';
 import MembersList from '@/components/new-transaction/MemberList';
 import ListboxSelection from '@/components/shared/ListboxSelection';
@@ -84,7 +86,7 @@ export default function NewTransactionPage() {
       splitType,
       setSplitType,
     }),
-    [payerId, membersList, totalCost, transactionType, splitType]
+    [payerId, membersList, totalCost, transactionType, splitType, currency]
   );
 
   useEffect(() => {
@@ -139,7 +141,7 @@ export default function NewTransactionPage() {
               membersList,
               transactionType,
               splitType,
-              currency: groupData!.currency,
+              currency,
             } as CreateTransactionForm,
             dispatch
           );
@@ -169,7 +171,7 @@ export default function NewTransactionPage() {
         </div>
 
         <div className="flexbox-col w-full space-y-4 md:p-2">
-          <div className="w-full rounded bg-alice-main p-2">
+          <div className="w-full rounded bg-alice-main p-2 shadow-md">
             <label className="flex w-full flex-col" htmlFor="howMuch">
               How much?
               <input
@@ -184,7 +186,7 @@ export default function NewTransactionPage() {
             </label>
           </div>
 
-          <div className="w-full rounded bg-alice-main p-2">
+          <div className="w-full rounded bg-alice-main p-2 shadow-md">
             <label className="flex w-full flex-col" htmlFor="whatFor">
               What for?
               <input
@@ -198,7 +200,7 @@ export default function NewTransactionPage() {
             </label>
           </div>
 
-          <div className="w-full rounded bg-alice-main p-2">
+          <div className="w-full rounded bg-alice-main p-2 shadow-md">
             <label className="flex w-full flex-col" htmlFor="when">
               When?
               <input
@@ -211,6 +213,13 @@ export default function NewTransactionPage() {
               />
             </label>
           </div>
+          {groupData!.level > 0 ? (
+            <CurrencySelection
+              selectedCurrency={currency}
+              setSelectedCurrency={setCurrency}
+              labelName="What currency?"
+            />
+          ) : null}
         </div>
 
         <div className="w-full md:p-2">
@@ -239,7 +248,7 @@ export default function NewTransactionPage() {
       >
         {snackbarState.isOpen ? (
           <Alert severity={snackbarState.alertType}>
-            {snackbarState.message}
+            <Balancer>{snackbarState.message}</Balancer>
           </Alert>
         ) : (
           <div />

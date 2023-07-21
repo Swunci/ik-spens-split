@@ -2,6 +2,7 @@ import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import { useRouter } from 'next/navigation';
 import { useReducer, useRef, useState } from 'react';
+import Balancer from 'react-wrap-balancer';
 
 import {
   ACTION_TYPES,
@@ -63,6 +64,7 @@ export default function NewGroupPage() {
         <CurrencySelection
           selectedCurrency={currency}
           setSelectedCurrency={setCurrency}
+          labelName="Main currency"
         />
         <label
           className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
@@ -118,7 +120,7 @@ export default function NewGroupPage() {
       >
         {snackbarState.isOpen ? (
           <Alert severity={snackbarState.alertType}>
-            {snackbarState.message}
+            <Balancer>{snackbarState.message}</Balancer>
           </Alert>
         ) : (
           <div />

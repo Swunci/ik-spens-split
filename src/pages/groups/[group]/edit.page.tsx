@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import { useEffect, useReducer, useRef, useState } from 'react';
+import Balancer from 'react-wrap-balancer';
 import useSwr from 'swr';
 
 import {
@@ -119,6 +120,7 @@ export default function EditGroupPage() {
         <CurrencySelection
           selectedCurrency={currency}
           setSelectedCurrency={setCurrency}
+          labelName="Main currency"
         />
         <div className="flexbox-row w-full">
           <button
@@ -139,7 +141,7 @@ export default function EditGroupPage() {
       >
         {snackbarState.isOpen ? (
           <Alert severity={snackbarState.alertType}>
-            {snackbarState.message}
+            <Balancer>{snackbarState.message}</Balancer>
           </Alert>
         ) : (
           <div />

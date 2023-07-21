@@ -1,6 +1,7 @@
 import { Alert, CircularProgress, Link, Snackbar } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import Balancer from 'react-wrap-balancer';
 import useSwr from 'swr';
 import Tesseract from 'tesseract.js';
 
@@ -260,7 +261,7 @@ export default function ScanReceiptPage() {
       >
         {snackbarState.isOpen ? (
           <Alert severity={snackbarState.alertType}>
-            {snackbarState.message}
+            <Balancer>{snackbarState.message}</Balancer>
           </Alert>
         ) : (
           <div />

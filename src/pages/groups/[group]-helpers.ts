@@ -6,6 +6,7 @@ import type { ActionType } from '@/components/hooks/snackbarReducer';
 import { ACTION_TYPES } from '@/components/hooks/snackbarReducer';
 import type { CommentCreation } from '@/interfaces/request';
 import type {
+  Group,
   Member,
   PaidDebt,
   ShareCost,
@@ -20,13 +21,115 @@ export interface MemberDetails {
   debt: Decimal;
 }
 
+function convertCurrency(
+  amount: Decimal,
+  exchangeRates: Map<Date, Map<string, Decimal>>,
+  group: Group,
+  transaction: Transaction
+): [Decimal, boolean] {
+  if (group.level > 0 && transaction.currency !== group.currency) {
+    const rates = exchangeRates.get(transaction.date);
+    if (!rates) {
+      return [new Decimal(0), true];
+    }
+    const usdAmount = amount.dividedBy(rates.get(transaction.currency)!);
+    return [
+      usdAmount.mul(rates.get(group.currency)!).toDecimalPlaces(2),
+      false,
+    ];
+  }
+  return [amount, false];
+}
+
+function calculatePaidDebts(
+  paidDebts: Array<PaidDebt>,
+  membersMap: Map<string, MemberDetails>
+) {
+  const updatedMembersMap = membersMap;
+  paidDebts.forEach((paidDebt: PaidDebt) => {
+    const { creditor, debtor, amount } = paidDebt;
+    updatedMembersMap.get(creditor)!.received = membersMap
+      .get(creditor)!
+      .received.plus(amount);
+    updatedMembersMap.get(debtor)!.paid = membersMap
+      .get(debtor)!
+      .paid.plus(amount);
+  });
+  return updatedMembersMap;
+}
+
+function calculateMoneySpent(
+  exchangeRates: Map<Date, Map<string, Decimal>>,
+  group: Group,
+  transaction: Transaction,
+  membersMap: Map<string, MemberDetails>
+): [Decimal, boolean, Map<string, MemberDetails>] {
+  let conversionError = false;
+  let amount = new Decimal(0);
+  const updatedMembersMap = membersMap;
+  transaction.shareCosts.forEach((split: ShareCost) => {
+    const [share, shareError] = convertCurrency(
+      new Decimal(split.shareCost),
+      exchangeRates,
+      group,
+      transaction
+    );
+    conversionError = shareError;
+    if (shareError) {
+      return;
+    }
+    updatedMembersMap.get(split.memberId)!.cost = membersMap
+      .get(split.memberId)!
+      .cost.plus(share);
+    amount = amount.plus(share);
+    conversionError = shareError;
+  });
+  updatedMembersMap.get(transaction.payerId)!.paid = membersMap
+    .get(transaction.payerId)!
+    .paid.plus(amount);
+  return [amount, conversionError, updatedMembersMap];
+}
+
+function calculateMoneyReceived(
+  exchangeRates: Map<Date, Map<string, Decimal>>,
+  group: Group,
+  transaction: Transaction,
+  membersMap: Map<string, MemberDetails>
+): [Decimal, boolean, Map<string, MemberDetails>] {
+  let conversionError = false;
+  let amount = new Decimal(0);
+  const updatedMembersMap = membersMap;
+  transaction.shareCosts.forEach((split: ShareCost) => {
+    const [share, shareError] = convertCurrency(
+      new Decimal(split.shareCost),
+      exchangeRates,
+      group,
+      transaction
+    );
+    conversionError = shareError;
+    if (shareError) {
+      return;
+    }
+    updatedMembersMap.get(split.memberId)!.cost = membersMap
+      .get(split.memberId)!
+      .cost.minus(share);
+    amount = amount.plus(share);
+  });
+  updatedMembersMap.get(transaction.payerId)!.received = membersMap
+    .get(transaction.payerId)!
+    .received.plus(amount);
+  return [amount, conversionError, updatedMembersMap];
+}
+
 export function getOverviewStats(
   transactions: Array<Transaction>,
   members: Array<Member>,
-  paidDebts: Array<PaidDebt>
-): [Decimal, Map<string, MemberDetails>] {
+  paidDebts: Array<PaidDebt>,
+  exchangeRates: Map<Date, Map<string, Decimal>>,
+  group: Group
+): [Decimal, Map<string, MemberDetails>, boolean] {
   let groupCost = new Decimal(0);
-  const membersMap = members.reduce(
+  let membersMap = members.reduce(
     (map: Map<string, MemberDetails>, member: Member) => {
       map.set(member.memberId, {
         cost: new Decimal(0),
@@ -38,47 +141,50 @@ export function getOverviewStats(
     },
     new Map<string, MemberDetails>()
   );
-  paidDebts.forEach((paidDebt: PaidDebt) => {
-    const { creditor, debtor, amount } = paidDebt;
-    membersMap.get(creditor)!.received = membersMap
-      .get(creditor)!
-      .received.plus(amount);
-    membersMap.get(debtor)!.paid = membersMap.get(debtor)!.paid.plus(amount);
-  });
+
+  membersMap = calculatePaidDebts(paidDebts, membersMap);
+
+  const conversionError = false;
   transactions.forEach((transaction: Transaction) => {
     const type = transaction.type.toLowerCase();
-    const { payerId, amount } = transaction;
 
     if (type === 'expense' || type === 'loan') {
+      const [amount, error, updatedMap] = calculateMoneySpent(
+        exchangeRates,
+        group,
+        transaction,
+        membersMap
+      );
+      if (error) {
+        return;
+      }
       groupCost = groupCost.plus(amount);
-      membersMap.get(payerId)!.paid = membersMap
-        .get(payerId)!
-        .paid.plus(amount);
-      transaction.shareCosts.forEach((split: ShareCost) => {
-        membersMap.get(split.memberId)!.cost = membersMap
-          .get(split.memberId)!
-          .cost.plus(split.shareCost);
-      });
+      membersMap = updatedMap;
     }
+
     if (type === 'income') {
+      const [amount, error, updatedMap] = calculateMoneyReceived(
+        exchangeRates,
+        group,
+        transaction,
+        membersMap
+      );
+      if (error) {
+        return;
+      }
       groupCost = groupCost.minus(amount);
-      membersMap.get(payerId)!.received = membersMap
-        .get(payerId)!
-        .received.plus(amount);
-      transaction.shareCosts.forEach((split: ShareCost) => {
-        membersMap.get(split.memberId)!.cost = membersMap
-          .get(split.memberId)!
-          .cost.minus(split.shareCost);
-      });
+      membersMap = updatedMap;
     }
   });
+
   membersMap.forEach((memberDetails, _memberName) => {
     const details = memberDetails;
     details.debt = memberDetails.paid
       .minus(memberDetails.cost)
       .minus(memberDetails.received);
   });
-  return [groupCost, membersMap];
+
+  return [groupCost, membersMap, conversionError];
 }
 
 export async function createComment(

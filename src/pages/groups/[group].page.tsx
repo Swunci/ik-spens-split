@@ -7,6 +7,7 @@ import Decimal from 'decimal.js';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useReducer, useState } from 'react';
+import Balancer from 'react-wrap-balancer';
 import useSwr from 'swr';
 
 import CommentList from '@/components/[group]/CommentList';
@@ -25,11 +26,17 @@ import type {
   Group,
   Member,
   PaidDebtResponse,
+  Transaction,
   TransactionResponse,
 } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
-import { currencyCodeSymbolMap, TwoWayReadonlyMap } from '@/utils/currencyUtil';
+import {
+  currencyCodeSymbolMap,
+  currencyNameCodeMap,
+  ratesMap,
+  TwoWayReadonlyMap,
+} from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
 
@@ -44,6 +51,10 @@ export default function GroupPage() {
   const [commentText, setCommentText] = useState('');
   const [memberIdToNameMap, setMemberIdToNameMap] = useState(
     new TwoWayReadonlyMap(new Map<string, string>())
+  );
+
+  const [exchangeRates, setExchangeRates] = useState(
+    new Map<Date, Map<string, Decimal>>()
   );
 
   const contextValue = useMemo(
@@ -109,6 +120,26 @@ export default function GroupPage() {
     }
   }, [groupData]);
 
+  const getExchangeRates = async (dates: Set<Date>) => {
+    const rates = new Map<Date, Map<string, Decimal>>();
+    await Promise.all(
+      Array.from(dates).map(async (date: Date) => {
+        rates.set(date, ratesMap);
+      })
+    );
+    setExchangeRates(rates);
+  };
+
+  useEffect(() => {
+    if (transactionsData && groupData && groupData.level > 0) {
+      const dates = new Set<Date>();
+      transactionsData.transactions.forEach((transaction: Transaction) => {
+        dates.add(transaction.date);
+      });
+      getExchangeRates(dates);
+    }
+  }, [transactionsData]);
+
   if (
     isLoadingGroup ||
     !currentPath ||
@@ -133,14 +164,28 @@ export default function GroupPage() {
 
   const currencySymbol: string = currencyCodeSymbolMap.get(currencyCode) ?? '';
 
-  const [groupCost, membersMap] =
-    isLoadingGroup || isLoadingTransactions || isLoadingPaidDebts
+  const [groupCost, membersMap, conversionError] =
+    isLoadingGroup ||
+    isLoadingTransactions ||
+    isLoadingPaidDebts ||
+    exchangeRates.size === 0
       ? [new Decimal(0), new Map<string, MemberDetails>()]
       : getOverviewStats(
           transactionsData!.transactions,
           groupData!.members,
-          paidDebtsData!.paidDebts
+          paidDebtsData!.paidDebts,
+          exchangeRates,
+          groupData!
         );
+
+  if (conversionError && groupData!.level > 0) {
+    dispatch({
+      type: ACTION_TYPES.OPEN_ERROR,
+      message: `Currency conversion api is done, displaying only transactions done in ${currencyNameCodeMap.revGet(
+        groupData!.currency
+      )}`,
+    });
+  }
 
   return (
     <RootLayout>
@@ -293,7 +338,7 @@ export default function GroupPage() {
       >
         {snackbarState.isOpen ? (
           <Alert severity={snackbarState.alertType}>
-            {snackbarState.message}
+            <Balancer>{snackbarState.message}</Balancer>
           </Alert>
         ) : (
           <div />

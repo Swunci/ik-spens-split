@@ -24,6 +24,7 @@ import { getLocaleDateString } from '@/utils/timeUtils';
 import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import type { ActionType } from '../hooks/snackbarReducer';
 import { TransactionContext } from '../hooks/TransactionContext';
+import CurrencySelection from '../new-group/CurrencySelection';
 import MembersList from '../new-transaction/MemberList';
 import ListboxSelection from '../shared/ListboxSelection';
 import MemberSelection from '../shared/MemberSelection';
@@ -203,7 +204,7 @@ export default function EditTransactionModal({
                     />
                   </div>
                   <div className="flexbox-col w-full space-y-4">
-                    <div className="w-full rounded bg-alice-main p-2">
+                    <div className="w-full rounded bg-alice-main p-2 shadow-md">
                       <label className="flex w-full flex-col" htmlFor="howMuch">
                         How much?
                         <input
@@ -221,7 +222,7 @@ export default function EditTransactionModal({
                       </label>
                     </div>
 
-                    <div className="w-full rounded bg-alice-main p-2">
+                    <div className="w-full rounded bg-alice-main p-2 shadow-md">
                       <label className="flex w-full flex-col" htmlFor="whatFor">
                         What for?
                         <input
@@ -236,7 +237,7 @@ export default function EditTransactionModal({
                       </label>
                     </div>
 
-                    <div className="w-full rounded bg-alice-main p-2">
+                    <div className="w-full rounded bg-alice-main p-2 shadow-md">
                       <label className="flex w-full flex-col" htmlFor="when">
                         When?
                         <input
@@ -249,6 +250,13 @@ export default function EditTransactionModal({
                         />
                       </label>
                     </div>
+                    {group.level > 0 ? (
+                      <CurrencySelection
+                        selectedCurrency={currency}
+                        setSelectedCurrency={setCurrency}
+                        labelName="What currency?"
+                      />
+                    ) : null}
                   </div>
                   <div className="w-full py-2">
                     <div className="p-2">How to split?</div>

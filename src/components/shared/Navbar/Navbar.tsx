@@ -2,6 +2,7 @@ import { Alert, Snackbar } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useReducer, useState } from 'react';
+import Balancer from 'react-wrap-balancer';
 import useSwr from 'swr';
 
 import type CustomError from '@/errors/customError';
@@ -90,7 +91,7 @@ export default function Navbar() {
       >
         {snackbarState.isOpen ? (
           <Alert severity={snackbarState.alertType}>
-            {snackbarState.message}
+            <Balancer>{snackbarState.message}</Balancer>
           </Alert>
         ) : (
           <div />
