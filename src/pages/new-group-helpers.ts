@@ -8,7 +8,6 @@ import {
 import type { GroupCreation } from '@/interfaces/request';
 import type { Group } from '@/interfaces/response';
 import NextApiClient from '@/utils/api/NextApiClient';
-import { currencyNameCodeMap } from '@/utils/currencyUtil';
 import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
 
 export function onAddMember(
@@ -59,7 +58,7 @@ export async function handleSubmit(
   e.preventDefault();
   const data: GroupCreation = <GroupCreation>{};
   data.groupName = groupNameRef.current!.value;
-  data.currency = currencyNameCodeMap.get(currency) ?? '';
+  data.currency = currency;
   data.members = [...currentMembers].sort((a, b) => a.localeCompare(b));
 
   const nextApiClient = new NextApiClient().jsonBody();
