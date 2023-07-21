@@ -1,13 +1,16 @@
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
-import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 import NextApiClient from '@/utils/api/NextApiClient';
 
 const nextApiClient = new NextApiClient().jsonBody();
 
 export default function PaypalCheckout({ groupId }: { groupId: string }) {
+  const router = useRouter();
   const showSpinner = true;
   const [{ options, isPending }, dispatch] = usePayPalScriptReducer();
+  const [isApproved, setIsApproved] = useState(false);
 
   useEffect(() => {
     dispatch({
@@ -18,6 +21,9 @@ export default function PaypalCheckout({ groupId }: { groupId: string }) {
     });
   }, [showSpinner]);
 
+  if (isApproved) {
+    router.push(`/groups/${groupId}`);
+  }
   return (
     <>
       {showSpinner && isPending}
@@ -42,6 +48,7 @@ export default function PaypalCheckout({ groupId }: { groupId: string }) {
           );
           if (response.ok) {
             const order = await response.json();
+            setIsApproved(true);
             return order;
           }
           return undefined;

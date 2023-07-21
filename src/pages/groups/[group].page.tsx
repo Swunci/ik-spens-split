@@ -165,10 +165,7 @@ export default function GroupPage() {
   const currencySymbol: string = currencyCodeSymbolMap.get(currencyCode) ?? '';
 
   const [groupCost, membersMap, conversionError] =
-    isLoadingGroup ||
-    isLoadingTransactions ||
-    isLoadingPaidDebts ||
-    (exchangeRates.size === 0 && groupData!.level > 0)
+    isLoadingGroup || isLoadingTransactions || isLoadingPaidDebts
       ? [new Decimal(0), new Map<string, MemberDetails>()]
       : getOverviewStats(
           transactionsData!.transactions,

@@ -46,6 +46,13 @@ router.post(async (req: NextApiRequest, res: NextApiResponse) => {
           },
         ],
         intent: 'CAPTURE',
+        payment_source: {
+          paypal: {
+            experience_context: {
+              shipping_preference: 'NO_SHIPPING',
+            },
+          },
+        },
       }),
     }
   );
