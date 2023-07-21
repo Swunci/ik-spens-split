@@ -117,7 +117,7 @@ export default function NewTransactionPage() {
 
   return (
     <RootLayout>
-      <div className="w-full py-4 md:px-2">
+      <div className="w-full py-2 md:px-2">
         <Link
           className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
           focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"

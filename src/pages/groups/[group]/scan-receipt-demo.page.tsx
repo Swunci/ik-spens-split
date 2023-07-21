@@ -1,4 +1,5 @@
-import { Alert, CircularProgress, Link, Snackbar } from '@mui/material';
+import { Alert, CircularProgress, Snackbar } from '@mui/material';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import Balancer from 'react-wrap-balancer';
@@ -24,7 +25,7 @@ import { getTodaysDate } from '@/utils/timeUtils';
 
 import { handleFileInput, handleImageProcessing } from './scan-receipt-helpers';
 
-export default function ScanReceiptPage() {
+export default function ScanReceiptDemoPage() {
   const router = useRouter();
   const groupId = router.query.group as string;
 
@@ -112,7 +113,7 @@ export default function ScanReceiptPage() {
     <RootLayout>
       <div className="w-full py-2 md:px-2">
         <Link
-          className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+          className="rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
                    focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
           type="button"
           href={`/groups/${group.groupId}`}

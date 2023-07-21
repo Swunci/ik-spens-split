@@ -1,4 +1,5 @@
-import { Alert, CircularProgress, Link, Snackbar } from '@mui/material';
+import { Alert, CircularProgress, Snackbar } from '@mui/material';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import Balancer from 'react-wrap-balancer';
