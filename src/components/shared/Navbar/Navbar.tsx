@@ -66,7 +66,7 @@ export default function Navbar() {
     <div className="z-50 flex h-12 w-screen flex-col items-center bg-alice-secondary shadow-md">
       <div className="flex-container-row h-12 w-screen justify-between bg-alice-secondary">
         <Link className="h-full" href="/" passHref>
-          <button className="h-full text-base" type="button">
+          <button className="h-full p-2 text-base" type="button">
             Home
           </button>
         </Link>

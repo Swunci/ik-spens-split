@@ -34,7 +34,9 @@ function convertCurrency(
     }
     const usdAmount = amount.dividedBy(rates.get(transaction.currency)!);
     return [
-      usdAmount.mul(rates.get(group.currency)!).toDecimalPlaces(2),
+      group.currency === 'USD'
+        ? usdAmount
+        : usdAmount.mul(rates.get(group.currency)!).toDecimalPlaces(2),
       false,
     ];
   }

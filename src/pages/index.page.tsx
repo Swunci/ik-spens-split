@@ -10,27 +10,23 @@ const Index = () => {
     <>
       <Meta
         title="ShareCost"
-        description="Application for sharing group expenses"
+        description="Effortless Expense Sharing with ShareCost | Split bills, manage group finances, and simplify multi-currency expenses.
+        No registration required. Explore receipt scanning and automated currency conversion"
       />
       <HomeLayout>
         <div className="flexbox-col space-y-4">
           <header className="text-center">
-            <h1 className="text-3xl">Welcome to Share Cost!</h1>
-            <h2 className="text-2xl">
-              Effortless Group Expense Management Made Easy
-            </h2>
+            <h1 className="text-4xl">Welcome to ShareCost!</h1>
           </header>
           <section className="p-1 md:p-3">
-            <h3 className="text-center text-alice-accent">
-              Simplify Your Group Expenses
-            </h3>
+            <h1 className="text-center text-2xl text-alice-accent">
+              Simplify the process of splitting expenses
+            </h1>
             <p className="text-center">
-              <Balancer>
-                {`Tired of endless back-and-forth conversations about who paid for
-            what? Our powerful expense splitting tool takes the stress out of
-            sharing costs. Whether you're organizing a trip, throwing a party,
-            or simply splitting the rent, GroupShare has got you
-            covered.`}
+              <Balancer className="p-2">
+                Say goodbye to the headaches of splitting bills and managing
+                group expenses. Effortlessly track and settle shared expenses
+                among friends, roommates, or colleagues.
               </Balancer>
             </p>
           </section>
@@ -48,58 +44,172 @@ const Index = () => {
           <RecentGroups />
 
           <section className="p-1 md:p-3">
-            <h3 className="text-2xl text-alice-accent">How It Works</h3>
-            <Balancer>
-              Create an Event: Start by setting up an event and inviting
-              participants. You can customize the event name, date, and
-              description to suit your needs.
-              {`Add Expenses: As expenses accumulate, easily log them in our
-              user-friendly interface. Specify the amount, category, and
-              participants involved. We'll take care of the rest!`}
-              Split & Settle: With just a few clicks, our intelligent algorithm
-              calculates the fairest way to split the expenses. You can choose
-              from various splitting methods, including equal, percentage-based,
-              or custom splits. Track Debts: Our interactive dashboard allows
-              you to monitor who owes what, keeping everyone accountable. You
-              can also send friendly reminders and notifications to ensure
-              timely settlements.
-            </Balancer>
+            <h1 className="text-2xl text-alice-accent">
+              How to use ShareCost?
+            </h1>
+            <ol className="flexbox-col list-decimal space-y-2 px-4">
+              <li>
+                <h3 className="text-xl">Create a Group</h3>
+                <ol className="flexbox-col list-disc space-y-2 px-4">
+                  <li>
+                    Start by creating a new group for friends, family, or
+                    colleagues.
+                  </li>
+                  <li>
+                    Name the group, set the main currency, and add members.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <h3 className="text-xl">Share the Group Link</h3>
+                <ol className="flexbox-col list-disc space-y-2 px-4">
+                  <li>Copy the group URL and share it with your friends.</li>
+                  <li>
+                    Anyone with the link can add expenses to the group, no
+                    registration required.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <h3 className="text-xl">Add Expenses</h3>
+                <ol className="flexbox-col list-disc space-y-2 px-4">
+                  <li>
+                    Simply create a transaction from the group page for any
+                    shared expense.
+                  </li>
+                  <li>
+                    Input the item amount, description, payer, date, and
+                    expense-splitting preferences.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <h3 className="text-xl">Review Debts</h3>
+                <ol className="flexbox-col list-disc space-y-2 px-4">
+                  <li>
+                    {`Visit the group page to see everyone's owed amounts and
+                    debts to be settled.`}
+                  </li>
+                </ol>
+              </li>
+            </ol>
           </section>
 
           <section className="p-1 md:p-3">
-            <h3 className="text-2xl text-alice-accent">
-              Features That Simplify Your Life
-            </h3>
-            <Balancer>
-              Real-Time Updates: Stay up-to-date with live updates on expense
-              additions, modifications, and settlements. Multi-Currency Support:
-              No matter where your group adventure takes you, our platform
-              supports multiple currencies for seamless global transactions.
-              Receipt Uploads: Easily attach receipts to expenses for a clear
-              record of your financial transactions. Secure and Private: We
-              prioritize your data privacy and use industry-standard security
-              measures to safeguard your information.
-            </Balancer>
-          </section>
-
-          <section className="p-1 md:p-3">
-            <h3 className="text-2xl text-alice-accent">
-              Join Our Growing Community
-            </h3>
-            <p>
-              <Balancer>
-                {`Become a part of our ever-expanding community of users who have
-            embraced a stress-free way to split expenses. Whether you're
-            traveling, hosting events, or managing shared living expenses, [Your
-            Website Name] is here to simplify your financial journey.`}
-              </Balancer>
-            </p>
+            <h1 className="text-2xl text-alice-accent">ShareCost features</h1>
+            <ol className="flexbox-col space-y-6 px-1 pt-2">
+              <li className="">
+                <h3 className="rounded bg-alice-main p-2 text-xl">
+                  No Account Registration or Installation Required:
+                </h3>
+                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                  <li>
+                    Enjoy hassle-free access without providing personal
+                    information.
+                  </li>
+                  <li>
+                    Simply use ShareCost via any browser with an internet
+                    connection.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <h3 className="rounded bg-alice-main p-2 text-xl">
+                  Comments Section
+                </h3>
+                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                  <li>
+                    Engage with your group members through the built-in comments
+                    section.
+                  </li>
+                  <li>
+                    Chat, discuss expenses, and store random notes conveniently.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <h3 className="rounded bg-alice-main p-2 text-xl">
+                  History section
+                </h3>
+                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                  <li>
+                    Track all group activity in the history page for easy
+                    reference.
+                  </li>
+                  <li>
+                    Recover from accidentally deleted expenses and review edits
+                    made.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <h3 className="rounded bg-alice-main p-2 text-xl">
+                  Support for 150+ Currencies
+                </h3>
+                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                  <li>
+                    {`Experience smooth expense tracking in your group's chosen
+                    main currency.`}
+                  </li>
+                  <li>
+                    Upgrade to unlock automatic currency conversion for
+                    multi-currency expenses.
+                  </li>
+                  <li>
+                    Ideal for international trips and diverse spending with
+                    friends.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <h3 className="rounded bg-alice-main p-2 text-xl">
+                  Export Expenses to Excel:
+                </h3>
+                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                  <li>
+                    {`Easily export your group's expenses and paid debts to Excel
+                    format.`}
+                  </li>
+                  <li>
+                    Simplify financial tracking and reporting for your records.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <h3 className="rounded bg-alice-main p-2 text-xl">
+                  Automated Currency Conversion (Premium Feature):
+                </h3>
+                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                  <li>
+                    Upgrade your group to enable automatic currency conversion.
+                  </li>
+                  <li>
+                    {`Add expenses in multiple currencies, automatically converted
+                    to your group's main currency based on the exchange rates
+                    from the transaction date.`}
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <h3 className="rounded bg-alice-main p-2 text-xl">
+                  Receipt Scanning (Premium Feature):
+                </h3>
+                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                  <li>Upgrade your group to use receipt scanning feature.</li>
+                  <li>
+                    Upload a receipt image, and the app will do its best to
+                    extract the expenses for editing
+                  </li>
+                  <li>Demo is available in the options dropdown menu.</li>
+                </ol>
+              </li>
+            </ol>
           </section>
 
           <section className="p-1 md:p-3">
             <h3 className="text-2xl text-alice-accent">Get Started Today!</h3>
             <p>
-              <Balancer>
+              <Balancer className="p-2">
                 Start organizing your expenses, splitting bills, and maintaining
                 financial harmony. Create a group and experience the convenience
                 of effortless group expense management.

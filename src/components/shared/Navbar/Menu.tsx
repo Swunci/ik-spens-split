@@ -61,8 +61,8 @@ export default function MenuExample({
   }, []);
 
   return (
-    <div className="h-full w-full p-2">
-      <Menu as="div" className="relative inline-block text-left">
+    <div className="h-full w-full p-1">
+      <Menu as="div" className="relative inline-block h-full text-left">
         <div>
           <Menu.Button
             className="inline-flex w-full justify-center rounded-md px-4 py-2 text-base
