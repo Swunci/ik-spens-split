@@ -4,7 +4,7 @@ import Footer from '@/components/shared/Footer';
 
 export default function HomeLayout({ children }: { children: any }) {
   return (
-    <div className="flex w-screen flex-col place-content-start items-center overflow-x-hidden bg-alice-base">
+    <div className="relative flex w-screen flex-col place-content-start items-center bg-alice-base">
       <Banner />
       <BodyContainer>{children}</BodyContainer>
       <Footer />

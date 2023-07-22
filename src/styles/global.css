@@ -20,6 +20,7 @@ html {
 }
 body {
 	background-color: #B6C9FF;
+  overflow-y: auto;
 }
 
 .scroll-content {

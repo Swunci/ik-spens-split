@@ -70,7 +70,7 @@ export default function RecentGroups() {
                         </div>
                       </div>
                       <div className="flexbox-row w-full gap-2 text-xs">
-                        <div className="block overflow-hidden break-words">
+                        <div className="block break-words">
                           <Balancer>
                             {`Members: ${getGroupMemberNames(group)}`}
                           </Balancer>

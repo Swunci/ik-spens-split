@@ -47,10 +47,10 @@ const Index = () => {
             <h1 className="text-2xl text-alice-accent">
               How to use ShareCost?
             </h1>
-            <ol className="flexbox-col list-decimal space-y-2 px-4">
-              <li>
+            <ul className="flexbox-col list-decimal space-y-2 px-6">
+              <li className="">
                 <h3 className="text-xl">Create a Group</h3>
-                <ol className="flexbox-col list-disc space-y-2 px-4">
+                <ul className="flexbox-col list-disc space-y-2 px-4">
                   <li>
                     Start by creating a new group for friends, family, or
                     colleagues.
@@ -58,21 +58,21 @@ const Index = () => {
                   <li>
                     Name the group, set the main currency, and add members.
                   </li>
-                </ol>
+                </ul>
               </li>
               <li>
                 <h3 className="text-xl">Share the Group Link</h3>
-                <ol className="flexbox-col list-disc space-y-2 px-4">
+                <ul className="flexbox-col list-disc space-y-2 px-4">
                   <li>Copy the group URL and share it with your friends.</li>
                   <li>
                     Anyone with the link can add expenses to the group, no
                     registration required.
                   </li>
-                </ol>
+                </ul>
               </li>
               <li>
                 <h3 className="text-xl">Add Expenses</h3>
-                <ol className="flexbox-col list-disc space-y-2 px-4">
+                <ul className="flexbox-col list-disc space-y-2 px-4">
                   <li>
                     Simply create a transaction from the group page for any
                     shared expense.
@@ -81,28 +81,28 @@ const Index = () => {
                     Input the item amount, description, payer, date, and
                     expense-splitting preferences.
                   </li>
-                </ol>
+                </ul>
               </li>
               <li>
                 <h3 className="text-xl">Review Debts</h3>
-                <ol className="flexbox-col list-disc space-y-2 px-4">
+                <ul className="flexbox-col list-disc space-y-2 px-4">
                   <li>
                     {`Visit the group page to see everyone's owed amounts and
                     debts to be settled.`}
                   </li>
-                </ol>
+                </ul>
               </li>
-            </ol>
+            </ul>
           </section>
 
-          <section className="p-1 md:p-3">
+          <section className="md:p-3">
             <h1 className="text-2xl text-alice-accent">ShareCost features</h1>
-            <ol className="flexbox-col space-y-6 px-1 pt-2">
+            <ul className="flexbox-col space-y-6 px-1 pt-2">
               <li className="">
                 <h3 className="rounded bg-alice-main p-2 text-xl">
                   No Account Registration or Installation Required:
                 </h3>
-                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                <ul className="flexbox-col list-disc space-y-2 px-8 pt-2">
                   <li>
                     Enjoy hassle-free access without providing personal
                     information.
@@ -111,13 +111,13 @@ const Index = () => {
                     Simply use ShareCost via any browser with an internet
                     connection.
                   </li>
-                </ol>
+                </ul>
               </li>
               <li>
                 <h3 className="rounded bg-alice-main p-2 text-xl">
                   Comments Section
                 </h3>
-                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                <ul className="flexbox-col list-disc space-y-2 px-8 pt-2">
                   <li>
                     Engage with your group members through the built-in comments
                     section.
@@ -125,13 +125,13 @@ const Index = () => {
                   <li>
                     Chat, discuss expenses, and store random notes conveniently.
                   </li>
-                </ol>
+                </ul>
               </li>
               <li>
                 <h3 className="rounded bg-alice-main p-2 text-xl">
                   History section
                 </h3>
-                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                <ul className="flexbox-col list-disc space-y-2 px-8 pt-2">
                   <li>
                     Track all group activity in the history page for easy
                     reference.
@@ -140,13 +140,13 @@ const Index = () => {
                     Recover from accidentally deleted expenses and review edits
                     made.
                   </li>
-                </ol>
+                </ul>
               </li>
               <li>
                 <h3 className="rounded bg-alice-main p-2 text-xl">
                   Support for 150+ Currencies
                 </h3>
-                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                <ul className="flexbox-col list-disc space-y-2 px-8 pt-2">
                   <li>
                     {`Experience smooth expense tracking in your group's chosen
                     main currency.`}
@@ -159,13 +159,13 @@ const Index = () => {
                     Ideal for international trips and diverse spending with
                     friends.
                   </li>
-                </ol>
+                </ul>
               </li>
               <li>
                 <h3 className="rounded bg-alice-main p-2 text-xl">
                   Export Expenses to Excel:
                 </h3>
-                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                <ul className="flexbox-col list-disc space-y-2 px-8 pt-2">
                   <li>
                     {`Easily export your group's expenses and paid debts to Excel
                     format.`}
@@ -173,13 +173,13 @@ const Index = () => {
                   <li>
                     Simplify financial tracking and reporting for your records.
                   </li>
-                </ol>
+                </ul>
               </li>
               <li>
                 <h3 className="rounded bg-alice-main p-2 text-xl">
                   Automated Currency Conversion (Premium Feature):
                 </h3>
-                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                <ul className="flexbox-col list-disc space-y-2 px-8 pt-2">
                   <li>
                     Upgrade your group to enable automatic currency conversion.
                   </li>
@@ -188,22 +188,22 @@ const Index = () => {
                     to your group's main currency based on the exchange rates
                     from the transaction date.`}
                   </li>
-                </ol>
+                </ul>
               </li>
               <li>
                 <h3 className="rounded bg-alice-main p-2 text-xl">
                   Receipt Scanning (Premium Feature):
                 </h3>
-                <ol className="flexbox-col list-disc space-y-2 px-8 pt-2">
+                <ul className="flexbox-col list-disc space-y-2 px-8 pt-2">
                   <li>Upgrade your group to use receipt scanning feature.</li>
                   <li>
                     Upload a receipt image, and the app will do its best to
                     extract the expenses for editing
                   </li>
                   <li>Demo is available in the options dropdown menu.</li>
-                </ol>
+                </ul>
               </li>
-            </ol>
+            </ul>
           </section>
 
           <section className="p-1 md:p-3">
