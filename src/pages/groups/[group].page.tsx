@@ -278,23 +278,27 @@ export default function GroupPage() {
             <TextareaAutosize
               className="custom-focus my-2 inline-block w-full overflow-hidden rounded bg-alice-base p-2 focus:outline-alice-accent"
               id="commentText"
+              value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
             />
-            <div className="flexbox-col max-w-fit place-content-end">
+            <div className="flexbox-col max-w-fit justify-end">
               <button
-                className="custom-focus m-1 rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
+                className="custom-focus m-1 mb-2 rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
                        focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
                 type="button"
-                onClick={(e) =>
-                  createComment(
+                onClick={async (e) => {
+                  const success = await createComment(
                     e,
                     groupData!.groupId,
                     currentMemberId,
                     commentText,
                     currentPath,
                     dispatch
-                  )
-                }
+                  );
+                  if (success) {
+                    setCommentText('');
+                  }
+                }}
               >
                 Send
               </button>

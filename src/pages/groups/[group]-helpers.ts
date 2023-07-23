@@ -208,7 +208,7 @@ export async function createComment(
       type: ACTION_TYPES.OPEN_ERROR,
       message: 'Comment is empty',
     });
-    return;
+    return false;
   }
 
   const nextApiClient = new NextApiClient().jsonBody();
@@ -219,11 +219,12 @@ export async function createComment(
       type: ACTION_TYPES.OPEN_ERROR,
       message: 'Failed to create comment',
     });
-    return;
+    return false;
   }
   dispatch({
     type: ACTION_TYPES.OPEN_SUCCESS,
     message: 'Comment created',
   });
   mutate(`/api${currentPath}/comments`);
+  return true;
 }
