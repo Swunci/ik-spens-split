@@ -8,9 +8,6 @@ import { RootLayout } from '@/layouts/RootLayout';
 const benefits = [
   'Receipt scanning feature to auto generate transactions',
   'Use multiple currencies and auto currency conversion',
-  'Read-only access for group',
-  'No ad banners',
-  'Feature request',
 ];
 
 export default function PaypalTestPage() {
@@ -30,6 +27,7 @@ export default function PaypalTestPage() {
         </Link>
       </div>
       <div className="mt-5 flex w-full max-w-screen-sm flex-col items-start space-y-4 rounded rounded-t-md bg-alice-main">
+        <div className="w-full text-center text-5xl">Work in Progress</div>
         <div className="w-full rounded-t-md bg-alice-accent p-2 py-3 text-center text-alice-base shadow-md">
           Group Upgrade
         </div>

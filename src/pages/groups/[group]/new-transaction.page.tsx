@@ -213,13 +213,13 @@ export default function NewTransactionPage() {
               />
             </label>
           </div>
-          {groupData!.level > 0 ? (
+          {groupData!.level > 0 && (
             <CurrencySelection
               selectedCurrency={currency}
               setSelectedCurrency={setCurrency}
               labelName="What currency?"
             />
-          ) : null}
+          )}
         </div>
 
         <div className="w-full md:p-2">

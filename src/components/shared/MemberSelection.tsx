@@ -36,19 +36,21 @@ export default function MemberSelection({
     >
       <div className="relative">
         <div className="relative h-full w-full cursor-default overflow-hidden text-ellipsis rounded-md bg-alice-base text-left shadow-md">
-          <Combobox.Input
-            className="h-full w-full rounded-md border-3 border-alice-main bg-alice-base p-2 pr-7 text-base leading-5 text-gray-900 shadow-md
+          <Combobox.Button as="div" className="flex h-full items-center">
+            <Combobox.Input
+              className="h-full w-full rounded-md border-3 border-alice-main bg-alice-base p-2 pr-7 text-base leading-5 text-gray-900 shadow-md
                      focus:border-alice-accent focus:outline-none betterhover:hover:border-alice-accent betterhover:hover:bg-alice-base"
-            displayValue={(member) => member as string}
-            required
-            id="currentMember"
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-            <ChevronUpDownIcon
-              className="h-5 w-5 text-gray-400"
-              aria-hidden="true"
+              displayValue={(member) => member as string}
+              required
+              id="currentMember"
+              onChange={(event) => setQuery(event.target.value)}
             />
+            <span className="absolute right-2">
+              <ChevronUpDownIcon
+                className="h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+            </span>
           </Combobox.Button>
         </div>
         <Transition

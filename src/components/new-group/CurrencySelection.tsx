@@ -36,24 +36,27 @@ export default function CurrencySelection({
       >
         {labelName}
         <Combobox
-          value={currencyNameCodeMap.revGet(selectedCurrency)}
+          value={currencyNameCodeMap.revGet(selectedCurrency) || ''}
           onChange={(e) => setSelectedCurrency(currencyNameCodeMap.get(e)!)}
         >
           <div className="relative mt-2">
-            <div className="relative w-full cursor-default overflow-hidden rounded-md bg-alice-base text-left">
-              <Combobox.Input
-                className="custom-focus w-full rounded-md border-3 border-alice-main bg-alice-base p-2 text-base leading-5
+            <div className="relative h-full w-full cursor-default overflow-hidden rounded-md bg-alice-base text-left">
+              <Combobox.Button as="div" className="flex h-full items-center">
+                <Combobox.Input
+                  className="custom-focus w-full rounded-md border-3 border-alice-main bg-alice-base p-2 text-base leading-5
                          text-gray-900 focus:border-alice-accent betterhover:hover:bg-alice-main/30"
-                displayValue={(currency) => currency as string}
-                required
-                id="mainCurrency"
-                onChange={(event) => setQuery(event.target.value)}
-              />
-              <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
-                <ChevronUpDownIcon
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
+                  displayValue={(currency) => currency as string}
+                  required
+                  id="mainCurrency"
+                  onChange={(event) => setQuery(event.target.value)}
                 />
+
+                <span className="absolute right-2">
+                  <ChevronUpDownIcon
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                </span>
               </Combobox.Button>
             </div>
             <Transition

@@ -55,7 +55,7 @@ export default function MembersList() {
               options={['Equal', 'Weight', 'Custom']}
               selection={transactionContext!.splitType}
               setSelection={transactionContext!.setSplitType}
-              customWidth="w-24"
+              customWidth="w-28"
             />
           </div>
         </FormControl>

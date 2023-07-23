@@ -220,7 +220,6 @@ export default function GroupPage() {
           <div className="">
             <div className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md">
               <p className="p-2">View as</p>
-              <div />
               <MemberSelection
                 currentMemberId={currentMemberId}
                 members={groupData!.members}
