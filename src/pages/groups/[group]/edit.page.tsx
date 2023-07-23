@@ -17,7 +17,6 @@ import type CustomError from '@/errors/customError';
 import type { GroupUpdate } from '@/interfaces/request';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
-import { currencyNameCodeMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 
 import { handleGroupDelete, handleGroupUpdate } from './edit-helpers';
@@ -44,7 +43,7 @@ export default function EditGroupPage() {
 
   useEffect(() => {
     if (groupData) {
-      setCurrency(currencyNameCodeMap.revGet(groupData.currency)!);
+      setCurrency(groupData.currency);
     }
   }, [groupData]);
 

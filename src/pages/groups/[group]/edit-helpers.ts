@@ -4,7 +4,6 @@ import type { ActionType } from '@/components/hooks/snackbarReducer';
 import { ACTION_TYPES } from '@/components/hooks/snackbarReducer';
 import type { GroupUpdate } from '@/interfaces/request';
 import NextApiClient from '@/utils/api/NextApiClient';
-import { currencyNameCodeMap } from '@/utils/currencyUtil';
 import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
 
 export type GroupUpdateForm = {
@@ -22,7 +21,7 @@ export async function handleGroupUpdate(
   const requestBody: GroupUpdate = {} as GroupUpdate;
   requestBody.groupId = formDetails.groupId;
   requestBody.groupName = formDetails.groupName;
-  requestBody.currency = currencyNameCodeMap.get(formDetails.currency)!;
+  requestBody.currency = formDetails.currency;
 
   const nextApiClient = new NextApiClient().jsonBody();
   const response = await nextApiClient.groups.update(requestBody);
