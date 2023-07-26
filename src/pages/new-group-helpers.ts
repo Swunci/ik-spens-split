@@ -11,7 +11,7 @@ import NextApiClient from '@/utils/api/NextApiClient';
 import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
 
 export function onAddMember(
-  e: React.MouseEvent,
+  e: FormEvent<HTMLFormElement>,
   currentMembers: Set<string>,
   memberInputRef: RefObject<HTMLInputElement>,
   setCurrentMembers: Function,
@@ -48,7 +48,7 @@ export function onAddMember(
 }
 
 export async function handleSubmit(
-  e: FormEvent<HTMLFormElement>,
+  e: React.MouseEvent,
   groupNameRef: RefObject<HTMLInputElement>,
   currency: string,
   currentMembers: Set<string>,

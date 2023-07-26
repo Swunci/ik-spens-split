@@ -34,19 +34,7 @@ export default function NewGroupPage() {
       <div className="w-full overscroll-none p-2 text-2xl md:px-4">
         Create a new group
       </div>
-      <form
-        className="flex w-full flex-col items-start space-y-4 md:p-2"
-        onSubmit={(e) =>
-          handleSubmit(
-            e,
-            groupNameRef,
-            currency,
-            currentMembers,
-            router,
-            dispatch
-          )
-        }
-      >
+      <div className="flex w-full flex-col items-start space-y-4 md:p-2">
         <label
           className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
           htmlFor="groupName"
@@ -66,36 +54,40 @@ export default function NewGroupPage() {
           setSelectedCurrency={setCurrency}
           labelName="Main currency"
         />
-        <label
-          className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
-          htmlFor="addMembers"
+        <form
+          className="w-full"
+          onSubmit={(e) => {
+            onAddMember(
+              e,
+              currentMembers,
+              memberInputRef,
+              setCurrentMembers,
+              dispatch
+            );
+          }}
         >
-          Add member(s)
-          <div className="flex flex-row place-content-between">
-            <input
-              className="custom-focus mt-2 w-full rounded bg-alice-base p-2 focus:outline-alice-accent betterhover:hover:bg-alice-base/70"
-              id="addMembers"
-              type="text"
-              placeholder="Alice, Bob, Charlie"
-              ref={memberInputRef}
-            />
-            <button
-              className="mt-2 rounded bg-alice-accent p-2 px-4 text-alice-base shadow-md"
-              type="button"
-              onClick={(e) =>
-                onAddMember(
-                  e,
-                  currentMembers,
-                  memberInputRef,
-                  setCurrentMembers,
-                  dispatch
-                )
-              }
-            >
-              Add
-            </button>
-          </div>
-        </label>
+          <label
+            className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
+            htmlFor="addMembers"
+          >
+            Add member(s)
+            <div className="flex flex-row place-content-between">
+              <input
+                className="custom-focus mt-2 w-full rounded bg-alice-base p-2 focus:outline-alice-accent betterhover:hover:bg-alice-base/70"
+                id="addMembers"
+                type="text"
+                placeholder="Alice, Bob, Charlie"
+                ref={memberInputRef}
+              />
+              <button
+                className="mt-2 rounded bg-alice-accent p-2 px-4 text-alice-base shadow-md"
+                type="submit"
+              >
+                Add
+              </button>
+            </div>
+          </label>
+        </form>
         <div className="flex w-full max-w-full flex-col space-y-2 rounded bg-alice-main p-2 shadow-md">
           <div>Current members ({currentMembers.size})</div>
           <MembersList
@@ -106,11 +98,21 @@ export default function NewGroupPage() {
         <button
           className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
                    focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
-          type="submit"
+          type="button"
+          onClick={(e) => {
+            handleSubmit(
+              e,
+              groupNameRef,
+              currency,
+              currentMembers,
+              router,
+              dispatch
+            );
+          }}
         >
           Create
         </button>
-      </form>
+      </div>
       <Snackbar
         open={snackbarState.isOpen}
         autoHideDuration={5000}
