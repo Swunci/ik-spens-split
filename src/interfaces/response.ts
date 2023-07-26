@@ -77,3 +77,8 @@ export interface Comment {
 export interface CommentResponse {
   comments: Array<Comment>;
 }
+
+export interface ExchangeRates {
+  exchangeRates: string;
+  date: string;
+}

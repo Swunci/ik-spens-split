@@ -10,3 +10,11 @@ export async function fetcher(url: string) {
   }
   return res.json();
 }
+
+export async function multiFetcher(urls: Array<string>) {
+  return Promise.all(
+    urls.map((url: string) => {
+      return fetcher(url);
+    })
+  );
+}

@@ -9,6 +9,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import Balancer from 'react-wrap-balancer';
 import useSwr from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 import CommentList from '@/components/[group]/CommentList';
 import DebtList from '@/components/[group]/DebtList';
@@ -23,6 +24,7 @@ import MemberSelection from '@/components/shared/MemberSelection';
 import type CustomError from '@/errors/customError';
 import type {
   CommentResponse,
+  ExchangeRates,
   Group,
   Member,
   PaidDebtResponse,
@@ -34,11 +36,11 @@ import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
 import {
   currencyCodeSymbolMap,
   currencyNameCodeMap,
-  ratesMap,
   TwoWayReadonlyMap,
 } from '@/utils/currencyUtil';
-import { fetcher } from '@/utils/fetcherWrapper';
+import { fetcher, multiFetcher } from '@/utils/fetcherWrapper';
 import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
+import { getLocaleDateString } from '@/utils/timeUtils';
 
 import type { MemberDetails } from './[group]-helpers';
 import { createComment, getOverviewStats } from './[group]-helpers';
@@ -53,9 +55,7 @@ export default function GroupPage() {
     new TwoWayReadonlyMap(new Map<string, string>())
   );
 
-  const [exchangeRates, setExchangeRates] = useState(
-    new Map<Date, Map<string, Decimal>>()
-  );
+  const [transactionDates, setTransactionDates] = useState(new Set<Date>());
 
   const contextValue = useMemo(
     () => ({
@@ -102,6 +102,27 @@ export default function GroupPage() {
     fetcher
   );
 
+  const exchangeRates = new Map<string, Map<string, Decimal>>();
+  const dates = Array.from(transactionDates);
+  const apiPaths = dates.map((date: Date) => {
+    return `/api/exchangeRates/${getLocaleDateString(date)}`;
+  });
+
+  const { data: ratesData } = useSWRImmutable<Array<ExchangeRates>>(
+    () => (groupData && groupData.level > 0 ? apiPaths : null),
+    multiFetcher
+  );
+
+  if (ratesData) {
+    for (let i = 0; i < dates.length; i += 1) {
+      const rates = ratesData.at(i);
+      if (rates) {
+        const ratesObj = JSON.parse(rates.exchangeRates);
+        exchangeRates.set(rates.date, new Map(Object.entries(ratesObj)));
+      }
+    }
+  }
+
   useEffect(() => {
     if (groupData) {
       const idNameMap = groupData.members.reduce(
@@ -120,23 +141,13 @@ export default function GroupPage() {
     }
   }, [groupData]);
 
-  const getExchangeRates = async (dates: Set<Date>) => {
-    const rates = new Map<Date, Map<string, Decimal>>();
-    await Promise.all(
-      Array.from(dates).map(async (date: Date) => {
-        rates.set(date, ratesMap);
-      })
-    );
-    setExchangeRates(rates);
-  };
-
   useEffect(() => {
     if (transactionsData && groupData && groupData.level > 0) {
-      const dates = new Set<Date>();
+      const uniqueDates = new Set<Date>();
       transactionsData.transactions.forEach((transaction: Transaction) => {
-        dates.add(transaction.date);
+        uniqueDates.add(transaction.date);
       });
-      getExchangeRates(dates);
+      setTransactionDates(uniqueDates);
     }
   }, [transactionsData]);
 

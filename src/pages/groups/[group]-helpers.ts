@@ -14,6 +14,8 @@ import type {
 } from '@/interfaces/response';
 import NextApiClient from '@/utils/api/NextApiClient';
 
+import { getLocaleDateString } from '../../utils/timeUtils';
+
 export interface MemberDetails {
   cost: Decimal;
   paid: Decimal;
@@ -23,16 +25,19 @@ export interface MemberDetails {
 
 function convertCurrency(
   amount: Decimal,
-  exchangeRates: Map<Date, Map<string, Decimal>>,
+  exchangeRates: Map<string, Map<string, Decimal>>,
   group: Group,
   transaction: Transaction
 ): [Decimal, boolean] {
   if (group.level > 0 && transaction.currency !== group.currency) {
-    const rates = exchangeRates.get(transaction.date);
+    const rates = exchangeRates.get(getLocaleDateString(transaction.date));
     if (!rates) {
       return [new Decimal(0), true];
     }
-    const usdAmount = amount.dividedBy(rates.get(transaction.currency)!);
+    const usdAmount =
+      transaction.currency !== 'USD'
+        ? amount.dividedBy(rates.get(transaction.currency)!)
+        : new Decimal(transaction.amount);
     return [
       group.currency === 'USD'
         ? usdAmount
@@ -61,7 +66,7 @@ function calculatePaidDebts(
 }
 
 function calculateMoneySpent(
-  exchangeRates: Map<Date, Map<string, Decimal>>,
+  exchangeRates: Map<string, Map<string, Decimal>>,
   group: Group,
   transaction: Transaction,
   membersMap: Map<string, MemberDetails>
@@ -93,7 +98,7 @@ function calculateMoneySpent(
 }
 
 function calculateMoneyReceived(
-  exchangeRates: Map<Date, Map<string, Decimal>>,
+  exchangeRates: Map<string, Map<string, Decimal>>,
   group: Group,
   transaction: Transaction,
   membersMap: Map<string, MemberDetails>
@@ -127,7 +132,7 @@ export function getOverviewStats(
   transactions: Array<Transaction>,
   members: Array<Member>,
   paidDebts: Array<PaidDebt>,
-  exchangeRates: Map<Date, Map<string, Decimal>>,
+  exchangeRates: Map<string, Map<string, Decimal>>,
   group: Group
 ): [Decimal, Map<string, MemberDetails>, boolean] {
   let groupCost = new Decimal(0);
