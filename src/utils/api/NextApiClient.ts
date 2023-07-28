@@ -3,6 +3,8 @@ import type {
   CommentUpdate,
   GroupCreation,
   GroupUpdate,
+  MemberCreation,
+  MemberUpdate,
   PaidDebtCreation,
   PaidDebtUpdate,
   TransactionCreation,
@@ -76,6 +78,17 @@ class NextApiClient extends HttpClient {
         this.post(`/api/groups/${groupId}/paypal/orders`, {}),
       capture: (groupId: string, orderId: string) =>
         this.post(`/api/groups/${groupId}/paypal/orders/${orderId}`, {}),
+    };
+  }
+
+  get members() {
+    return {
+      create: (body: MemberCreation) =>
+        this.post(`/api/groups/${body.groupId}/members`, body),
+      update: (body: MemberUpdate) =>
+        this.put(`/api/groups/${body.groupId}/members/${body.memberId}`, body),
+      delete: (groupId: string, memberId: string) =>
+        this.delete(`/api/groups/${groupId}/members/${memberId}`),
     };
   }
 }

@@ -1,12 +1,13 @@
 import { Alert, Snackbar } from '@mui/material';
-import type { Group } from '@prisma/client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import Balancer from 'react-wrap-balancer';
 import useSwr from 'swr';
 
+import MembersList from '@/components/edit/MembersList';
+import { MemberIdNameContext } from '@/components/hooks/MemberIdNameContext';
 import {
   ACTION_TYPES,
   initialState,
@@ -15,11 +16,17 @@ import {
 import CurrencySelection from '@/components/new-group/CurrencySelection';
 import type CustomError from '@/errors/customError';
 import type { GroupUpdate } from '@/interfaces/request';
+import type { Group, Member } from '@/interfaces/response';
 import { RootLayout } from '@/layouts/RootLayout';
 import { displayBackdrop, displaySnackbar } from '@/utils/component/helpers';
+import { TwoWayReadonlyMap } from '@/utils/currencyUtil';
 import { fetcher } from '@/utils/fetcherWrapper';
 
-import { handleGroupDelete, handleGroupUpdate } from './edit-helpers';
+import {
+  handleGroupDelete,
+  handleGroupUpdate,
+  handleMemberCreation,
+} from './edit-helpers';
 
 export default function EditGroupPage() {
   const router = useRouter();
@@ -31,6 +38,19 @@ export default function EditGroupPage() {
 
   const groupNameRef = useRef<HTMLInputElement>(null);
   const [currency, setCurrency] = useState('');
+  const memberInputRef = useRef<HTMLInputElement>(null);
+  const [currentMembers, setCurrentMembers] = useState(new Set<string>());
+
+  const [memberIdToNameMap, setMemberIdToNameMap] = useState(
+    new TwoWayReadonlyMap(new Map<string, string>())
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      memberIdToNameMap,
+    }),
+    [memberIdToNameMap]
+  );
 
   const {
     data: groupData,
@@ -44,6 +64,21 @@ export default function EditGroupPage() {
   useEffect(() => {
     if (groupData) {
       setCurrency(groupData.currency);
+      const members = new Set<string>();
+      groupData.members.forEach((member: Member) => {
+        members.add(member.memberName);
+      });
+      setCurrentMembers(members);
+
+      const idNameMap = groupData.members.reduce(
+        (map: Map<string, string>, member: Member) => {
+          map.set(member.memberId, member.memberName);
+          return map;
+        },
+        new Map<string, string>()
+      );
+      const readOnlyMap = new TwoWayReadonlyMap(idNameMap);
+      setMemberIdToNameMap(readOnlyMap);
     }
   }, [groupData]);
 
@@ -87,20 +122,7 @@ export default function EditGroupPage() {
           Delete
         </button>
       </div>
-      <form
-        className="flex w-full flex-col items-start space-y-4 py-2 md:p-2"
-        onSubmit={(e) =>
-          handleGroupUpdate(
-            e,
-            {
-              groupId,
-              groupName: groupNameRef.current!.value,
-              currency,
-            } as GroupUpdate,
-            dispatch
-          )
-        }
-      >
+      <div className="flex w-full flex-col items-start space-y-4 py-2 md:p-2">
         <label
           className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
           htmlFor="groupName"
@@ -121,16 +143,71 @@ export default function EditGroupPage() {
           setSelectedCurrency={setCurrency}
           labelName="Main currency"
         />
+        <form
+          className="w-full"
+          onSubmit={(e) => {
+            handleMemberCreation(
+              e,
+              groupId as string,
+              currentMembers,
+              memberInputRef,
+              dispatch
+            );
+          }}
+        >
+          <label
+            className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
+            htmlFor="addMembers"
+          >
+            Add member(s)
+            <div className="flex flex-row place-content-between">
+              <input
+                className="custom-focus mt-2 w-full rounded bg-alice-base p-2 focus:outline-alice-accent betterhover:hover:bg-alice-base/70"
+                id="addMembers"
+                type="text"
+                placeholder="Alice, Bob, Charlie"
+                ref={memberInputRef}
+              />
+              <button
+                className="mt-2 rounded bg-alice-accent p-2 px-4 text-alice-base shadow-md"
+                type="submit"
+              >
+                Add
+              </button>
+            </div>
+          </label>
+        </form>
+        <div className="flex w-full max-w-full flex-col space-y-2 rounded bg-alice-main p-2 shadow-md">
+          <div>Current members ({currentMembers.size})</div>
+          <MemberIdNameContext.Provider value={contextValue}>
+            <MembersList
+              currentMembers={currentMembers}
+              groupId={groupData!.groupId}
+              dispatch={dispatch}
+            />
+          </MemberIdNameContext.Provider>
+        </div>
         <div className="flexbox-row w-full">
           <button
             className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
                      focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"
-            type="submit"
+            type="button"
+            onClick={(e) =>
+              handleGroupUpdate(
+                e,
+                {
+                  groupId,
+                  groupName: groupNameRef.current!.value,
+                  currency,
+                } as GroupUpdate,
+                dispatch
+              )
+            }
           >
             Update
           </button>
         </div>
-      </form>
+      </div>
       <Snackbar
         autoHideDuration={5000}
         open={snackbarState.isOpen}

@@ -56,3 +56,12 @@ export interface CommentCreation {
 export interface CommentUpdate extends CommentCreation {
   commentId: string;
 }
+
+export interface MemberCreation {
+  groupId: string;
+  memberName: string;
+}
+
+export interface MemberUpdate extends MemberCreation {
+  memberId: string;
+}

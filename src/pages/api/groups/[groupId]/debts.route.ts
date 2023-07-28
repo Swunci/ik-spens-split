@@ -9,9 +9,9 @@ import { prisma } from '@/prisma/db';
 import validate from '../../../../middleware/validation';
 
 const schema = Joi.object({
-  groupId: Joi.string().required(),
-  creditor: Joi.string().required(),
-  debtor: Joi.string().required(),
+  groupId: Joi.string().min(36).max(36).required(),
+  creditor: Joi.string().min(36).max(36).required(),
+  debtor: Joi.string().min(36).max(36).required(),
   amount: Joi.number()
     .precision(2)
     .max(10 ** 9)

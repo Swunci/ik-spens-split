@@ -42,7 +42,7 @@ export function onAddMember(
   if (invalidMembers) {
     dispatch({
       type: ACTION_TYPES.OPEN_WARNING,
-      message: 'Maximum characters allowed for names is 50!',
+      message: 'Maximum characters allowed for names is 35!',
     });
   }
 }
