@@ -177,8 +177,7 @@ const Index = () => {
               </li>
               <li>
                 <h3 className="rounded bg-alice-main p-2 text-xl">
-                  Automated Currency Conversion (Premium Feature/Work in
-                  Progress):
+                  Automated Currency Conversion (Premium Feature):
                 </h3>
                 <ul className="flexbox-col list-disc space-y-2 px-8 pt-2">
                   <li>
