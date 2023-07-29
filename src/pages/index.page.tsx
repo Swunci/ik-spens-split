@@ -9,8 +9,8 @@ const Index = () => {
   return (
     <>
       <Meta
-        title="ShareCost"
-        description="Effortless Expense Sharing with ShareCost | Split bills, manage group finances, and simplify multi-currency expenses.
+        title="ShareCost - Effortless Expense Sharing with ShareCost"
+        description="Split bills, manage group finances, and simplify multi-currency expenses.
         No registration required. Explore receipt scanning and automated currency conversion"
       />
       <HomeLayout>
