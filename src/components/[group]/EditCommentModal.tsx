@@ -58,7 +58,7 @@ export default function EditCommentModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="flexbox-col m-2 min-h-96 w-full max-w-screen-md justify-start space-y-3 overflow-hidden rounded border-2 border-alice-accent bg-alice-main p-2 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="flexbox-col m-2 min-h-96 w-full max-w-screen-md justify-start space-y-3 overflow-hidden rounded border-2 border-alice-accent bg-alice-secondary p-2 text-left align-middle shadow-xl transition-all">
                 <div className="flexbox-row pt-2 md:p-2">
                   <button
                     className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
@@ -92,25 +92,29 @@ export default function EditCommentModal({
                   </button>
                 </div>
                 <div className="w-full">
-                  <Typography className="min-w-fit p-1">Commenter</Typography>
                   <MemberSelection
                     currentMemberId={commenterId}
                     members={members}
                     idNameMap={idNameMap}
                     setCurrentMemberId={setCommenterId}
+                    labelName="Commenter"
                   />
                 </div>
                 <div className="w-full">
-                  <Typography className="min-w-fit p-1">Comment</Typography>
-                  <TextareaAutosize
-                    className="custom-focus my-2 inline-block w-full overflow-hidden rounded bg-alice-base p-2 focus:outline-alice-accent"
-                    id="commentText"
-                    onChange={(e) => setCommentText(e.target.value)}
-                    defaultValue={commentRecord.comment}
-                    onFocus={() => {
-                      document.body.scrollTop = 0;
-                    }}
-                  />
+                  <div className="flex-col rounded bg-alice-main p-2 shadow-md">
+                    <Typography className="min-w-fit px-2 py-1">
+                      Comment
+                    </Typography>
+                    <TextareaAutosize
+                      className="custom-focus inline-block w-full overflow-hidden rounded bg-alice-base p-2 focus:outline-alice-accent"
+                      id="commentText"
+                      onChange={(e) => setCommentText(e.target.value)}
+                      defaultValue={commentRecord.comment}
+                      onFocus={() => {
+                        document.body.scrollTop = 0;
+                      }}
+                    />
+                  </div>
                 </div>
                 <div className="flexbox-row w-full pb-2 md:p-2">
                   <button

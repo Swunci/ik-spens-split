@@ -229,15 +229,13 @@ export default function GroupPage() {
       <div className="w-full space-y-6 py-2 md:p-2">
         <div className="w-full">
           <div className="">
-            <div className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md">
-              <p className="p-2">View as</p>
-              <MemberSelection
-                currentMemberId={currentMemberId}
-                members={groupData!.members}
-                idNameMap={memberIdToNameMap}
-                setCurrentMemberId={setCurrentMemberId}
-              />
-            </div>
+            <MemberSelection
+              currentMemberId={currentMemberId}
+              members={groupData!.members}
+              idNameMap={memberIdToNameMap}
+              setCurrentMemberId={setCurrentMemberId}
+              labelName="View as"
+            />
           </div>
         </div>
         <Overview

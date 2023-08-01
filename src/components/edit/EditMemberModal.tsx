@@ -55,7 +55,7 @@ export default function EditMemberModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="flexbox-col m-2 w-full max-w-screen-md overflow-hidden rounded border-2 border-alice-accent bg-alice-main p-2 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="flexbox-col m-2 w-full max-w-screen-md overflow-hidden rounded border-2 border-alice-accent bg-alice-secondary p-2 text-left align-middle shadow-xl transition-all">
                 <label
                   className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
                   htmlFor="memberName"

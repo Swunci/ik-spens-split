@@ -30,21 +30,20 @@ export default function CurrencySelection({
 
   return (
     <div className="w-full">
-      <label
-        className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md"
-        htmlFor="mainCurrency"
-      >
-        {labelName}
+      <div className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md">
+        <label className="w-full px-2 py-1" htmlFor="mainCurrency">
+          {labelName}
+        </label>
         <Combobox
           value={currencyNameCodeMap.revGet(selectedCurrency) || ''}
           onChange={(e) => setSelectedCurrency(currencyNameCodeMap.get(e)!)}
         >
-          <div className="relative mt-2">
+          <div className="relative">
             <div className="relative h-full w-full cursor-default overflow-hidden rounded-md bg-alice-base text-left">
               <Combobox.Button as="div" className="flex h-full items-center">
                 <Combobox.Input
-                  className="custom-focus w-full rounded-md border-3 border-alice-main bg-alice-base p-2 text-base leading-5
-                         text-gray-900 focus:border-alice-accent betterhover:hover:bg-alice-main/30"
+                  className="h-full w-full rounded-md border-3 border-alice-main bg-alice-base p-2 pr-7 text-base leading-5 text-gray-900 shadow-md
+                focus:border-alice-accent focus:outline-none betterhover:hover:border-alice-accent betterhover:hover:bg-alice-base"
                   displayValue={(currency) => currency as string}
                   required
                   id="mainCurrency"
@@ -66,7 +65,7 @@ export default function CurrencySelection({
               leaveTo="opacity-0"
               afterLeave={() => setQuery('')}
             >
-              <Combobox.Options className="absolute z-10 mt-0 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+              <Combobox.Options className="absolute z-10 mt-0 max-h-60 w-full overflow-auto rounded-md bg-alice-base py-1 text-base shadow-lg sm:text-sm">
                 {filteredCurrencies.length === 0 && query !== '' ? (
                   <div className="relative cursor-default select-none px-4 py-2 text-gray-700">
                     Nothing found.
@@ -114,7 +113,7 @@ export default function CurrencySelection({
             </Transition>
           </div>
         </Combobox>
-      </label>
+      </div>
     </div>
   );
 }

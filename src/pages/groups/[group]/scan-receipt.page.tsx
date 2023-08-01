@@ -187,15 +187,13 @@ export default function ScanReceiptPage() {
         {data !== '' && !isProcessing ? (
           <>
             <div className="w-full py-2">
-              <div className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md">
-                <p className="px-2 py-1">Who paid?</p>
-                <MemberSelection
-                  members={groupData!.members}
-                  currentMemberId={payerId}
-                  setCurrentMemberId={setPayerId}
-                  idNameMap={memberIdToNameMap}
-                />
-              </div>
+              <MemberSelection
+                members={groupData!.members}
+                currentMemberId={payerId}
+                setCurrentMemberId={setPayerId}
+                idNameMap={memberIdToNameMap}
+                labelName="Who paid?"
+              />
             </div>
             <div className="w-full py-2">
               <div className="w-full rounded bg-alice-main p-2">
@@ -213,19 +211,20 @@ export default function ScanReceiptPage() {
               </div>
             </div>
             <div className="w-full py-2">
-              <div className="flex w-full flex-col rounded bg-alice-main p-2 shadow-md">
-                <p className="px-2 py-1">View as</p>
-                <MemberSelection
-                  currentMemberId={currentMemberId}
-                  members={groupData!.members}
-                  idNameMap={memberIdToNameMap}
-                  setCurrentMemberId={setCurrentMemberId}
-                />
-              </div>
+              <MemberSelection
+                currentMemberId={currentMemberId}
+                members={groupData!.members}
+                idNameMap={memberIdToNameMap}
+                setCurrentMemberId={setCurrentMemberId}
+                labelName="View as"
+              />
             </div>
             <div className="w-full py-2">
               <ReceiptScanningContext.Provider value={contextValue}>
-                <PendingTransactionsList transactions={transactions} />
+                <PendingTransactionsList
+                  transactions={transactions}
+                  setTransactions={setTransactions}
+                />
               </ReceiptScanningContext.Provider>
             </div>
             <button

@@ -65,7 +65,7 @@ export default function EditDebtModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="flexbox-col m-2 min-h-96 w-full max-w-screen-md justify-start overflow-hidden rounded border-2 border-alice-accent bg-alice-main p-2 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="flexbox-col m-2 min-h-96 w-full max-w-screen-md justify-start overflow-hidden rounded border-2 border-alice-accent bg-alice-secondary p-2 text-left align-middle shadow-xl transition-all">
                 <div className="flexbox-row w-full p-2">
                   <button
                     className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
@@ -111,7 +111,7 @@ export default function EditDebtModal({
                     );
                   }}
                 >
-                  <div className="flexbox-row w-full place-content-start gap-2 p-2">
+                  <div className="flexbox-row w-full place-content-start gap-2 py-2">
                     <MemberSelection
                       currentMemberId={creditor}
                       members={groupData.members}
