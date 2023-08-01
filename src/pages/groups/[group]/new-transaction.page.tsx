@@ -213,7 +213,7 @@ export default function NewTransactionPage() {
               />
             </label>
           </div>
-          {groupData!.level > 0 && (
+          {groupData!.level >= 0 && (
             <CurrencySelection
               selectedCurrency={currency}
               setSelectedCurrency={setCurrency}

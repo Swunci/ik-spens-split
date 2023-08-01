@@ -223,33 +223,35 @@ export default function MenuExample({
                 )}
               </Menu.Item>
             </div>
-            <div className="p-1">
-              <Menu.Item>
-                {({ active }) => (
-                  <button
-                    className={`${
-                      active ? 'bg-alice-accent text-white' : 'text-gray-900'
-                    } group flex w-full items-center rounded-md p-2 text-sm`}
-                    onClick={() =>
-                      router.push(`/groups/${groupId}/scan-receipt-demo`)
-                    }
-                  >
-                    {active ? (
-                      <ScanActiveIcon
-                        className="mr-2 h-5 w-5"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <ScanInactiveIcon
-                        className="mr-2 h-5 w-5 fill-alice-main stroke-alice-accent"
-                        aria-hidden="true"
-                      />
-                    )}
-                    Scan receipt demo
-                  </button>
-                )}
-              </Menu.Item>
-            </div>
+            {false && (
+              <div className="p-1">
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      className={`${
+                        active ? 'bg-alice-accent text-white' : 'text-gray-900'
+                      } group flex w-full items-center rounded-md p-2 text-sm`}
+                      onClick={() =>
+                        router.push(`/groups/${groupId}/scan-receipt-demo`)
+                      }
+                    >
+                      {active ? (
+                        <ScanActiveIcon
+                          className="mr-2 h-5 w-5"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <ScanInactiveIcon
+                          className="mr-2 h-5 w-5 fill-alice-main stroke-alice-accent"
+                          aria-hidden="true"
+                        />
+                      )}
+                      Scan receipt demo
+                    </button>
+                  )}
+                </Menu.Item>
+              </div>
+            )}
           </Menu.Items>
         </Transition>
       </Menu>

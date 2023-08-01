@@ -177,7 +177,7 @@ const Index = () => {
               </li>
               <li>
                 <h3 className="rounded bg-alice-main p-2 text-xl">
-                  Automated Currency Conversion (Premium Feature):
+                  Automated Currency Conversion:
                 </h3>
                 <ul className="flexbox-col list-disc space-y-2 px-8 pt-2">
                   <li>
@@ -192,7 +192,7 @@ const Index = () => {
               </li>
               <li>
                 <h3 className="rounded bg-alice-main p-2 text-xl">
-                  Receipt Scanning (Premium Feature/ Work in Progress):
+                  Receipt Scanning:
                 </h3>
                 <ul className="flexbox-col list-disc space-y-2 px-8 pt-2">
                   <li>Upgrade your group to use receipt scanning feature.</li>

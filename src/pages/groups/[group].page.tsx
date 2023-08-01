@@ -109,7 +109,7 @@ export default function GroupPage() {
   });
 
   const { data: ratesData } = useSWRImmutable<Array<ExchangeRates>>(
-    () => (groupData && groupData.level > 0 ? apiPaths : null),
+    () => (groupData && groupData.level >= 0 ? apiPaths : null),
     multiFetcher
   );
 
@@ -142,7 +142,7 @@ export default function GroupPage() {
   }, [groupData]);
 
   useEffect(() => {
-    if (transactionsData && groupData && groupData.level > 0) {
+    if (transactionsData && groupData && groupData.level >= 0) {
       const uniqueDates = new Set<Date>();
       transactionsData.transactions.forEach((transaction: Transaction) => {
         uniqueDates.add(transaction.date);
@@ -186,7 +186,7 @@ export default function GroupPage() {
           groupData!
         );
 
-  if (conversionError && groupData!.level > 0) {
+  if (conversionError && groupData!.level >= 0) {
     dispatch({
       type: ACTION_TYPES.OPEN_ERROR,
       message: `Currency conversion api is done, displaying only transactions done in ${currencyNameCodeMap.revGet(
@@ -205,7 +205,7 @@ export default function GroupPage() {
         >
           Back
         </Link>
-        {groupData!.level > 0 ? (
+        {groupData!.level >= 0 ? (
           <Link
             className="custom-focus rounded bg-alice-accent p-2 px-3 text-alice-base shadow-md focus:bg-alice-accent/50 focus:text-black
                    focus:outline-alice-accent betterhover:hover:bg-alice-accent/90"

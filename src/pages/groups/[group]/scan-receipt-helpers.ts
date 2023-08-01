@@ -23,7 +23,7 @@ export function handleFileInput(
   if (file) {
     setSelectedImage(file);
   }
-  if (file && file.name.toLowerCase().match(/\.(bmp|jpg|png|pbm|webp)$/)) {
+  if (file && file.name.toLowerCase().match(/\.(bmp|jpg|jpeg|png|pbm|webp)$/)) {
     URL.revokeObjectURL(filePath);
     setFilePath(URL.createObjectURL(file));
     setIsSupported(true);

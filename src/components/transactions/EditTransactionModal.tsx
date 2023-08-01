@@ -250,7 +250,7 @@ export default function EditTransactionModal({
                         />
                       </label>
                     </div>
-                    {group.level > 0 ? (
+                    {group.level >= 0 ? (
                       <CurrencySelection
                         selectedCurrency={currency}
                         setSelectedCurrency={setCurrency}

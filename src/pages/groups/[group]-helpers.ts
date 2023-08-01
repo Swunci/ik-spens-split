@@ -29,7 +29,7 @@ function convertCurrency(
   group: Group,
   transaction: Transaction
 ): [Decimal, boolean] {
-  if (group.level > 0 && transaction.currency !== group.currency) {
+  if (group.level >= 0 && transaction.currency !== group.currency) {
     const rates = exchangeRates.get(getLocaleDateString(transaction.date));
     if (!rates) {
       return [new Decimal(0), true];
