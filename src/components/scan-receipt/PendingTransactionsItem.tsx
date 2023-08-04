@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js';
 import { useContext, useEffect, useMemo, useState } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import Balancer from 'react-wrap-balancer';
@@ -36,6 +37,9 @@ export default function PendingTransactionsItem({
     new Array<TransactionMember>()
   );
 
+  const [totalCost, setTotalCost] = useState(new Decimal(transaction.amount));
+  const [description, setDescription] = useState(transaction.description);
+
   const contextValue = useMemo(
     () => ({
       splitType,
@@ -43,8 +47,12 @@ export default function PendingTransactionsItem({
       membersList,
       setMembersList,
       transaction,
+      totalCost,
+      setTotalCost,
+      description,
+      setDescription,
     }),
-    [splitType, membersList, transaction]
+    [splitType, membersList, transaction, totalCost, description]
   );
 
   useEffect(() => {
@@ -57,12 +65,13 @@ export default function PendingTransactionsItem({
         const newTransaction = pendingTransaction;
         if (newTransaction.id === transaction.id) {
           newTransaction.membersList = membersList;
+          newTransaction.description = description;
         }
         return newTransaction;
       }
     );
     setTransactions(newTransactions);
-  }, [membersList]);
+  }, [membersList, description, totalCost]);
 
   return (
     <Draggable draggableId={transaction.id} index={index}>
@@ -77,9 +86,9 @@ export default function PendingTransactionsItem({
             <div className="flexbox-row">
               <div className="w-full">
                 <div className="flexbox-row text-base">
-                  <div>{`${currencyCodeSymbolMap.get(currency)}${
-                    transaction.amount
-                  } for ${transaction.description}`}</div>
+                  <div>{`${currencyCodeSymbolMap.get(
+                    currency
+                  )}${totalCost} for ${transaction.description}`}</div>
                 </div>
                 <div className="flexbox-row gap-2 pt-1">
                   <div className="w-full text-left text-xs">

@@ -18,7 +18,7 @@ export default function MemberItem({ member }: { member: TransactionMember }) {
 
   const pendingTransactionContext = useContext(PendingTransactionContext);
 
-  const { transaction, splitType, membersList, setMembersList } =
+  const { transaction, splitType, membersList, setMembersList, totalCost } =
     pendingTransactionContext!;
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function MemberItem({ member }: { member: TransactionMember }) {
       },
       new Decimal(0)
     );
-    setIsOver(total.greaterThan(transaction.amount));
+    setIsOver(total.greaterThan(totalCost));
   }, [membersList]);
 
   const handleSelect = (e: React.MouseEvent) => {

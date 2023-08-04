@@ -1,7 +1,9 @@
 import Decimal from 'decimal.js';
+import type { Dispatch, SetStateAction } from 'react';
 
 import type { Member } from '@/interfaces/response';
 import type { TransactionMember } from '@/pages/groups/[group]/new-transaction-helpers';
+import { trimLeadingZeros } from '@/utils/currencyUtil';
 
 import { assignRemainingToSomeone } from '../new-transaction/helpers';
 
@@ -58,4 +60,17 @@ export function getYourShare(
     }
   }
   return new Decimal(0);
+}
+
+export function handleTotalCostInput(
+  input: string,
+  setTotalCost: Dispatch<SetStateAction<Decimal>>
+) {
+  let nums = input.replace(/\D/g, '');
+  if (nums.length <= 1) {
+    nums = `0${nums}`;
+  }
+  const precision = -1 * 2;
+  const num = `${nums.slice(0, precision)}.${nums.slice(precision)}`;
+  setTotalCost(new Decimal(trimLeadingZeros(num)));
 }

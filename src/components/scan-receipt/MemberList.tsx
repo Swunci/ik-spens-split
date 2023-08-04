@@ -19,8 +19,14 @@ export default function MembersList() {
 
   const pendingTransactionContext = useContext(PendingTransactionContext);
 
-  const { transaction, splitType, setSplitType, membersList, setMembersList } =
-    pendingTransactionContext!;
+  const {
+    transaction,
+    splitType,
+    setSplitType,
+    membersList,
+    setMembersList,
+    totalCost,
+  } = pendingTransactionContext!;
 
   const handleSelectAll = (isAllSelected: boolean) => {
     setSelectAllMembers(
@@ -40,13 +46,13 @@ export default function MembersList() {
         getMembersListBySplitType(
           splitType,
           membersList,
-          transaction.amount,
+          totalCost,
           'expense',
           payerId
         )
       );
     }
-  }, [payerId, transaction, splitType]);
+  }, [payerId, transaction, splitType, totalCost]);
 
   return (
     <>

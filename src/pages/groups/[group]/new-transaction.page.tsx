@@ -194,7 +194,6 @@ export default function NewTransactionPage() {
                 id="whatFor"
                 type="text"
                 placeholder="Food"
-                required
                 ref={descriptionRef}
               />
             </label>

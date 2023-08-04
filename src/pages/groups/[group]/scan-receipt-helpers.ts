@@ -202,3 +202,39 @@ export function handleDeletePendingTransaction(
   setTransactions(pendingTransactions);
   setOpen(false);
 }
+
+export interface PendingTransactionForm {
+  description: string;
+  amount: Decimal;
+  id: string;
+  splitType: string;
+  membersList: Array<TransactionMember>;
+}
+
+export function handleCreatePendingTransaction(
+  e: React.MouseEvent,
+  formDetails: PendingTransactionForm,
+  transactions: Array<PendingTransaction>,
+  setTransactions: Dispatch<SetStateAction<Array<PendingTransaction>>>,
+  setOpen: Dispatch<SetStateAction<boolean>>,
+  dispatch: Dispatch<ActionType>
+) {
+  e.preventDefault();
+
+  if (formDetails.amount.greaterThan(10 ** 9)) {
+    dispatch({
+      type: ACTION_TYPES.OPEN_WARNING,
+      message: 'Maximum value is 1,000,000,000',
+    });
+    return;
+  }
+  const newPendingTransaction = {} as PendingTransaction;
+  newPendingTransaction.amount = formDetails.amount;
+  newPendingTransaction.description = formDetails.description;
+  newPendingTransaction.id = formDetails.id;
+  newPendingTransaction.membersList = formDetails.membersList;
+  newPendingTransaction.splitType = formDetails.splitType;
+  transactions.push(newPendingTransaction);
+  setTransactions(transactions);
+  setOpen(false);
+}
