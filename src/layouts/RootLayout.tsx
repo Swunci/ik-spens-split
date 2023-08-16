@@ -8,9 +8,9 @@ export default function RootLayout({ children }: { children: any }) {
   return (
     <div className="relative flex w-screen flex-col place-content-start items-center bg-alice-base">
       <Meta
-        title="ShareCost - Simplify the splitting of group expenses"
-        description="Split bills with friends and family without having to worry about “who owes who”.
-        Your share cost will be automatically calculated based on your expenses. No registration required."
+        title="ShareCost - Split expenses easily"
+        description="Split bills/expenses with friends and family without having to worry about “who owes who”.
+        Your cost will be automatically calculated based on your expenses. No registration required. Splitwise Kittysplit Spliito share cost app split expense"
       />
       <Navbar />
       <BodyContainer>{children}</BodyContainer>

@@ -9,9 +9,9 @@ const Index = () => {
   return (
     <>
       <Meta
-        title="ShareCost - Simplify the splitting of group expenses"
-        description="Split bills with friends and family without having to worry about “who owes who”.
-        Your share cost will be automatically calculated based on your expenses. No registration required."
+        title="ShareCost - Split expenses easily"
+        description="Split bills/expenses with friends and family without having to worry about “who owes who”.
+        Your cost will be automatically calculated based on your expenses. No registration required. Splitwise Kittysplit Spliito share cost app split expense"
       />
       <HomeLayout>
         <div className="flexbox-col space-y-4">
@@ -20,7 +20,7 @@ const Index = () => {
           </header>
           <section className="p-1 md:p-3">
             <h1 className="text-center text-2xl text-alice-accent">
-              Simplify the process of splitting expenses
+              Split expenses easily
             </h1>
             <p className="text-center">
               <Balancer className="p-2">
