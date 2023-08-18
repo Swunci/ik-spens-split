@@ -180,7 +180,7 @@ export default function EditTransactionModal({
                         membersList,
                         transactionType,
                         splitType,
-                        currency: group.currency,
+                        currency,
                       } as UpdateTransactionForm,
                       dispatch
                     );
