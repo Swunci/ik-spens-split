@@ -4,7 +4,6 @@ CREATE TABLE "Group" (
     "groupName" VARCHAR(100) NOT NULL,
     "currency" CHAR(3) NOT NULL,
     "createdDate" TIMESTAMP(3) NOT NULL,
-    "level" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "Group_pkey" PRIMARY KEY ("groupId")
 );
@@ -35,7 +34,7 @@ CREATE TABLE "Transaction" (
     "transactionId" TEXT NOT NULL,
     "description" VARCHAR(1000) NOT NULL,
     "amount" DECIMAL(36,18) NOT NULL,
-    "date" DATE NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
     "type" VARCHAR(10) NOT NULL,
     "currency" CHAR(3) NOT NULL,
     "splitType" VARCHAR(10) NOT NULL,
