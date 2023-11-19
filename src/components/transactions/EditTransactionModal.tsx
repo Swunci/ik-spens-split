@@ -19,7 +19,7 @@ import {
   handleTotalCostInput,
 } from '@/pages/groups/[group]/new-transaction-helpers';
 import { displayWithCommas } from '@/utils/currencyUtil';
-import { getLocaleDateString } from '@/utils/timeUtils';
+import { getUTCDateString } from '@/utils/timeUtils';
 
 import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import type { ActionType } from '../hooks/snackbarReducer';
@@ -245,7 +245,7 @@ export default function EditTransactionModal({
                           id="when"
                           type="date"
                           ref={dateRef}
-                          defaultValue={getLocaleDateString(transaction.date)}
+                          defaultValue={getUTCDateString(transaction.date)}
                           required
                         />
                       </label>

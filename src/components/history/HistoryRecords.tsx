@@ -14,7 +14,7 @@ import {
 } from '@/pages/groups/[group]/history-helpers';
 import type { TwoWayReadonlyMap } from '@/utils/currencyUtil';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
-import { getHowLongAgo, getLocaleDateString } from '@/utils/timeUtils';
+import { getHowLongAgo, getUTCDateString } from '@/utils/timeUtils';
 
 export default function HistoryRecords({
   historyRecords,
@@ -74,7 +74,7 @@ export default function HistoryRecords({
                     transaction.amount
                   } for ${transaction.description}`}</div>
                   <div className="text-xs">
-                    Date: {getLocaleDateString(transaction.date)}
+                    Date: {getUTCDateString(transaction.date)}
                   </div>
                   <div className="text-xs">
                     <Balancer>

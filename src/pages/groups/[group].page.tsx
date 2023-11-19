@@ -40,7 +40,7 @@ import {
 } from '@/utils/currencyUtil';
 import { fetcher, multiFetcher } from '@/utils/fetcherWrapper';
 import { saveGroupToLocalStorage } from '@/utils/localStorageUtils';
-import { getLocaleDateString } from '@/utils/timeUtils';
+import { getUTCDateString } from '@/utils/timeUtils';
 
 import type { MemberDetails } from './[group]-helpers';
 import { createComment, getOverviewStats } from './[group]-helpers';
@@ -105,7 +105,7 @@ export default function GroupPage() {
   const exchangeRates = new Map<string, Map<string, Decimal>>();
   const dates = Array.from(transactionDates);
   const apiPaths = dates.map((date: Date) => {
-    return `/api/exchangeRates/${getLocaleDateString(date)}`;
+    return `/api/exchangeRates/${getUTCDateString(date)}`;
   });
 
   const { data: ratesData } = useSWRImmutable<Array<ExchangeRates>>(

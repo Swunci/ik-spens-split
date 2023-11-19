@@ -10,7 +10,7 @@ import {
   isMemberInvolved,
 } from '@/pages/groups/[group]/transactions-helper';
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
-import { getLocaleDateString } from '@/utils/timeUtils';
+import { getUTCDateString } from '@/utils/timeUtils';
 
 import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
 import type { ActionType } from '../hooks/snackbarReducer';
@@ -69,7 +69,7 @@ export default function TransactionsItem({
                   : null}
               </div>
               <div className="min-w-fit text-xs">
-                {getLocaleDateString(transaction.date)}
+                {getUTCDateString(transaction.date)}
               </div>
             </div>
           </div>

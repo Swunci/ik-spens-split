@@ -14,7 +14,7 @@ import type {
   TransactionResponse,
 } from '@/interfaces/response';
 import type { TwoWayReadonlyMap } from '@/utils/currencyUtil';
-import { getLocaleDateString } from '@/utils/timeUtils';
+import { getUTCDateString } from '@/utils/timeUtils';
 
 export function handleNewGroup(
   e: React.MouseEvent,
@@ -69,7 +69,7 @@ export function handleExportToExcel(
         );
       });
       jsonObjects.push({
-        date: getLocaleDateString(transaction.date),
+        date: getUTCDateString(transaction.date),
         payer: memberIdToNameMap.get(transaction.payerId),
         type: transaction.type,
         amount: transaction.amount,
@@ -88,7 +88,7 @@ export function handleExportToExcel(
         }
       });
       jsonObjects.push({
-        date: getLocaleDateString(paidDebt.date),
+        date: getUTCDateString(paidDebt.date),
         payer: paidDebt.debtor,
         type: 'settlement',
         amount: paidDebt.amount,

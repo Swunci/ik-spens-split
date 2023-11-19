@@ -4,7 +4,7 @@ import { useContext, useState } from 'react';
 import Balancer from 'react-wrap-balancer';
 
 import { currencyCodeSymbolMap } from '@/utils/currencyUtil';
-import { getLocaleDateString } from '@/utils/timeUtils';
+import { getUTCDateString } from '@/utils/timeUtils';
 
 import type { Group, PaidDebt } from '../../interfaces/response';
 import { MemberIdNameContext } from '../hooks/MemberIdNameContext';
@@ -37,7 +37,7 @@ export default function PaidDebtsItem({
                   paidDebt.creditor
                 )} ${currencyCodeSymbolMap.get(paidDebt.currency)}${
                   paidDebt.amount
-                } on ${getLocaleDateString(paidDebt.date)}`}
+                } on ${getUTCDateString(paidDebt.date)}`}
               </Balancer>
             </div>
           </div>

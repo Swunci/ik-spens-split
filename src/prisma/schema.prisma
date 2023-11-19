@@ -52,7 +52,7 @@ model Transaction {
 	transactionId String @id @default(uuid())
 	description String @db.VarChar(1000)
 	amount Decimal @db.Decimal(36, 18)
-	date DateTime
+	date DateTime @db.Date
 	type String @db.VarChar(10)
 	currency String @db.Char(3)
   splitType String @db.VarChar(10)

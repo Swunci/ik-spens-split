@@ -14,7 +14,7 @@ import type {
 } from '@/interfaces/response';
 import NextApiClient from '@/utils/api/NextApiClient';
 
-import { getLocaleDateString } from '../../utils/timeUtils';
+import { getUTCDateString } from '../../utils/timeUtils';
 
 export interface MemberDetails {
   cost: Decimal;
@@ -30,7 +30,7 @@ function convertCurrency(
   transaction: Transaction
 ): [Decimal, boolean] {
   if (group.level >= 0 && transaction.currency !== group.currency) {
-    const rates = exchangeRates.get(getLocaleDateString(transaction.date));
+    const rates = exchangeRates.get(getUTCDateString(transaction.date));
     if (!rates) {
       return [new Decimal(0), true];
     }

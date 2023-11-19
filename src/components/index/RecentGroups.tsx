@@ -7,7 +7,7 @@ import type { Group, GroupList } from '@/interfaces/response';
 import { getGroupMemberNames } from '@/pages/groups/[group]/history-helpers';
 import NextApiClient from '@/utils/api/NextApiClient';
 import { removeGroupFromLocalStorage } from '@/utils/localStorageUtils';
-import { getLocaleDateString } from '@/utils/timeUtils';
+import { getUTCDateString } from '@/utils/timeUtils';
 
 export default function RecentGroups() {
   const [groups, setGroups] = useState(new Array<Group>());
@@ -66,7 +66,7 @@ export default function RecentGroups() {
                       <div className="flexbox-row w-full">
                         <div className="text-base">{group.groupName}</div>
                         <div className="text-xs">
-                          {getLocaleDateString(group.createdDate)}
+                          {getUTCDateString(group.createdDate)}
                         </div>
                       </div>
                       <div className="flexbox-row w-full gap-2 text-xs">

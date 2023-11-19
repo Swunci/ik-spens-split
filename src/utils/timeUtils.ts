@@ -6,11 +6,11 @@ export function getTodaysDate() {
   return localDate!;
 }
 
-export function getLocaleDateString(timestamp: Date) {
+export function getUTCDateString(timestamp: Date) {
   const date = new Date(timestamp);
-  return `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? '0' : ''}${
+  return `${date.getFullYear()}-${date.getUTCMonth() + 1 < 10 ? '0' : ''}${
     date.getMonth() + 1
-  }-${date.getDate() + 1 < 10 ? '0' : ''}${date.getDate() + 1}`;
+  }-${date.getUTCDate() < 10 ? '0' : ''}${date.getUTCDate()}`;
 }
 
 export function getHowLongAgo(timestamp: Date) {
