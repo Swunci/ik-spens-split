@@ -32,13 +32,13 @@ export default function DebtList({
   const debtors = new Array<MemberAmount>();
 
   membersMap.forEach((details, memberName) => {
-    if (details.debt.greaterThan(0)) {
+    if (details.debt.greaterThanOrEqualTo(0.01)) {
       creditors.push({
         name: memberName,
         amount: details.debt,
       } as MemberAmount);
     }
-    if (details.debt.lessThan(0)) {
+    if (details.debt.lessThanOrEqualTo(-0.01)) {
       debtors.push({
         name: memberName,
         amount: details.debt,
