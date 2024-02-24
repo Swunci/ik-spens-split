@@ -39,7 +39,7 @@ export default function DebtItem({
   async function createPaidDebt(e: React.MouseEvent) {
     e.preventDefault();
     const body: PaidDebtCreation = {} as PaidDebtCreation;
-    body.amount = debt.paidAmount.toString();
+    body.amount = debt.paidAmount.toDecimalPlaces(2).toString();
     body.creditor = debt.creditor;
     body.debtor = debt.debtor;
     body.groupId = groupId as string;

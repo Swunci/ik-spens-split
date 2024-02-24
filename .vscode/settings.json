@@ -29,5 +29,6 @@
     "className",
     "customWidth",
     ".*Styles"
-  ]
+  ],
+  "explorer.sortOrder": "filesFirst"
 }
