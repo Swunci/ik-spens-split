@@ -37,7 +37,7 @@ function convertCurrency(
     const usdAmount =
       transaction.currency !== 'USD'
         ? amount.dividedBy(rates.get(transaction.currency)!)
-        : new Decimal(transaction.amount);
+        : amount;
     return [
       group.currency === 'USD'
         ? usdAmount

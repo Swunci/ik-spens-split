@@ -75,7 +75,8 @@ router
             },
           },
         })
-        .catch(() => {
+        .catch((err) => {
+          console.log(err);
           throw Error('Database problem');
         });
       await prisma.history.create({
